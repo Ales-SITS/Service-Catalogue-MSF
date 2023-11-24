@@ -1,0 +1,18 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/config.2.0.schema.json",
+  "version": "2.0",
+  "bundles": {
+    "sits-service-catalogue-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/sitsServiceCatalogue/SitsServiceCatalogueWebPart.js",
+          "manifest": "./src/webparts/sitsServiceCatalogue/SitsServiceCatalogueWebPart.manifest.json"
+        }
+      ]
+    }
+  },
+  "externals": {},
+  "localizedResources": {
+    "SitsServiceCatalogueWebPartStrings": "lib/webparts/sitsServiceCatalogue/loc/{locale}.js"
+  }
+}

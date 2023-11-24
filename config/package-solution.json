@@ -1,0 +1,40 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "service-catalogue-client-side-solution",
+    "id": "28456783-887f-4444-a785-65e07d1fa789",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.18.2"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "service-catalogue description"
+      },
+      "longDescription": {
+        "default": "service-catalogue description"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "service-catalogue Feature",
+        "description": "The feature that activates elements of the service-catalogue solution.",
+        "id": "32ad960f-432f-4243-abd6-f02b2196d791",
+        "version": "1.0.0.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/service-catalogue.sppkg"
+  }
+}
