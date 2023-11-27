@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import styles from './SitsServiceCatalogue.module.scss';
 
 //API
@@ -8,10 +8,19 @@ import { Web } from "@pnp/sp/webs";
 import "@pnp/sp/webs";
 import "@pnp/sp/lists";
 import "@pnp/sp/items";
-//import type { ISitsServiceCatalogueProps } from './ISitsServiceCatalogueProps';
 
-//import parse from 'html-react-parser';
-import * as DOMPurify from 'dompurify';
+import { SPFx as SPFxGraph, graphfi } from "@pnp/graph";
+import "@pnp/graph/users";
+import "@pnp/graph/groups";
+import "@pnp/graph/members";
+
+//3rd party Modules
+import { Icon } from '@fluentui/react/lib/Icon';
+
+//Components
+import SitsServiceCatalogueByServices from './SitsServiceCatalogueByServices';
+import SitsServiceCatalogueByProduct from './SitsServiceCatalogueByProducts';
+
 
 export default function SitsServiceCatalogue (props:any) {
     const {
@@ -20,107 +29,75 @@ export default function SitsServiceCatalogue (props:any) {
     } = props;
 
     const sp = spfi().using(SPFxsp(context))
+    const graph = graphfi().using(SPFxGraph(context))
 
-    const [selectedCategory, setSelectedcategory] = useState("")
-    const [serviceCategories,setServiceCategories] = useState<string[]>([])
-    const [services,setServices] = useState<any[]>([])
-    const [selectedService,setSelectedService] = useState("")
+    const [searchby,setSearchby] = useState(1)
+    const [servicelist,setServicelist] = useState<any[]>([])
+    const [internal,setInternal] = useState(false)
 
-
-    async function getListItems ():Promise<any[]> {
+    async function getListItems():Promise<any[]> {
       const listSite = Web([sp.web, 'https://msfintl.sharepoint.com/sites/GRP-SITS-Crossroad'])  
       const items: any[] = await listSite.lists.getById("91133e8a-e37c-42cb-bf65-b4a0cc0da7e2").items();
-      console.log(items);
+   
       return await items 
     }
 
-    async function getUniqueCategories(): Promise<string[]> {
-      const items = await getListItems(); 
-      // Extracting unique categories
-      setServices(items)
-      const uniqueCategories: string[] = Array.from(
-          new Set(items.map(item=> item.ServicesCategory))
-      )
-      return uniqueCategories;
+
+    async function getSITSInternal () {
+      const currentUser = await graph.me()
+      const currentUserDomain = currentUser.mail.split("@")[1].toLowerCase()
+      currentUserDomain === "sits.msf.org" ? setInternal(true) : setInternal(false)     
     }
 
-    useEffect(() => {  
-      getUniqueCategories().then(uniqueCategories => {
-        setServiceCategories(uniqueCategories)
-        const filteredCategories = uniqueCategories.filter(category => category !== null);
-            setServiceCategories(filteredCategories);
-            setSelectedcategory(filteredCategories[0])
-    }).catch(error => {
-        // Handle errors if any
-        console.error('Error fetching categories:', error);
-    });
+    useEffect(() => {
+      getSITSInternal()
+      getListItems().then(services => {
+        setServicelist(services)
+      })
     }, []);
 
-    const [dynServiceFilter, setDynServiceFilter] = useState("")
-    const dynServiceFilterHandler = (val):void => {
-   
-      if (val === "") {
-        setSelectedcategory(serviceCategories[0])
-      } else {
-        setSelectedcategory("")
-        setSelectedService("")
-      }
-      setDynServiceFilter(val)
-    }
 
-    const displayedServices = dynServiceFilter !== "" ? services?.filter(service => service.Title.includes(dynServiceFilter)) : services?.filter(service => service.ServicesCategory === selectedCategory)
-    const displayedService = services?.filter(service => service.Title === selectedService)
 
     return (
-      <section>
-        <h1>{description}</h1>
-        <div className={styles.categories_tabs}>
-            {serviceCategories.map((category,idx) => (
-              <button
-                className = {selectedCategory === category && styles.category_button_selected}
-                key={`${category}_${idx}`} 
-                onClick={()=>{setSelectedcategory(category)}}
-              >
-                {category}
-              </button>
-            ))}
-        </div>
-        <input
-          type="text" 
-          name="service" 
-          placeholder="Search for service"
-          onChange={e => dynServiceFilterHandler (e.target.value)}      
-        />
-        <div className={styles.services_box}>
-            <ul className={styles.services_list}>
-              {displayedServices.map((service,idx) => (
-                <li 
-                  
-                  key={`${service}_${idx}`}
+      <section className={styles.service_catalogue}>
+        <div className={styles.service_catalogue_top}>
+          <h1>{description}</h1>
+          <div className={styles.service_catalogue_top_options}>
+            <button 
+                onClick={()=>setSearchby(1)}
+                title="Search by services"
+                style={{
+                  color: searchby === 1 ? "white" : "black",
+                  backgroundColor: searchby === 1 ? "red" : "white"
+                }}
                 >
-                  <button 
-                    className = {selectedService === service.Title && styles.service_button_selected}
-                    onClick={()=>{setSelectedService(service.Title)}}
-                  >
-                    {service.Title}
-                    </button>
-                </li>
-              ))
-              }
-            </ul>
-            <div className={styles.service_content}>
-              {displayedService.length > 0 && 
-              <div>
-                <h3>{displayedService[0]?.Title}</h3>
-                {displayedService[0]?.Products?.split(';').map(product => <span className={styles.service_product}>{product}</span>)}
-                <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(displayedService[0]?.ServiceDescription)}}/>
-              </div>
-              }
-            </div>
+              <Icon
+                  iconName="EngineeringGroup" 
+                  title="Search by services"/>
+            </button>
+            <button  
+                onClick={()=>setSearchby(2)} 
+                title="Search by products"
+                style={{
+                  color: searchby === 1 ? "black" : "white",
+                  backgroundColor: searchby === 1 ? "white" : "red"
+                }}
+                >
+              <Icon
+                  iconName="OfficeLogo" 
+                  title="Search by products"
+            /></button>
+          </div>
         </div>
+        {searchby === 1 ? 
+        <SitsServiceCatalogueByServices internal={internal} servicelist={servicelist}/>:
+        <SitsServiceCatalogueByProduct internal={internal} servicelist={servicelist}/>
+        }     
       </section>
     );
   }
 
 
   //PURIFY DOUBLECHECK
+
+  //STATUS: Active/Archive/Upcoming
