@@ -11,45 +11,22 @@ import SitsServiceContent from './SitsServiceContent'
 export default function SitsServiceCatalogueByServices (props:any) {
     const {
       internal,
-      servicelist
+      servicesList,
+      categoriesList
     } = props;
+
+    console.log(categoriesList[0])
 
     const categoriesDrag = useRef();
     const { events } = useDraggable(categoriesDrag);
 
-    const [selectedCategory, setSelectedcategory] = useState("")
-    const [serviceCategories,setServiceCategories] = useState<string[]>([])
+    const [selectedCategory, setSelectedcategory] = useState(categoriesList[0])
     const [selectedService,setSelectedService] = useState("")
-
-
-    async function getUniqueCategories(): Promise<string[]> {
-        console.log(servicelist)
-      // Extracting unique categories
-      const uniqueCategories: string[] = Array.from(
-          new Set(servicelist.map(item=> item.ServicesCategory))
-      )
-      return uniqueCategories;
-    }
-
-    useEffect(() => {
-
-      getUniqueCategories().then(uniqueCategories => {
-        console.log(uniqueCategories)
-        setServiceCategories(uniqueCategories)
-        const filteredCategories = uniqueCategories.filter(category => category !== null);
-            setServiceCategories(filteredCategories);
-            setSelectedcategory(filteredCategories[0])
-      }).catch(error => {
-        // Handle errors if any
-        console.error('Error fetching categories:', error);
-      });
-    }, [servicelist]);
-
 
     const [dynServiceFilter, setDynServiceFilter] = useState("")
     const dynServiceFilterHandler = (val):void => {
       if (val === "") {
-        setSelectedcategory(serviceCategories[0])
+        setSelectedcategory(categoriesList[0])
       } else {
         setSelectedcategory("")
         setSelectedService("")
@@ -57,23 +34,33 @@ export default function SitsServiceCatalogueByServices (props:any) {
       setDynServiceFilter(val)
     }
 
+    useEffect(()=>{
+      setSelectedcategory(categoriesList[0])
+    },[categoriesList])
+
     //Filter list of services based on user domain => sits.msf.org => display all, other => display all excepted "Archived"
-    const servicesChecked = internal === true ? servicelist : servicelist?.filter(service => service.Status!=="Archived")
+    const servicesChecked = internal === true ? servicesList : servicesList?.filter(service => service.Status!=="Archived")
 
     //Filter serviceChecked basted on input
-    const displayedServices = dynServiceFilter !== "" ? servicesChecked?.filter(service => service.Title.includes(dynServiceFilter)) : servicelist?.filter(service => service.ServicesCategory === selectedCategory)
+    const displayedServices = dynServiceFilter !== "" ? servicesChecked?.filter(service => service.Title.includes(dynServiceFilter)) : servicesList?.filter(service => service.ServicesCategory === selectedCategory)
     
     //Filter services based on selection
     const displayedService = servicesChecked?.filter(service => service.Title === selectedService)[0]
 
     return (
     <div>
+        <input
+          type="text" 
+          name="service" 
+          placeholder="Search for service"
+          onChange={e => dynServiceFilterHandler (e.target.value)}      
+        />
         <div 
           className={styles.categories_tabs} 
           {...events}
           ref={categoriesDrag}     
         >
-            {serviceCategories.map((category,idx) => (
+            {categoriesList.map((category,idx) => (
               <button
                 className={selectedCategory === category ? `${styles.category_button} ${styles.category_button_selected}` : `${styles.category_button}`}
                 key={`${category}_${idx}`} 
@@ -83,12 +70,6 @@ export default function SitsServiceCatalogueByServices (props:any) {
               </button>
             ))}
         </div>
-        <input
-          type="text" 
-          name="service" 
-          placeholder="Search for service"
-          onChange={e => dynServiceFilterHandler (e.target.value)}      
-        />
         <div className={styles.services_box}>
             <ul className={styles.services_list}>
               {displayedServices.map((service,idx) => (
@@ -96,7 +77,7 @@ export default function SitsServiceCatalogueByServices (props:any) {
                   key={`${service}_${idx}`}
                 >
                   <button 
-                    className = {selectedService === service.Title && styles.service_button_selected}
+                    className = {selectedService === service.Title ? `${styles.service_button} ${styles.service_button_selected}` : `${styles.service_button}`}
                     onClick={()=>{setSelectedService(service.Title)}}
                   >
                     {service.Title}

@@ -8,6 +8,7 @@ import { Web } from "@pnp/sp/webs";
 import "@pnp/sp/webs";
 import "@pnp/sp/lists";
 import "@pnp/sp/items";
+import "@pnp/sp/fields";
 
 import { SPFx as SPFxGraph, graphfi } from "@pnp/graph";
 import "@pnp/graph/users";
@@ -21,7 +22,6 @@ import { Icon } from '@fluentui/react/lib/Icon';
 import SitsServiceCatalogueByServices from './SitsServiceCatalogueByServices';
 import SitsServiceCatalogueByProduct from './SitsServiceCatalogueByProducts';
 
-
 export default function SitsServiceCatalogue (props:any) {
     const {
       description,
@@ -31,17 +31,13 @@ export default function SitsServiceCatalogue (props:any) {
     const sp = spfi().using(SPFxsp(context))
     const graph = graphfi().using(SPFxGraph(context))
 
+ 
+
     const [searchby,setSearchby] = useState(1)
-    const [servicelist,setServicelist] = useState<any[]>([])
     const [internal,setInternal] = useState(false)
-
-    async function getListItems():Promise<any[]> {
-      const listSite = Web([sp.web, 'https://msfintl.sharepoint.com/sites/GRP-SITS-Crossroad'])  
-      const items: any[] = await listSite.lists.getById("91133e8a-e37c-42cb-bf65-b4a0cc0da7e2").items();
-   
-      return await items 
-    }
-
+    const [servicesList,setServicesList] = useState<any[]>([])
+    const [categoriesList,setCategoriesList] = useState<string[]>([])
+    const [productsList,setProductsList] = useState<string[]>([])
 
     async function getSITSInternal () {
       const currentUser = await graph.me()
@@ -49,11 +45,42 @@ export default function SitsServiceCatalogue (props:any) {
       currentUserDomain === "sits.msf.org" ? setInternal(true) : setInternal(false)     
     }
 
+    async function getServices():Promise<any[]> {
+      const listSite = Web([sp.web, 'https://msfintl.sharepoint.com/sites/GRP-SITS-Crossroad'])  
+      const services: any[] = await listSite.lists.getById("91133e8a-e37c-42cb-bf65-b4a0cc0da7e2").items();
+   
+      return await services
+    }
+
+    async function getCategories():Promise<any[]> {
+      const listSite = Web([sp.web, 'https://msfintl.sharepoint.com/sites/GRP-SITS-Crossroad'])  
+      const categories = await listSite.lists.getById("91133e8a-e37c-42cb-bf65-b4a0cc0da7e2").fields.getByTitle("Services Category")();
+   
+      return await categories.Choices
+    }
+
+    async function getProducts():Promise<any[]> {
+      const listSite = Web([sp.web, 'https://msfintl.sharepoint.com/sites/GRP-SITS-Crossroad'])  
+      const products = await listSite.lists.getById("91133e8a-e37c-42cb-bf65-b4a0cc0da7e2").fields.getByTitle("Products")();
+   
+      return await products.Choices
+    }
+
     useEffect(() => {
       getSITSInternal()
-      getListItems().then(services => {
-        setServicelist(services)
+
+      getServices().then(services => {
+        setServicesList(services)
       })
+
+      getCategories().then(categories => {
+        setCategoriesList(categories)
+      })
+
+      getProducts().then(products => {
+        setProductsList(products)
+      })
+
     }, []);
 
 
@@ -90,8 +117,18 @@ export default function SitsServiceCatalogue (props:any) {
           </div>
         </div>
         {searchby === 1 ? 
-        <SitsServiceCatalogueByServices internal={internal} servicelist={servicelist}/>:
-        <SitsServiceCatalogueByProduct internal={internal} servicelist={servicelist}/>
+        <SitsServiceCatalogueByServices 
+          internal={internal} 
+          servicesList={servicesList} 
+          categoriesList={categoriesList}
+          productsList={productsList}
+          />:
+        <SitsServiceCatalogueByProduct
+          internal={internal} 
+          servicesList={servicesList} 
+          categoriesList={categoriesList}
+          productsList={productsList}
+        />
         }     
       </section>
     );

@@ -97,20 +97,23 @@
       list-style-type: none;
       margin: 0;
       padding: 0;
-      background-color: grey;
+      background-color: #b4b4b4;
+      padding: 0 0 5px 3px
     }
 
-    .services_list li button {
+    .service_button {
       outline: none;
       text-align: left;
       height: 50px;
       width: 100%;
       border: none;
+      border-radius: 5px 0 0 5px;
+      background-color: #b4b4b4;
       cursor: pointer;
     }
 
     .service_button_selected {
-      background-color: yellow !important;
+      background-color: white !important;
     }
 
 .service_content {

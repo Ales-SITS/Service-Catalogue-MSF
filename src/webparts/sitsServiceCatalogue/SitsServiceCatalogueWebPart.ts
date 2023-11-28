@@ -7,7 +7,6 @@ import {
 } from '@microsoft/sp-property-pane';
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
 
-
 import * as strings from 'SitsServiceCatalogueWebPartStrings';
 import SitsServiceCatalogue from './components/SitsServiceCatalogue';
 import { ISitsServiceCatalogueProps } from './components/ISitsServiceCatalogueProps';
@@ -17,7 +16,6 @@ export interface ISitsServiceCatalogueWebPartProps {
 }
 
 export default class SitsServiceCatalogueWebPart extends BaseClientSideWebPart<ISitsServiceCatalogueWebPartProps> {
-
 
   public render(): void {
     const element: React.ReactElement<ISitsServiceCatalogueProps> = React.createElement(
