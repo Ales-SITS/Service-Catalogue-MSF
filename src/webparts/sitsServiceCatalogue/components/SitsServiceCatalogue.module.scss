@@ -2,6 +2,11 @@
 
 .service_catalogue {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+
 }
 
 .service_catalogue_top {
@@ -9,6 +14,10 @@
   justify-content: space-between;
   align-items: center;
 }
+
+    .service_catalogue_top h1 {
+      font-size: 22px
+    }
 
     .service_catalogue_top_options {
       display: flex;
@@ -34,16 +43,22 @@
           background-color: #555;
         }
 
+.service_catalogue_input {
+  width: 100%;
+  margin: 2px 0;
+  border-radius: 10px;
+  padding: 5px 10px;
+  border: 1px solid #555
+}
+
 .categories_tabs {
-  max-width: 100%;
+  width: 100%;
   position: relative;
   display: flex;
-  justify-content: start;
-  align-items: end;
-  overflow-x: scroll;
-  overflow-y: hidden;
-  border-bottom: 1px solid red;
+  justify-content: space-evenly;
+  align-items: center;
   flex-wrap: nowrap;
+  margin: 5px 0;
   cursor:  pointer !important;
 }
 
@@ -66,39 +81,83 @@
 
 .category_button {
   outline: none;
-  width: 20%;
-  height: 80px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50px;
   padding: 5px;
   text-wrap: wrap;
   border: none;
   background-color: white;
   cursor: pointer;
   flex-shrink: 0;
-  font-size: 16px;
-  transition: 0.3;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  transition: 0.5;
+  color: #555
+}
+
+.category_button input[type="checkbox"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background-color: #fff;
+  margin: 0;
 }
 
 .category_button:hover {
-  background: #555;
-  color: white
+  color: red
 }
 
 .category_button_selected {
-  background-color: red !important;
+  color: red;
+  position: relative;
+}
+
+.category_button_selected:before {
+  content: "✓";
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  font-size: 12px;
+  width: 15px;
+  height: 15px;
+  border-radius: 15px;
+  text-align: center;
+  line-height: 15px;
+  background-color: #555;
   color: white
 }
 
+.service_catalogue_results {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: center;
+}
+
     .services_box {
-      display: flex
+      display: flex;
+
+    }
+
+    .product_services_box {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     .services_list {
-      width: 20%;
+      min-width: 20%;
       list-style-type: none;
       margin: 0;
       padding: 0;
-      background-color: #b4b4b4;
-      padding: 0 0 5px 3px
+      background-color: #919191;
+      padding: 0 0 5px 3px;
+      max-height: 800px;
+      overflow-y: scroll;
     }
 
     .service_button {
@@ -108,20 +167,59 @@
       width: 100%;
       border: none;
       border-radius: 5px 0 0 5px;
-      background-color: #b4b4b4;
+      background-color: #919191;
+      color: white;
       cursor: pointer;
+    }
+
+    .service_button:hover {
+      background-color: #b8b8b8;
     }
 
     .service_button_selected {
       background-color: white !important;
+      color: black
     }
 
+    .product_service_button {
+      outline: none;
+      font-size: 18px;
+      width: 100%;
+      background-color: white;
+      border: none;
+      border-bottom: 1px solid grey;
+      margin-top: 5px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      transition: 0.3s;
+    }
+
+    .product_service_button_top {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+
+
 .service_content {
-  width: 80%;
+  width: 98%;
   box-sizing: border-box;
   padding: 10px;
   display: flex;
   flex-direction: column;
+  border-radius: 15px;
+  margin: 5px 10px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.3);
+  margin-bottom: 10px;
+  overflow-x: hidden;
+  transition: 0.5s;
+}
+
+.service_content_opened {
+  box-shadow: 0 0 5px rgba(0,0,0,0.3);
 }
 
 .service_content_header {
@@ -154,5 +252,5 @@
     margin-right: 5px;
     border-radius: 14px;
     background-color: white;
-    box-shadow: 0 0 5px rgba(0,0,0,0.3);
+    box-shadow: 0 0 4px rgba(0,0,0,0.3);
   }

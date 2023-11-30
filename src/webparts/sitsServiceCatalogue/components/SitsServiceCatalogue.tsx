@@ -17,10 +17,12 @@ import "@pnp/graph/members";
 
 //3rd party Modules
 import { Icon } from '@fluentui/react/lib/Icon';
+import MiniSearch from 'minisearch'
+
 
 //Components
-import SitsServiceCatalogueByServices from './SitsServiceCatalogueByServices';
-import SitsServiceCatalogueByProduct from './SitsServiceCatalogueByProducts';
+import ProductContent from './ProductContent'
+import ServiceCategories from './ServiceCategories'
 
 export default function SitsServiceCatalogue (props:any) {
     const {
@@ -31,9 +33,6 @@ export default function SitsServiceCatalogue (props:any) {
     const sp = spfi().using(SPFxsp(context))
     const graph = graphfi().using(SPFxGraph(context))
 
- 
-
-    const [searchby,setSearchby] = useState(1)
     const [internal,setInternal] = useState(false)
     const [servicesList,setServicesList] = useState<any[]>([])
     const [categoriesList,setCategoriesList] = useState<string[]>([])
@@ -48,7 +47,7 @@ export default function SitsServiceCatalogue (props:any) {
     async function getServices():Promise<any[]> {
       const listSite = Web([sp.web, 'https://msfintl.sharepoint.com/sites/GRP-SITS-Crossroad'])  
       const services: any[] = await listSite.lists.getById("91133e8a-e37c-42cb-bf65-b4a0cc0da7e2").items();
-   
+      
       return await services
     }
 
@@ -66,11 +65,53 @@ export default function SitsServiceCatalogue (props:any) {
       return await products.Choices
     }
 
+    function setSearchCategories (services) {
+      const index = new MiniSearch({
+        fields: ["Title", "ServicesCategory", "ServiceDescription", "ProductsCheck"],
+        storeFields: ["Title", "ServicesCategory", "ServiceDescription","ProductsCheck", "Status"],
+        extractField: (service, fieldName) => {
+          if (Array.isArray(fieldName)) {
+           return service[fieldName].join(' ')
+          } else {
+           return service[fieldName]
+         }
+        },
+        idField: 'ID',
+        searchOptions: {
+          prefix: true,
+          fuzzy: 0.25,
+        },
+      });
+
+      index.addAll(services);
+      console.log(MiniSearch.getDefault('tokenize'))
+      setSearchIndexCategories(index);
+    }
+
+    function setSearchDescription(services) {
+      const index = new MiniSearch({
+        fields: ["Title", "ServicesCategory", "ServiceDescription", "ProductsCheck"],
+        storeFields: ["Title", "ServicesCategory", "ServiceDescription","ProductsCheck", "Status"],
+        tokenize: (string, _fieldName) => string.split('>'),
+        idField: 'ID',
+        searchOptions: {
+          prefix: true,
+          fuzzy: 0.25,
+        },
+      });
+
+      index.addAll(services);
+      setSearchIndexDescription(index);
+    }
+
+
     useEffect(() => {
-      getSITSInternal()
+      getSITSInternal() 
 
       getServices().then(services => {
         setServicesList(services)
+        setSearchCategories(services)
+        setSearchDescription(services)
       })
 
       getCategories().then(categories => {
@@ -83,40 +124,93 @@ export default function SitsServiceCatalogue (props:any) {
 
     }, []);
 
+    const [inputValue, setInputValue] = useState("");
 
+    const [results,setResults] = useState([])
+
+    const [searchIndexCategories, setSearchIndexCategories] = useState(null);
+    const [searchIndexDescription, setSearchIndexDescription] = useState(null);
+
+    const handleSearch = (e) => {
+      const newResultsCategories = searchIndexCategories?.search(e.target.value, {});
+      const newResultsDescription = searchIndexDescription?.search(e.target.value, {});
+
+      setInputValue(e.target.value);
+
+      const merged = newResultsCategories.concat(newResultsDescription)
+      const unique = merged.reduce((acc, obj) => {
+        if (!acc.some(item => item.Title === obj.Title)) {
+          acc.push(obj);
+        }
+        return acc;
+      }, []);
+
+      setResults(unique)
+
+    };
+
+    const [categoriesFilter,setCategoriesFilter] = useState(categoriesList)
+
+    function categoriesHandler(arr){
+      const filtered = categoriesList.filter((_, i) => arr[i]);
+      setCategoriesFilter(filtered)
+    }
+
+    let filteredResults = results.filter(obj => {
+      for(let cat of categoriesFilter) {
+        if (obj.ServicesCategory.includes(cat)) {
+          return true
+        }
+      }
+      return false
+    })
+
+    let filteredServicesList = servicesList.filter(obj => {
+      for(let cat of categoriesFilter) {
+        if (obj.ServicesCategory.includes(cat)) {
+          return true
+        }
+      }
+      return false
+    })
+
+    console.log(filteredResults)
+    console.log(filteredServicesList)
 
     return (
       <section className={styles.service_catalogue}>
         <div className={styles.service_catalogue_top}>
           <h1>{description}</h1>
           <div className={styles.service_catalogue_top_options}>
-            <button 
-                onClick={()=>setSearchby(1)}
-                title="Search by services"
-                style={{
-                  color: searchby === 1 ? "white" : "black",
-                  backgroundColor: searchby === 1 ? "red" : "white"
-                }}
-                >
-              <Icon
-                  iconName="EngineeringGroup" 
-                  title="Search by services"/>
-            </button>
-            <button  
-                onClick={()=>setSearchby(2)} 
-                title="Search by products"
-                style={{
-                  color: searchby === 1 ? "black" : "white",
-                  backgroundColor: searchby === 1 ? "white" : "red"
-                }}
-                >
-              <Icon
-                  iconName="OfficeLogo" 
-                  title="Search by products"
-            /></button>
           </div>
         </div>
-        {searchby === 1 ? 
+        <input
+          className={styles.service_catalogue_input} 
+          type="text"
+          onChange={handleSearch}
+          value={inputValue}
+          placeholder="Search"
+        />
+        <ServiceCategories
+          internal={internal}
+          categoriesList={categoriesList}
+          onCheckChange = {categoriesHandler}
+        />
+        <div 
+            className={styles.service_catalogue_results}  >
+          {
+          inputValue !== "" ? 
+          filteredResults.map((service,idx) => 
+          <ProductContent key={`${idx}_${service.Title}`} service={service}/>
+              ) : 
+          filteredServicesList.map((service,idx) => 
+          <ProductContent key={`${idx}_${service.Title}`} service={service}/>
+              )
+          }
+        </div>
+
+
+        {/*searchby === 1 ? 
         <SitsServiceCatalogueByServices 
           internal={internal} 
           servicesList={servicesList} 
@@ -129,7 +223,7 @@ export default function SitsServiceCatalogue (props:any) {
           categoriesList={categoriesList}
           productsList={productsList}
         />
-        }     
+        */}     
       </section>
     );
   }

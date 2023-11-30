@@ -4,9 +4,13 @@ import styles from './SitsServiceCatalogue.module.scss';
 
 //3rd party Modules
 import { useDraggable } from "react-use-draggable-scroll";
+import { Icon } from '@fluentui/react/lib/Icon';
 
 //Components
-import SitsServiceContent from './SitsServiceContent'
+import ServiceContent from './ServiceContent'
+
+//Helpers
+import iconHandler from '../helpers/iconHandler'
 
 export default function SitsServiceCatalogueByServices (props:any) {
     const {
@@ -14,8 +18,6 @@ export default function SitsServiceCatalogueByServices (props:any) {
       servicesList,
       categoriesList
     } = props;
-
-    console.log(categoriesList[0])
 
     const categoriesDrag = useRef();
     const { events } = useDraggable(categoriesDrag);
@@ -47,9 +49,23 @@ export default function SitsServiceCatalogueByServices (props:any) {
     //Filter services based on selection
     const displayedService = servicesChecked?.filter(service => service.Title === selectedService)[0]
 
+/*
+    function iconHandler(category) {
+      const iconMap = {
+        "Application Services": "WebAppBuilderFragment",
+        "Cloud & Infrastructure Services": "Cloud",
+        "Cybersecurity Services Category": "Shield",
+        "License management Services": "PublicContactCard"
+        // Add more categories and their respective icons here
+      };
+    
+      return iconMap[category] || "Library";
+     }
+*/
     return (
     <div>
         <input
+          className={styles.service_catalogue_input} 
           type="text" 
           name="service" 
           placeholder="Search for service"
@@ -65,7 +81,8 @@ export default function SitsServiceCatalogueByServices (props:any) {
                 className={selectedCategory === category ? `${styles.category_button} ${styles.category_button_selected}` : `${styles.category_button}`}
                 key={`${category}_${idx}`} 
                 onClick={()=>{setSelectedcategory(category)}}
-              >
+              > 
+                <Icon iconName={iconHandler(category)} style={{fontSize:"35px", marginBottom:"5px"}}/>
                 {category}
               </button>
             ))}
@@ -86,7 +103,7 @@ export default function SitsServiceCatalogueByServices (props:any) {
               ))
               }
             </ul>
-              {displayedService && <SitsServiceContent service = {displayedService}/>}
+              {displayedService && <ServiceContent service = {displayedService}/>}
         </div>
     </div>
 
