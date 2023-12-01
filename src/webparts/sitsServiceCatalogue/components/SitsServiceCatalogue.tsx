@@ -19,16 +19,19 @@ import "@pnp/graph/members";
 import { Icon } from '@fluentui/react/lib/Icon';
 import MiniSearch from 'minisearch'
 
-
 //Components
 import ProductContent from './ProductContent'
 import ServiceCategories from './ServiceCategories'
 
 export default function SitsServiceCatalogue (props:any) {
     const {
-      description,
+      header,
+      siteurl,
+      list,
       context
     } = props;
+
+    console.log(list)
 
     const sp = spfi().using(SPFxsp(context))
     const graph = graphfi().using(SPFxGraph(context))
@@ -45,8 +48,8 @@ export default function SitsServiceCatalogue (props:any) {
     }
 
     async function getServices():Promise<any[]> {
-      const listSite = Web([sp.web, 'https://msfintl.sharepoint.com/sites/GRP-SITS-Crossroad'])  
-      const services: any[] = await listSite.lists.getById("91133e8a-e37c-42cb-bf65-b4a0cc0da7e2").items();
+      const listSite = Web([sp.web, `${siteurl}`])  
+      const services: any[] = await listSite.lists.getById(`${list}`).items();
       
       return await services
     }
@@ -84,7 +87,7 @@ export default function SitsServiceCatalogue (props:any) {
       });
 
       index.addAll(services);
-      console.log(MiniSearch.getDefault('tokenize'))
+      //console.log(MiniSearch.getDefault('tokenize'))
       setSearchIndexCategories(index);
     }
 
@@ -103,7 +106,6 @@ export default function SitsServiceCatalogue (props:any) {
       index.addAll(services);
       setSearchIndexDescription(index);
     }
-
 
     useEffect(() => {
       getSITSInternal() 
@@ -174,13 +176,10 @@ export default function SitsServiceCatalogue (props:any) {
       return false
     })
 
-    console.log(filteredResults)
-    console.log(filteredServicesList)
-
     return (
       <section className={styles.service_catalogue}>
         <div className={styles.service_catalogue_top}>
-          <h1>{description}</h1>
+          <h1>{header}</h1>
           <div className={styles.service_catalogue_top_options}>
           </div>
         </div>

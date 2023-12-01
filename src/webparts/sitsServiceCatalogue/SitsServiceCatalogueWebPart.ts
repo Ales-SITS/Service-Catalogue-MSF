@@ -5,14 +5,18 @@ import {
   type IPropertyPaneConfiguration,
   PropertyPaneTextField
 } from '@microsoft/sp-property-pane';
+import { PropertyFieldListPicker, PropertyFieldListPickerOrderBy } from '@pnp/spfx-property-controls/lib/PropertyFieldListPicker';
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
 
 import * as strings from 'SitsServiceCatalogueWebPartStrings';
 import SitsServiceCatalogue from './components/SitsServiceCatalogue';
 import { ISitsServiceCatalogueProps } from './components/ISitsServiceCatalogueProps';
+import { thProperties } from '@fluentui/react';
 
 export interface ISitsServiceCatalogueWebPartProps {
-  description: string;
+    header: string;
+    siteurl: string;
+    list: string | string[];
 }
 
 export default class SitsServiceCatalogueWebPart extends BaseClientSideWebPart<ISitsServiceCatalogueWebPartProps> {
@@ -21,7 +25,9 @@ export default class SitsServiceCatalogueWebPart extends BaseClientSideWebPart<I
     const element: React.ReactElement<ISitsServiceCatalogueProps> = React.createElement(
       SitsServiceCatalogue,
       {
-        description: this.properties.description,
+        header: this.properties.header,
+        siteurl: this.properties.siteurl,
+        list: this.properties.list,
         context: this.context
       }
     );
@@ -29,14 +35,6 @@ export default class SitsServiceCatalogueWebPart extends BaseClientSideWebPart<I
     ReactDom.render(element, this.domElement);
   }
 
-/*
-  protected onInit(): Promise<void> {
-    return this._getEnvironmentMessage().then(message => {
-      this._environmentMessage = message;
-    });
-  }
-*/
- 
   protected onDispose(): void {
     ReactDom.unmountComponentAtNode(this.domElement);
   }
@@ -50,14 +48,32 @@ export default class SitsServiceCatalogueWebPart extends BaseClientSideWebPart<I
       pages: [
         {
           header: {
-            description: strings.PropertyPaneDescription
+            description: "Settings"
           },
           groups: [
             {
-              groupName: strings.BasicGroupName,
+              groupName: "Sources",
               groupFields: [
-                PropertyPaneTextField('description', {
-                  label: strings.DescriptionFieldLabel
+                PropertyPaneTextField('header', {
+                  label: "App header"
+                }),
+                PropertyPaneTextField('siteurl', {
+                  label: "List site url"
+                }),
+                PropertyFieldListPicker('list', {
+                  label: 'Select a list',
+                  selectedList: this.properties.list,
+                  includeHidden: false,
+                  orderBy: PropertyFieldListPickerOrderBy.Title,
+                  baseTemplate: 100,
+                  disabled: false,
+                  onPropertyChange: this.onPropertyPaneFieldChanged.bind(this),
+                  properties: this.properties,
+                  context: this.context,
+                  onGetErrorMessage: null,
+                  deferredValidationTime: 0,
+                  key: 'listPickerFieldId',
+                  webAbsoluteUrl: this.properties.siteurl
                 })
               ]
             }
