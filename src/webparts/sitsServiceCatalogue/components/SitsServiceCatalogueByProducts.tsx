@@ -30,7 +30,7 @@ export default function SitsServiceCatalogueByProduct (props:any) {
       setDynProductFilter(val)
     }
 
-    const displayedServices = servicesList?.filter(service => service.ProductsCheck?.includes(selectedProduct))
+    const displayedServices = servicesList?.filter(service => service.Assetsincludedintheservicedelive?.includes(selectedProduct))
 
     //const displayedService = servicesChecked?.filter(service => service.Title === selectedService)[0]
 

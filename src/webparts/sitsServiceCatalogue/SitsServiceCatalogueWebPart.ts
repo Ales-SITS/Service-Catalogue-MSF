@@ -6,8 +6,9 @@ import {
   PropertyPaneTextField
 } from '@microsoft/sp-property-pane';
 import { PropertyFieldListPicker, PropertyFieldListPickerOrderBy } from '@pnp/spfx-property-controls/lib/PropertyFieldListPicker';
+import { PropertyFieldCollectionData, CustomCollectionFieldType } from '@pnp/spfx-property-controls/lib/PropertyFieldCollectionData';
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
-
+import { IColumnReturnProperty, PropertyFieldColumnPicker, PropertyFieldColumnPickerOrderBy } from '@pnp/spfx-property-controls/lib/PropertyFieldColumnPicker';
 import * as strings from 'SitsServiceCatalogueWebPartStrings';
 import SitsServiceCatalogue from './components/SitsServiceCatalogue';
 import { ISitsServiceCatalogueProps } from './components/ISitsServiceCatalogueProps';
@@ -16,7 +17,9 @@ import { thProperties } from '@fluentui/react';
 export interface ISitsServiceCatalogueWebPartProps {
     header: string;
     siteurl: string;
-    list: string | string[];
+    list: string;
+    collectionData: any[];
+    multiColumn: string;
 }
 
 export default class SitsServiceCatalogueWebPart extends BaseClientSideWebPart<ISitsServiceCatalogueWebPartProps> {
@@ -55,25 +58,89 @@ export default class SitsServiceCatalogueWebPart extends BaseClientSideWebPart<I
               groupName: "Sources",
               groupFields: [
                 PropertyPaneTextField('header', {
-                  label: "App header"
+                  label: "1. App header"
                 }),
                 PropertyPaneTextField('siteurl', {
-                  label: "List site url"
+                  label: "2. List site url"
                 }),
                 PropertyFieldListPicker('list', {
-                  label: 'Select a list',
+                  label: '3. Select a list',
                   selectedList: this.properties.list,
                   includeHidden: false,
                   orderBy: PropertyFieldListPickerOrderBy.Title,
                   baseTemplate: 100,
-                  disabled: false,
                   onPropertyChange: this.onPropertyPaneFieldChanged.bind(this),
                   properties: this.properties,
                   context: this.context,
                   onGetErrorMessage: null,
                   deferredValidationTime: 0,
                   key: 'listPickerFieldId',
-                  webAbsoluteUrl: this.properties.siteurl
+                  webAbsoluteUrl: this.properties.siteurl,
+                  disabled: this.properties.siteurl !== "" ? false : true 
+                }),
+                PropertyFieldColumnPicker('multiColumn', {
+                  label: '4. Select columns',
+                  context: this.context,
+                  selectedColumn: this.properties.multiColumn,
+                  listId: this.properties.list,
+                  disabled: this.properties.list !== "" ? false : true,
+                  orderBy: PropertyFieldColumnPickerOrderBy.Title,
+                  onPropertyChange: this.onPropertyPaneFieldChanged.bind(this),
+                  properties: this.properties,
+                  onGetErrorMessage: null,
+                  deferredValidationTime: 0,
+                  key: 'multiColumnPickerFieldId',
+                  displayHiddenColumns: false,
+                  columnReturnProperty: IColumnReturnProperty.Title,
+                  multiSelect: true,
+                  webAbsoluteUrl: this.properties.siteurl,
+              }),
+                PropertyFieldCollectionData("collectionData", {
+                  key: "collectionData",
+                  label: "Collection data",
+                  panelHeader: "Collection data panel header",
+                  manageBtnLabel: "Manage collection data",
+                  value: this.properties.collectionData,
+                  fields: [
+                    {
+                      id: "Title",
+                      title: "Firstname",
+                      type: CustomCollectionFieldType.string,
+                      required: true
+                    },
+                    {
+                      id: "Age",
+                      title: "Age",
+                      type: CustomCollectionFieldType.number,
+                      required: true
+                    },
+                    {
+                      id: "City",
+                      title: "Favorite city",
+                      type: CustomCollectionFieldType.dropdown,
+                      options: [
+                        {
+                          key: "antwerp",
+                          text: "Antwerp"
+                        },
+                        {
+                          key: "helsinki",
+                          text: "Helsinki"
+                        },
+                        {
+                          key: "montreal",
+                          text: "Montreal"
+                        }
+                      ],
+                      required: true
+                    },
+                    {
+                      id: "Sign",
+                      title: "Signed",
+                      type: CustomCollectionFieldType.boolean
+                    }
+                  ],
+                  disabled: false
                 })
               ]
             }

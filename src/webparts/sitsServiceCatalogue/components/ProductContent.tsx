@@ -41,7 +41,7 @@ export default function ProductContent (props:any) {
             </div>
 
             <div className={styles.service_content_products}>
-                  {service?.ProductsCheck?.map(product => <span className={styles.service_product}>{product}</span>)}
+                  {service?.Assetsincludedintheservicedelive?.map(product => <span className={styles.service_product}>{product}</span>)}
             </div>
           </button>
           {serviceHidden === true ? null : <ServiceContent service = {service}/>}

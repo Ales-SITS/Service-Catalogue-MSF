@@ -31,8 +31,7 @@ export default function SitsServiceCatalogue (props:any) {
       context
     } = props;
 
-    console.log(list)
-
+  
     const sp = spfi().using(SPFxsp(context))
     const graph = graphfi().using(SPFxGraph(context))
 
@@ -70,8 +69,8 @@ export default function SitsServiceCatalogue (props:any) {
 
     function setSearchCategories (services) {
       const index = new MiniSearch({
-        fields: ["Title", "ServicesCategory", "ServiceDescription", "ProductsCheck"],
-        storeFields: ["Title", "ServicesCategory", "ServiceDescription","ProductsCheck", "Status"],
+        fields: ["Title", "ServicesCategory", "ServiceDescription", "Assetsincludedintheservicedelive"],
+        storeFields: ["Title", "ServicesCategory", "ServiceDescription","Assetsincludedintheservicedelive", "Status"],
         extractField: (service, fieldName) => {
           if (Array.isArray(fieldName)) {
            return service[fieldName].join(' ')
@@ -93,8 +92,8 @@ export default function SitsServiceCatalogue (props:any) {
 
     function setSearchDescription(services) {
       const index = new MiniSearch({
-        fields: ["Title", "ServicesCategory", "ServiceDescription", "ProductsCheck"],
-        storeFields: ["Title", "ServicesCategory", "ServiceDescription","ProductsCheck", "Status"],
+        fields: ["Title", "ServicesCategory", "ServiceDescription", "Assetsincludedintheservicedelive"],
+        storeFields: ["Title", "ServicesCategory", "ServiceDescription","Assetsincludedintheservicedelive", "Status"],
         tokenize: (string, _fieldName) => string.split('>'),
         idField: 'ID',
         searchOptions: {
@@ -125,6 +124,10 @@ export default function SitsServiceCatalogue (props:any) {
       })
 
     }, []);
+
+ console.log(servicesList)
+
+//SEARCH AND RESULTS 
 
     const [inputValue, setInputValue] = useState("");
 
@@ -158,6 +161,8 @@ export default function SitsServiceCatalogue (props:any) {
       setCategoriesFilter(filtered)
     }
 
+
+//List of services filtered by search and by selected categories
     let filteredResults = results.filter(obj => {
       for(let cat of categoriesFilter) {
         if (obj.ServicesCategory.includes(cat)) {
@@ -167,6 +172,7 @@ export default function SitsServiceCatalogue (props:any) {
       return false
     })
 
+//List of services filtered by selected categories
     let filteredServicesList = servicesList.filter(obj => {
       for(let cat of categoriesFilter) {
         if (obj.ServicesCategory.includes(cat)) {
@@ -206,28 +212,7 @@ export default function SitsServiceCatalogue (props:any) {
           <ProductContent key={`${idx}_${service.Title}`} service={service}/>
               )
           }
-        </div>
-
-
-        {/*searchby === 1 ? 
-        <SitsServiceCatalogueByServices 
-          internal={internal} 
-          servicesList={servicesList} 
-          categoriesList={categoriesList}
-          productsList={productsList}
-          />:
-        <SitsServiceCatalogueByProduct
-          internal={internal} 
-          servicesList={servicesList} 
-          categoriesList={categoriesList}
-          productsList={productsList}
-        />
-        */}     
+        </div>    
       </section>
     );
   }
-
-
-  //PURIFY DOUBLECHECK
-
-  //STATUS: Active/Archive/Upcoming
