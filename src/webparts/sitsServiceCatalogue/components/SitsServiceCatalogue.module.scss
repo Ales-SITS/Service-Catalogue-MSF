@@ -1,5 +1,18 @@
 @import '~@fluentui/react/dist/sass/References.scss';
 
+.PANEL_TEST { 
+  background-color: red;
+}
+
+.service_cat_vertical {
+  display: flex;
+  flex-direction: column;
+}
+
+.service_cat_horizontal {
+  display: flex;
+}
+
 .service_catalogue {
   position: relative;
   display: flex;
@@ -201,6 +214,16 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 5px;
+    }
+
+
+    .product_service_button_top div span {
+      font-size: 12px;
+      color: red
+    }
+
+    .product_service_button_top div h4 {
+      margin: 5px 0
     }
 
 

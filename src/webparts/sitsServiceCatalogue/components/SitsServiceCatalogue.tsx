@@ -28,18 +28,32 @@ export default function SitsServiceCatalogue (props:any) {
       header,
       siteurl,
       list,
-      context
+      columns,
+      context,
+      colroles,
+      catIcons
     } = props;
 
-  
+    //API init variables
     const sp = spfi().using(SPFxsp(context))
     const graph = graphfi().using(SPFxGraph(context))
+    
+
+    console.log(catIcons)
+
+    //ROLES handlers
+    const title = colroles?.filter(col => col.role === "title")[0]?.column
+    const category = colroles?.filter(col => col.role === "category")[0]?.column
+    const subcategory = colroles?.filter(col => col.role === "subcategory")[0]?.column
+    const status = colroles?.filter(col => col.role === "status")[0]?.column
+    const content = colroles?.filter(col => col.role === "content")[0]?.column
+    const label1 = colroles?.filter(col => col.role === "label1")[0]?.column
+    const label2 = colroles?.filter(col => col.role === "label2")[0]?.column
 
     const [internal,setInternal] = useState(false)
     const [servicesList,setServicesList] = useState<any[]>([])
     const [categoriesList,setCategoriesList] = useState<string[]>([])
-    const [productsList,setProductsList] = useState<string[]>([])
-
+  
     async function getSITSInternal () {
       const currentUser = await graph.me()
       const currentUserDomain = currentUser.mail.split("@")[1].toLowerCase()
@@ -54,23 +68,15 @@ export default function SitsServiceCatalogue (props:any) {
     }
 
     async function getCategories():Promise<any[]> {
-      const listSite = Web([sp.web, 'https://msfintl.sharepoint.com/sites/GRP-SITS-Crossroad'])  
-      const categories = await listSite.lists.getById("91133e8a-e37c-42cb-bf65-b4a0cc0da7e2").fields.getByTitle("Services Category")();
-   
-      return await categories.Choices
-    }
-
-    async function getProducts():Promise<any[]> {
-      const listSite = Web([sp.web, 'https://msfintl.sharepoint.com/sites/GRP-SITS-Crossroad'])  
-      const products = await listSite.lists.getById("91133e8a-e37c-42cb-bf65-b4a0cc0da7e2").fields.getByTitle("Products")();
-   
-      return await products.Choices
+      const listSite = Web([sp.web, `${siteurl}`])  
+      const categories = await listSite.lists.getById(`${list}`).fields.getByInternalNameOrTitle(`${category}`)();
+         return await categories.Choices
     }
 
     function setSearchCategories (services) {
       const index = new MiniSearch({
-        fields: ["Title", "ServicesCategory", "ServiceDescription", "Assetsincludedintheservicedelive"],
-        storeFields: ["Title", "ServicesCategory", "ServiceDescription","Assetsincludedintheservicedelive", "Status"],
+        fields: [`${title}`, `${category}`, `${subcategory}`, `${content}`, `${label1}`],
+        storeFields: [`${title}`, `${category}`, `${subcategory}`, `${content}`, `${label1}`, `${status}`],
         extractField: (service, fieldName) => {
           if (Array.isArray(fieldName)) {
            return service[fieldName].join(' ')
@@ -92,8 +98,8 @@ export default function SitsServiceCatalogue (props:any) {
 
     function setSearchDescription(services) {
       const index = new MiniSearch({
-        fields: ["Title", "ServicesCategory", "ServiceDescription", "Assetsincludedintheservicedelive"],
-        storeFields: ["Title", "ServicesCategory", "ServiceDescription","Assetsincludedintheservicedelive", "Status"],
+        fields: [`${title}`, `${category}`, `${subcategory}`, `${content}`, `${label1}`],
+        storeFields: [`${title}`, `${category}`, `${subcategory}`, `${content}`, `${label1}`, `${status}`],
         tokenize: (string, _fieldName) => string.split('>'),
         idField: 'ID',
         searchOptions: {
@@ -118,17 +124,11 @@ export default function SitsServiceCatalogue (props:any) {
       getCategories().then(categories => {
         setCategoriesList(categories)
       })
-
-      getProducts().then(products => {
-        setProductsList(products)
-      })
-
     }, []);
 
- console.log(servicesList)
+ //console.log(servicesList)
 
 //SEARCH AND RESULTS 
-
     const [inputValue, setInputValue] = useState("");
 
     const [results,setResults] = useState([])
@@ -206,10 +206,10 @@ export default function SitsServiceCatalogue (props:any) {
           {
           inputValue !== "" ? 
           filteredResults.map((service,idx) => 
-          <ProductContent key={`${idx}_${service.Title}`} service={service}/>
+          <ProductContent key={`${idx}_${service.Title}`} service={service} colroles={colroles} />
               ) : 
           filteredServicesList.map((service,idx) => 
-          <ProductContent key={`${idx}_${service.Title}`} service={service}/>
+          <ProductContent key={`${idx}_${service.Title}`} service={service} colroles={colroles}/>
               )
           }
         </div>    

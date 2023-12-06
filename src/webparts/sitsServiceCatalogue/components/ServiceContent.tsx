@@ -6,13 +6,14 @@ import * as DOMPurify from 'dompurify';
 
 
 export default function ServiceContent (props:any) {
-    const {service} = props;
-
-    const icon = service.Status === "Active" ? "CompletedSolid" : service.Status === "Archive" ? "RepoSolid" : "SkypeCircleClock"
+    const {
+        service,
+        content    
+    } = props;
 
     return (
         <div className={styles.service_content}>
-            <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(service?.ServiceDescription)}}/>
+            <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(service[content])}}/>
         </div>
     );
   }

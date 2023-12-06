@@ -3,26 +3,22 @@
   "id": "1fd7d340-899d-48bd-ba8a-0a3d6c0d445b",
   "alias": "SitsServiceCatalogueWebPart",
   "componentType": "WebPart",
-
-  // The "*" signifies that the version should be taken from the package.json
   "version": "*",
   "manifestVersion": 2,
-
-  // If true, the component can only be installed on sites where Custom Script is allowed.
-  // Components that allow authors to embed arbitrary script code should set this to true.
-  // https://support.office.com/en-us/article/Turn-scripting-capabilities-on-or-off-1f2c515f-5d7e-448a-9fd7-835da935584f
   "requiresCustomScript": false,
   "supportedHosts": ["SharePointWebPart", "TeamsPersonalApp", "TeamsTab", "SharePointFullPage"],
   "supportsThemeVariants": true,
-
   "preconfiguredEntries": [{
-    "groupId": "5c03119e-3074-46fd-976b-c60198311f70", // Advanced
+    "groupId": "5c03119e-3074-46fd-976b-c60198311f70",
     "group": { "default": "Advanced" },
     "title": { "default": "SITS Service Catalogue" },
     "description": { "default": "SITS Service Catalogue description" },
     "officeFabricIconFontName": "Page",
     "properties": {
-      "description": "SITS Service Catalogue"
+      "header": "SITS Service Catalogue",
+      "siteurl": "https://msfintl.sharepoint.com/sites/GRP-SITS-Crossroad",
+      "list": "91133e8a-e37c-42cb-bf65-b4a0cc0da7e2",
+      "multiColumn": ["ServicesCategory", "Title", "ServiceDescription", "Status", "Products", "ServiceSubcategory", "ServiceOwner", "ServiceManager", "Servicetype", "Assetsincludedintheservicedelivery", "Clients", "Contactsandproceduresforsigninguptotheservice", "Desiredoutcome", "Warranty", "Clientprocessesorfunctionssupportedbytheservice", "ServiceLevelAgreements", "Responsetime", "Serviceavailibilty"]
     }
   }]
 }
