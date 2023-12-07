@@ -5,14 +5,15 @@ import styles from './SitsServiceCatalogue.module.scss';
 //3rd party Modules
 import { Icon } from '@fluentui/react/lib/Icon';
 
-//Helpers
-import iconHandler from '../helpers/iconHandler'
-
 export default function ServiceCategories (props:any) {
     const {
       internal,
-      categoriesList
+      categoriesList,
+      catIcons,
+      context
     } = props;
+
+    const webpartID = context.instanceId.replaceAll("-","")
 
     const [checkedState, setCheckedState] = useState([])
 
@@ -31,15 +32,23 @@ export default function ServiceCategories (props:any) {
 
 
     return (
-         <ul className={styles.categories_tabs}>
+         <ul className={`sc_${webpartID}_category_block`}>
             {categoriesList.map((category,idx) => 
               <li
-                className={checkedState[idx] ? `${styles.category_button} ${styles.category_button_selected}` : `${styles.category_button}`}
+                className={checkedState[idx] ? `sc_${webpartID}_category_button sc_${webpartID}_category_button_selected` : `sc_${webpartID}_category_button`}
                 key={`${category}_${idx}`} 
                 title={category}
                 onClick={() => handleOnChange(idx)}
               > 
-                <Icon iconName={iconHandler(category)} style={{fontSize:"35px", marginBottom:"5px"}}/>
+                <Icon 
+                iconName={
+                  catIcons.find(cat => cat.category === category) ? 
+                  catIcons.find(cat => cat.category === category).cat_icon :
+                  catIcons.find(cat => cat.category === "default").cat_icon
+                  } 
+                  className={`sc_${webpartID}_category_icon`}
+                  style={{fontSize:"35px", marginBottom:"5px"}}/>
+                <span className={`sc_${webpartID}_category_label`}>{category}</span>
                 <input
                     type="checkbox"
                     name={category}

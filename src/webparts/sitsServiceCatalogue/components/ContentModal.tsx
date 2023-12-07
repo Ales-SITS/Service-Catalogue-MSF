@@ -5,14 +5,15 @@ import styles from './SitsServiceCatalogue.module.scss';
 import * as DOMPurify from 'dompurify';
 
 
-export default function ServiceContent (props:any) {
+export default function Content (props:any) {
     const {
         service,
         content    
     } = props;
 
     return (
-        <div className={styles.service_content}>
+        <div className={styles.service_content_modal}>
+            <button onClick={props.onCloseModal}>CLOSE</button>
             <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(service[content])}}/>
         </div>
     );

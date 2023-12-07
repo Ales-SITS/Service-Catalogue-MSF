@@ -1,18 +1,28 @@
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import { Version } from '@microsoft/sp-core-library';
+
+//Property panes
 import {
   type IPropertyPaneConfiguration,
-  PropertyPaneTextField
+  PropertyPaneTextField,
+  PropertyPaneLabel,
+  PropertyPaneSlider,
+  PropertyPaneToggle,
 } from '@microsoft/sp-property-pane';
 import { PropertyFieldListPicker, PropertyFieldListPickerOrderBy } from '@pnp/spfx-property-controls/lib/PropertyFieldListPicker';
 import { PropertyFieldCollectionData, CustomCollectionFieldType } from '@pnp/spfx-property-controls/lib/PropertyFieldCollectionData';
+import { CalloutTriggers } from '@pnp/spfx-property-controls/lib/Callout';
+import { PropertyFieldLabelWithCallout } from '@pnp/spfx-property-controls/lib/PropertyFieldLabelWithCallout';
+import { PropertyFieldMonacoEditor } from '@pnp/spfx-property-controls/lib/PropertyFieldMonacoEditor';
 
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
 import { IColumnReturnProperty, PropertyFieldColumnPicker, PropertyFieldColumnPickerOrderBy } from '@pnp/spfx-property-controls/lib/PropertyFieldColumnPicker';
 import SitsServiceCatalogue from './components/SitsServiceCatalogue';
 import { ISitsServiceCatalogueProps } from './components/ISitsServiceCatalogueProps';
+import { PropertyPaneWebPartInformation } from '@pnp/spfx-property-controls/lib/PropertyPaneWebPartInformation';
 
+import { PropertyFieldToggleWithCallout } from '@pnp/spfx-property-controls/lib/PropertyFieldToggleWithCallout';
 
 //API
 import { spfi, SPFx as SPFxsp} from "@pnp/sp";
@@ -24,20 +34,43 @@ import "@pnp/sp/fields";
 
 
 export interface ISitsServiceCatalogueWebPartProps {
+    toggleInfoHeaderValue: boolean;
+
     header: string;
     siteurl: string;
     list: string;
     colroles: any[];
     multiColumn: string[];
+    categories: any[];
+
+    cardsPerRow: number;
+    contentType: boolean;
+
     catIcons: any [];
-    categories: any[]
+    catCSS: string;
+
+    subcatIcons: any [];
+    subcatCSS: string;
 }
 
 export default class SitsServiceCatalogueWebPart extends BaseClientSideWebPart<ISitsServiceCatalogueWebPartProps> {
 
-  private categories: any[] = []
-
+  private categories: any[] = ["default"]
+  private subcategories: any[] = ["default"]
+  
   public render(): void {
+    const existingStyleElement = document.head.querySelector('style[data-webpart-styles]');
+    if (existingStyleElement) {
+      existingStyleElement.remove();
+  }
+    const webPartId = this.context.instanceId.replaceAll("-","")
+    const dynamicStyles = document.createElement('style');
+    const concatCSS = this.properties.catCSS?.concat(" ",this.properties.subcatCSS)
+    const dynamicStylesContent = concatCSS?.replaceAll(".sc__",`.sc_${webPartId}_`);
+
+  
+    dynamicStyles.textContent = dynamicStylesContent;
+
     const element: React.ReactElement<ISitsServiceCatalogueProps> = React.createElement(
       SitsServiceCatalogue,
       {
@@ -46,10 +79,17 @@ export default class SitsServiceCatalogueWebPart extends BaseClientSideWebPart<I
         list: this.properties.list,
         columns: this.properties.multiColumn,
         colroles: this.properties.colroles,
+
+        cardsPerRow: this.properties.cardsPerRow,
+        contentType: this.properties.contentType,
         catIcons: this.properties.catIcons,
+        subcatIcons: this.properties.subcatIcons,
+        
         context: this.context
       }
     );
+
+    document.head.appendChild(dynamicStyles);
 
     ReactDom.render(element, this.domElement);
   }
@@ -64,7 +104,8 @@ export default class SitsServiceCatalogueWebPart extends BaseClientSideWebPart<I
 
 
   public onInit(): Promise<void> {
-    return this.getCategories()
+    this.choicesHandler()
+    return Promise.resolve()
   }
 
   //CUSTOM functions
@@ -72,14 +113,34 @@ export default class SitsServiceCatalogueWebPart extends BaseClientSideWebPart<I
   public async getCategories():Promise<void> {
     const category = this.properties.colroles?.filter(col => col.role === "category")[0]?.column
     const sp = spfi().using(SPFxsp(this.context))
-    const listSite = Web([sp.web, `${this.properties.siteurl}`])  
-    const cat = await listSite.lists.getById(`${this.properties.list}`).fields.getByInternalNameOrTitle(`${category}`)();
-    this.categories = cat.Choices
+    const listSite = Web([sp.web, `${this.properties.siteurl}`]) 
+    try {
+      const cat = await listSite.lists.getById(`${this.properties.list}`).fields.getByInternalNameOrTitle(`${category}`)()
+      this.categories = ["default", ...cat.Choices]
+    } catch (error) {
+      
+    } 
+    
   }
 
-  public categoriesHandler(): void {
-    console.log("TEST")
+  public async getSubcategories():Promise<void> {
+    const subcategory = this.properties.colroles?.filter(col => col.role === "subcategory")[0]?.column
+    const sp = spfi().using(SPFxsp(this.context))
+    const listSite = Web([sp.web, `${this.properties.siteurl}`]) 
+    try {
+      const cat = await listSite.lists.getById(`${this.properties.list}`).fields.getByInternalNameOrTitle(`${subcategory}`)()
+      this.subcategories = ["default", ...cat.Choices]
+    } catch (error) {
+      
+    } 
+    
+  }
+
+  public choicesHandler(): void {
       this.getCategories().catch(error => {
+        console.error('Error fetching categories:', error);
+      });
+      this.getSubcategories().catch(error => {
         console.error('Error fetching categories:', error);
       });
   }
@@ -90,10 +151,26 @@ export default class SitsServiceCatalogueWebPart extends BaseClientSideWebPart<I
     return {
       pages: [
         {
-          header: {
-            description: "Settings"
-          },
           groups: [
+            {
+              groupName: "",
+              groupFields: [
+                PropertyPaneWebPartInformation({
+                  description: `This is webart helps you to create dynamic and modern layouts based on data stored in a SharePoint list. It is fully customizable by CSS</br></br>
+                                Property pane pages:
+                                <ul>
+                                  <li>Page 1 - <strong>General settings</strong></li>
+                                  <li>Page 2 - <strong>Visuals</strong></li>
+                                </ul>`,
+                  moreInfoLink: `https://msfintl.sharepoint.com/sites/SITSExternalPortal`,
+                  videoProperties: {
+                    embedLink: `https://www.youtube.com/embed/d_9o3tQ90zo`,
+                    properties: { allowFullScreen: true}
+                  },
+                  key: 'webPartInfoId'
+                })
+              ]
+            },
             {
               groupName: "General settings",
               groupFields: [
@@ -143,7 +220,7 @@ export default class SitsServiceCatalogueWebPart extends BaseClientSideWebPart<I
                   value: this.properties.colroles,
                   panelProps: {
                     customWidth: "300px",
-                    onDismissed: () => this.categoriesHandler()
+                    onDismissed: () => this.choicesHandler()
                   },
                   fields: [
                     {
@@ -166,11 +243,11 @@ export default class SitsServiceCatalogueWebPart extends BaseClientSideWebPart<I
                         },
                         {
                           key: "category",
-                          text: "Category"
+                          text: "Category (choice column)"
                         },
                         {
                           key: "subcategory",
-                          text: "Subcategory"
+                          text: "Subcategory (choice column)"
                         },
                         {
                           key: "content",
@@ -178,19 +255,23 @@ export default class SitsServiceCatalogueWebPart extends BaseClientSideWebPart<I
                         },
                         {
                           key: "status",
-                          text: "Status"
+                          text: "Status (choice column)"
                         },
                         {
                           key: "label1",
-                          text: "Label 1"
+                          text: "Label 1 (choice column)"
                         },
                         {
                           key: "label2",
-                          text: "Label 2"
+                          text: "Label 2 (choice column)"
                         },
                         {
                           key: "owner",
-                          text: "Owner"
+                          text: "Owner (person column)"
+                        },
+                        {
+                          key: "link",
+                          text: "link (url)"
                         }
                       ],
                       required: true
@@ -200,19 +281,47 @@ export default class SitsServiceCatalogueWebPart extends BaseClientSideWebPart<I
                 })
               ]
             },
+
+          ]
+        },
+        {
+          groups: [
             {
-              groupName: "Roles visuals",
+              groupName: "General Visuals",
+              groupFields: [
+                PropertyPaneSlider('cardsPerRow',{  
+                  label:"Number of cards per row",  
+                  min:1,  
+                  max:5,  
+                  value:1,  
+                  showValue:true,  
+                  step:1                
+                }),
+                PropertyFieldToggleWithCallout('contentType', {
+                  calloutTrigger: CalloutTriggers.Hover,
+                  calloutWidth: 200,
+                  key: 'toggleInfoHeaderFieldId',
+                  label: 'Turn on the PnP feature',
+                  calloutContent: React.createElement('p', {}, 'With this control you can set if the content displays within the card or as a model window on top of the app.'),
+                  onText: 'Modal',
+                  offText: 'In card',
+                  checked: this.properties.toggleInfoHeaderValue
+                })
+              ]
+            },
+            {
+              groupName: "Roles Visuals",
               groupFields: [
                 PropertyFieldCollectionData("catIcons", {
                   key: "catIcons",
-                  label: "1. Set icons for categories",
+                  label: "1. Set visuals for categories",
                   panelHeader: "Categories icons",
                   manageBtnLabel: "Categories icons",
                   value: this.properties.catIcons,
                     fields: [
                       {
                         id: 'category',
-                        title: 'Category',
+                        title: 'Select category',
                         type: CustomCollectionFieldType.dropdown,
                         options: this.categories?.map(item => {
                           return { key: item, text: item };
@@ -220,12 +329,53 @@ export default class SitsServiceCatalogueWebPart extends BaseClientSideWebPart<I
                       },
                       {
                         id: "cat_icon",
-                        title: "Icon",
+                        title: "Select icon",
                         iconFieldRenderMode: "picker",
                         type: CustomCollectionFieldType.fabricIcon,
                       }                
                   ],
-                  disabled: this.properties.colroles.filter(col => col.role === "category").length < 1 || this.categories.length === 0
+                  disabled: this.properties.colroles?.filter(col => col.role === "category").length < 1 || this.categories.length === 0
+                }),
+                PropertyFieldMonacoEditor('catCSS', {
+                  key: 'catCSS',
+                  value: this.properties.catCSS,
+                  onChange: (code: string) => { this.properties.catCSS = code; },
+                  language:"css",
+                  showLineNumbers:true,
+                  theme: 'vs-dark'
+                }),
+                PropertyFieldCollectionData("subcatIcons", {
+                  key: "subcatIcons",
+                  label: "2. Set visuals for subcategories",
+                  panelHeader: "Subcategories icons",
+                  manageBtnLabel: "Subcategories icons",
+                  value: this.properties.subcatIcons,
+                    fields: [
+                      {
+                        id: 'subcategory',
+                        title: 'Select subcategory',
+                        type: CustomCollectionFieldType.dropdown,
+                        options: this.subcategories?.map(item => {
+                          return { key: item, text: item };
+                        }),
+                      },
+                      {
+                        id: "subcat_icon",
+                        title: "Select icon",
+                        iconFieldRenderMode: "picker",
+                        type: CustomCollectionFieldType.fabricIcon,
+                      }                
+                  ],
+                  disabled: this.properties.colroles?.filter(col => col.role === "subcategory").length < 1 || this.categories.length === 0
+                }),
+                PropertyFieldMonacoEditor('subcatCSS', {
+                  key: 'subcatCSS',
+                  value: this.properties.subcatCSS,
+                  onChange: (code: string) => { this.properties.subcatCSS = code; },
+                  showMiniMap: true,
+                  language:"css",
+                  showLineNumbers:true,
+                  theme: 'vs-dark'
                 })
               ]
             }

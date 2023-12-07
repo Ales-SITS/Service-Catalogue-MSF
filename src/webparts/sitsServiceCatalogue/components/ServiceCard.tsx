@@ -4,15 +4,15 @@ import styles from './SitsServiceCatalogue.module.scss';
 
 //3rd party Modules
 import { Icon } from '@fluentui/react/lib/Icon';
-import ServiceContent from './ServiceContent'
+import Content from './Content'
+import ContentModal from './ContentModal'
 
-//Helpers
-import iconHandler from '../helpers/iconHandler'
-
-export default function ProductContent (props:any) {
+export default function ServiceCard (props:any) {
     const {
       service,
-      colroles    
+      colroles,
+      catIcons,
+      contentType
     } = props;
 
     //console.log(colroles)
@@ -27,20 +27,20 @@ export default function ProductContent (props:any) {
 
     //console.log(service[subcategory])
 
-    const [serviceHidden, setServiceHidden] = useState(true)
-    const serviceHiddenHandler = () => {
-      setServiceHidden(current => !current)
+    const [contentHidden, setContentHidden] = useState(true)
+    const contentHiddenHandler = () => {
+      setContentHidden(current => !current)
     }
 
     const icon = service[status] === "Active" ? "CompletedSolid" : service[status]  === "Archive" ? "RepoSolid" : "SkypeCircleClock"
     
     return (
         <div 
-        className={serviceHidden ? `${styles.service_content}` : `${styles.service_content} ${styles.service_content_opened}`}
+        className={contentHidden ? `${styles.service_content}` : `${styles.service_content} ${styles.service_content_opened}`}
         >
           <button
             className={styles.product_service_button}
-            onClick={serviceHiddenHandler}>
+            onClick={contentHiddenHandler}>
             <div className={styles.product_service_button_top}>
               <div className={styles.service_cat_vertical}>
                 <span>{service[subcategory]}</span>
@@ -48,7 +48,13 @@ export default function ProductContent (props:any) {
               </div>
 
               <div className={styles.service_cat_horizontal}>
-                <Icon iconName={iconHandler(service[category])} title={service[category]}/>
+                <Icon 
+                iconName={
+                  catIcons.find(cat => cat.category === service[category]) ? 
+                  catIcons.find(cat => cat.category === service[category]).cat_icon :
+                  catIcons.find(cat => cat.category === "default").cat_icon
+                  } 
+                title={service[category]}/>
                 <Icon 
                       iconName={icon} 
                       title={service[status]}
@@ -63,7 +69,10 @@ export default function ProductContent (props:any) {
                   {service[label1]?.map(product => <span className={styles.service_product}>{product}</span>)}
             </div>
           </button>
-          {serviceHidden === true ? null : <ServiceContent service = {service} content = {content}/>}
+          {contentHidden === true ? null : 
+           contentType ? <ContentModal service = {service} content = {content} onCloseModal={contentHiddenHandler}/>:
+           <Content service = {service} content = {content} />    
+          }      
         </div>
     );
   }

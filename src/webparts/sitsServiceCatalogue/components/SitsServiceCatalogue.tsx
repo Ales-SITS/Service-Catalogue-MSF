@@ -20,8 +20,9 @@ import { Icon } from '@fluentui/react/lib/Icon';
 import MiniSearch from 'minisearch'
 
 //Components
-import ProductContent from './ProductContent'
+import ServiceCard from './ServiceCard'
 import ServiceCategories from './ServiceCategories'
+import { ContextualMenu } from '@fluentui/react';
 
 export default function SitsServiceCatalogue (props:any) {
     const {
@@ -29,17 +30,19 @@ export default function SitsServiceCatalogue (props:any) {
       siteurl,
       list,
       columns,
-      context,
       colroles,
-      catIcons
+
+      contentType,
+      cardsPerRow,
+      catIcons,
+      subcatIcons,
+      
+      context
     } = props;
 
     //API init variables
     const sp = spfi().using(SPFxsp(context))
     const graph = graphfi().using(SPFxGraph(context))
-    
-
-    console.log(catIcons)
 
     //ROLES handlers
     const title = colroles?.filter(col => col.role === "title")[0]?.column
@@ -126,7 +129,6 @@ export default function SitsServiceCatalogue (props:any) {
       })
     }, []);
 
- //console.log(servicesList)
 
 //SEARCH AND RESULTS 
     const [inputValue, setInputValue] = useState("");
@@ -182,6 +184,8 @@ export default function SitsServiceCatalogue (props:any) {
       return false
     })
 
+    const auto = "1fr "
+
     return (
       <section className={styles.service_catalogue}>
         <div className={styles.service_catalogue_top}>
@@ -200,16 +204,34 @@ export default function SitsServiceCatalogue (props:any) {
           internal={internal}
           categoriesList={categoriesList}
           onCheckChange = {categoriesHandler}
+          catIcons = {catIcons}
+          context={context}
         />
         <div 
-            className={styles.service_catalogue_results}  >
+            className={styles.service_catalogue_results}
+            style={{
+              gridTemplateColumns: `${auto.repeat(cardsPerRow)}` 
+            }}
+            >
           {
           inputValue !== "" ? 
           filteredResults.map((service,idx) => 
-          <ProductContent key={`${idx}_${service.Title}`} service={service} colroles={colroles} />
+          <ServiceCard 
+              key={`${idx}_${service.Title}`} 
+              service={service} 
+              colroles={colroles} 
+              catIcons = {catIcons} 
+              contentType = {contentType}
+          />
               ) : 
           filteredServicesList.map((service,idx) => 
-          <ProductContent key={`${idx}_${service.Title}`} service={service} colroles={colroles}/>
+          <ServiceCard 
+              key={`${idx}_${service.Title}`} 
+              service={service} 
+              colroles={colroles} 
+              catIcons = {catIcons}
+              contentType = {contentType}
+          />
               )
           }
         </div>    
