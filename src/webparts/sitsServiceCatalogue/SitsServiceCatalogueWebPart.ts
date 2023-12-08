@@ -9,6 +9,7 @@ import {
   PropertyPaneLabel,
   PropertyPaneSlider,
   PropertyPaneToggle,
+  PropertyPaneChoiceGroup
 } from '@microsoft/sp-property-pane';
 import { PropertyFieldListPicker, PropertyFieldListPickerOrderBy } from '@pnp/spfx-property-controls/lib/PropertyFieldListPicker';
 import { PropertyFieldCollectionData, CustomCollectionFieldType } from '@pnp/spfx-property-controls/lib/PropertyFieldCollectionData';
@@ -18,8 +19,7 @@ import { PropertyFieldMonacoEditor } from '@pnp/spfx-property-controls/lib/Prope
 
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
 import { IColumnReturnProperty, PropertyFieldColumnPicker, PropertyFieldColumnPickerOrderBy } from '@pnp/spfx-property-controls/lib/PropertyFieldColumnPicker';
-import SitsServiceCatalogue from './components/SitsServiceCatalogue';
-import { ISitsServiceCatalogueProps } from './components/ISitsServiceCatalogueProps';
+import Catalogue from './components/Catalogue';
 import { PropertyPaneWebPartInformation } from '@pnp/spfx-property-controls/lib/PropertyPaneWebPartInformation';
 
 import { PropertyFieldToggleWithCallout } from '@pnp/spfx-property-controls/lib/PropertyFieldToggleWithCallout';
@@ -33,7 +33,7 @@ import "@pnp/sp/items";
 import "@pnp/sp/fields";
 
 
-export interface ISitsServiceCatalogueWebPartProps {
+export interface ICatalogueWebPartProps {
     toggleInfoHeaderValue: boolean;
 
     header: string;
@@ -42,6 +42,7 @@ export interface ISitsServiceCatalogueWebPartProps {
     colroles: any[];
     multiColumn: string[];
     categories: any[];
+    defaultgroupby: string;
 
     cardsPerRow: number;
     contentType: boolean;
@@ -53,7 +54,7 @@ export interface ISitsServiceCatalogueWebPartProps {
     subcatCSS: string;
 }
 
-export default class SitsServiceCatalogueWebPart extends BaseClientSideWebPart<ISitsServiceCatalogueWebPartProps> {
+export default class SitsServiceCatalogueWebPart extends BaseClientSideWebPart<ICatalogueWebPartProps> {
 
   private categories: any[] = ["default"]
   private subcategories: any[] = ["default"]
@@ -71,14 +72,15 @@ export default class SitsServiceCatalogueWebPart extends BaseClientSideWebPart<I
   
     dynamicStyles.textContent = dynamicStylesContent;
 
-    const element: React.ReactElement<ISitsServiceCatalogueProps> = React.createElement(
-      SitsServiceCatalogue,
+    const element: React.ReactElement<ICatalogueWebPartProps> = React.createElement(
+      Catalogue,
       {
         header: this.properties.header,
         siteurl: this.properties.siteurl,
         list: this.properties.list,
         columns: this.properties.multiColumn,
         colroles: this.properties.colroles,
+        defaultgroupby: this.properties.defaultgroupby,
 
         cardsPerRow: this.properties.cardsPerRow,
         contentType: this.properties.contentType,
@@ -211,7 +213,7 @@ export default class SitsServiceCatalogueWebPart extends BaseClientSideWebPart<I
                   columnReturnProperty: IColumnReturnProperty['Internal Name'],
                   multiSelect: true,
                   webAbsoluteUrl: this.properties.siteurl,
-              }),
+                }),
                 PropertyFieldCollectionData("colroles", {
                   key: "colroles",
                   label: "5. Set columns roles",
@@ -278,6 +280,16 @@ export default class SitsServiceCatalogueWebPart extends BaseClientSideWebPart<I
                     }
                   ],
                   disabled: this.properties.multiColumn.length < 1
+                }),
+                PropertyPaneChoiceGroup("defaultgroupby", {
+                  label: '6. Set default grouping',
+                  options: [
+                    {key: "None", text: "None", checked: true},
+                    {key: "Category", text: "Category"},
+                    {key: "Subcategory", text: "Subcategory"},
+                    {key: "Status", text: "Status"},
+                    {key: "Owner", text: "Owner"}
+                  ]
                 })
               ]
             },
@@ -290,7 +302,7 @@ export default class SitsServiceCatalogueWebPart extends BaseClientSideWebPart<I
               groupName: "General Visuals",
               groupFields: [
                 PropertyPaneSlider('cardsPerRow',{  
-                  label:"Number of cards per row",  
+                  label:"1. Set number of cards per row",  
                   min:1,  
                   max:5,  
                   value:1,  
@@ -301,7 +313,7 @@ export default class SitsServiceCatalogueWebPart extends BaseClientSideWebPart<I
                   calloutTrigger: CalloutTriggers.Hover,
                   calloutWidth: 200,
                   key: 'toggleInfoHeaderFieldId',
-                  label: 'Turn on the PnP feature',
+                  label: '2. Set content display type',
                   calloutContent: React.createElement('p', {}, 'With this control you can set if the content displays within the card or as a model window on top of the app.'),
                   onText: 'Modal',
                   offText: 'In card',

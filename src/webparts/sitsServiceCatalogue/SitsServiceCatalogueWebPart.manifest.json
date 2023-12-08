@@ -18,7 +18,7 @@
       "header": "SITS Service Catalogue",
       "siteurl": "https://msfintl.sharepoint.com/sites/GRP-SITS-Crossroad",
       "list": "91133e8a-e37c-42cb-bf65-b4a0cc0da7e2",
-      "multiColumn": ["ServicesCategory", "Title", "ServiceDescription", "Status", "Products", "ServiceSubcategory", "ServiceOwner", "ServiceManager", "Servicetype", "Assetsincludedintheservicedelivery", "Clients", "Contactsandproceduresforsigninguptotheservice", "Desiredoutcome", "Warranty", "Clientprocessesorfunctionssupportedbytheservice", "ServiceLevelAgreements", "Responsetime", "Serviceavailibilty"]
+      "multiColumn": ["ServicesCategory", "Title", "ServiceDescription", "Status", "ServiceSubcategory", "ServiceOwner", "ServiceManager", "Servicetype", "Assetsincludedintheservicedelivery"]
     
     }
   }]

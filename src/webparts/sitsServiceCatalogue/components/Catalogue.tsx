@@ -20,17 +20,20 @@ import { Icon } from '@fluentui/react/lib/Icon';
 import MiniSearch from 'minisearch'
 
 //Components
-import ServiceCard from './ServiceCard'
-import ServiceCategories from './ServiceCategories'
-import { ContextualMenu } from '@fluentui/react';
+import Card from './Card/Card'
+import Categories from './Categories'
+import SortByBox from './SortByBox'
+import GroupByBox from './GroupByBox'
 
-export default function SitsServiceCatalogue (props:any) {
+
+export default function Catalogue (props:any) {
     const {
       header,
       siteurl,
       list,
       columns,
       colroles,
+      defaultgroupby,
 
       contentType,
       cardsPerRow,
@@ -56,7 +59,9 @@ export default function SitsServiceCatalogue (props:any) {
     const [internal,setInternal] = useState(false)
     const [servicesList,setServicesList] = useState<any[]>([])
     const [categoriesList,setCategoriesList] = useState<string[]>([])
-  
+    const [subcategoriesList,setSubcategoriesList] = useState<string[]>([])
+
+    //READ CORE DATA
     async function getSITSInternal () {
       const currentUser = await graph.me()
       const currentUserDomain = currentUser.mail.split("@")[1].toLowerCase()
@@ -76,6 +81,34 @@ export default function SitsServiceCatalogue (props:any) {
          return await categories.Choices
     }
 
+    async function getSubcategories():Promise<any[]> {
+      const listSite = Web([sp.web, `${siteurl}`])  
+      const subcategories = await listSite.lists.getById(`${list}`).fields.getByInternalNameOrTitle(`${subcategory}`)();
+         return await subcategories.Choices
+    }
+
+    useEffect(() => {
+      getSITSInternal() 
+
+      getServices().then(services => {
+        setServicesList(services)
+        setSearchCategories(services)
+        setSearchDescription(services)
+      })
+
+      getCategories().then(categories => {
+        setCategoriesList(categories)
+      })
+
+      getSubcategories().then(subcategories => {
+        setSubcategoriesList(subcategories)
+      })
+
+      groupHandler(defaultgroupby)
+
+    }, []);
+
+    //SEARCH
     function setSearchCategories (services) {
       const index = new MiniSearch({
         fields: [`${title}`, `${category}`, `${subcategory}`, `${content}`, `${label1}`],
@@ -115,21 +148,6 @@ export default function SitsServiceCatalogue (props:any) {
       setSearchIndexDescription(index);
     }
 
-    useEffect(() => {
-      getSITSInternal() 
-
-      getServices().then(services => {
-        setServicesList(services)
-        setSearchCategories(services)
-        setSearchDescription(services)
-      })
-
-      getCategories().then(categories => {
-        setCategoriesList(categories)
-      })
-    }, []);
-
-
 //SEARCH AND RESULTS 
     const [inputValue, setInputValue] = useState("");
 
@@ -156,6 +174,7 @@ export default function SitsServiceCatalogue (props:any) {
 
     };
 
+//FILTERS
     const [categoriesFilter,setCategoriesFilter] = useState(categoriesList)
 
     function categoriesHandler(arr){
@@ -184,9 +203,38 @@ export default function SitsServiceCatalogue (props:any) {
       return false
     })
 
-    const auto = "1fr "
 
-    return (
+// SORTING functions
+    const [sorting, setSorting] = useState("Title")
+    const [sortingAsc, setSortingAsc] = useState(1)
+    const sortHandler = (sort) => {
+      const sorted = colroles?.filter(col => col.role === sort[0].toLowerCase())[0]?.column
+      setSorting(sorted)
+      const sortedAsc = sort[1] === true ? 1 : -1
+      setSortingAsc(sortedAsc)
+ }
+
+// GROUPING functions
+    const [grouping, setGrouping] = useState(defaultgroupby)
+    const [groupingArr,setGroupingArr] = useState([])
+    const groupHandler = (group) => {
+      if (group === "Category") {
+        setGroupingArr(categoriesFilter)
+      } else {
+        setGroupingArr(subcategoriesList)
+      }
+      setGrouping(group) 
+    }
+
+    useEffect(()=>{
+      defaultgroupby === "Category" ? setGroupingArr(categoriesFilter) : setGroupingArr(subcategoriesList)
+
+    },[categoriesFilter.length, subcategoriesList.length])
+
+    const column = "1fr "
+
+
+      return (
       <section className={styles.service_catalogue}>
         <div className={styles.service_catalogue_top}>
           <h1>{header}</h1>
@@ -194,29 +242,73 @@ export default function SitsServiceCatalogue (props:any) {
           </div>
         </div>
         <input
-          className={styles.service_catalogue_input} 
-          type="text"
-          onChange={handleSearch}
-          value={inputValue}
-          placeholder="Search"
-        />
-        <ServiceCategories
+            className={styles.sc__input} 
+            type="text"
+            onChange={handleSearch}
+            value={inputValue}
+            placeholder="Search"
+          />
+        <Categories 
           internal={internal}
           categoriesList={categoriesList}
           onCheckChange = {categoriesHandler}
           catIcons = {catIcons}
           context={context}
         />
+        <SortByBox onSort={sortHandler}/>
+        <GroupByBox onGroup={groupHandler} defaultgroupby={defaultgroupby}/>
+        {     
+        grouping !== "None" ?
+        groupingArr.map((grp,idx)=>
+        <>
+          <h2>{grp}</h2>
+          <div 
+            className={styles.service_catalogue_results}
+            style={{
+              gridTemplateColumns: `${column.repeat(cardsPerRow)}` 
+            }}
+          >
+            {   
+              inputValue !== "" ?
+              filteredResults
+              .sort((a,b)=> a[sorting] > b[sorting] ? sortingAsc*1 : -sortingAsc*1)
+              .filter(service => service[grouping === "Category" ? category : subcategory] === grp)
+              .map((service,idx)=>
+              <Card 
+                  key={`${idx}_${service.Title}`} 
+                  service={service} 
+                  colroles={colroles} 
+                  catIcons = {catIcons}
+                  contentType = {contentType}
+              />
+              ) :
+              filteredServicesList
+              .sort((a,b)=> a[sorting] > b[sorting] ? sortingAsc*1 : -sortingAsc*1)
+              .filter(service => service[grouping === "Category" ? category : subcategory] === grp)
+              .map((service,idx)=>
+              <Card 
+                  key={`${idx}_${service.Title}`} 
+                  service={service} 
+                  colroles={colroles} 
+                  catIcons = {catIcons}
+                  contentType = {contentType}
+              />
+              )
+              
+            }
+          </div>
+        </>
+        ) :
         <div 
             className={styles.service_catalogue_results}
             style={{
-              gridTemplateColumns: `${auto.repeat(cardsPerRow)}` 
+              gridTemplateColumns: `${column.repeat(cardsPerRow)}` 
             }}
             >
           {
           inputValue !== "" ? 
-          filteredResults.map((service,idx) => 
-          <ServiceCard 
+          filteredResults.sort((a,b)=> a[sorting] > b[sorting] ? sortingAsc*1 : -sortingAsc*1).map((service,idx) => 
+          <Card 
               key={`${idx}_${service.Title}`} 
               service={service} 
               colroles={colroles} 
@@ -224,8 +316,8 @@ export default function SitsServiceCatalogue (props:any) {
               contentType = {contentType}
           />
               ) : 
-          filteredServicesList.map((service,idx) => 
-          <ServiceCard 
+          filteredServicesList.sort((a,b)=> a[sorting] > b[sorting] ? sortingAsc*1 : -sortingAsc*1).map((service,idx) => 
+          <Card 
               key={`${idx}_${service.Title}`} 
               service={service} 
               colroles={colroles} 
@@ -234,7 +326,8 @@ export default function SitsServiceCatalogue (props:any) {
           />
               )
           }
-        </div>    
+        </div> 
+          }   
       </section>
     );
   }

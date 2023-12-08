@@ -1,5 +1,5 @@
 import * as React from 'react';
-import styles from './SitsServiceCatalogue.module.scss';
+import styles from '../SitsServiceCatalogue.module.scss';
 
 //3rd party Modules
 import * as DOMPurify from 'dompurify';
@@ -12,8 +12,7 @@ export default function Content (props:any) {
     } = props;
 
     return (
-        <div className={styles.service_content_modal}>
-            <button onClick={props.onCloseModal}>CLOSE</button>
+        <div className={styles.content}>
             <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(service[content])}}/>
         </div>
     );

@@ -1,13 +1,13 @@
 import * as React from 'react';
 import { useState} from 'react';
-import styles from './SitsServiceCatalogue.module.scss';
+import styles from '../SitsServiceCatalogue.module.scss';
 
 //3rd party Modules
 import { Icon } from '@fluentui/react/lib/Icon';
 import Content from './Content'
 import ContentModal from './ContentModal'
 
-export default function ServiceCard (props:any) {
+export default function Card (props:any) {
     const {
       service,
       colroles,
@@ -36,7 +36,7 @@ export default function ServiceCard (props:any) {
     
     return (
         <div 
-        className={contentHidden ? `${styles.service_content}` : `${styles.service_content} ${styles.service_content_opened}`}
+        className={contentHidden ? `${styles.content}` : `${styles.content} ${styles.content_opened}`}
         >
           <button
             className={styles.product_service_button}
@@ -65,12 +65,13 @@ export default function ServiceCard (props:any) {
                 </div>
             </div>
 
-            <div className={styles.service_content_products}>
+            <div className={styles.content_products}>
                   {service[label1]?.map(product => <span className={styles.service_product}>{product}</span>)}
             </div>
           </button>
           {contentHidden === true ? null : 
-           contentType ? <ContentModal service = {service} content = {content} onCloseModal={contentHiddenHandler}/>:
+           contentType ? 
+           <ContentModal service = {service} content = {content} onCloseModal={contentHiddenHandler}/>:
            <Content service = {service} content = {content} />    
           }      
         </div>
