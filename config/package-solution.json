@@ -3,10 +3,28 @@
   "solution": {
     "name": "service-catalogue-client-side-solution",
     "id": "28456783-887f-4444-a785-65e07d1fa789",
-    "version": "1.0.0.5",
+    "version": "1.0.6.1",
     "includeClientSideAssets": true,
     "skipFeatureDeployment": true,
     "isDomainIsolated": false,
+    "webApiPermissionRequests": [
+      {
+        "resource": "Microsoft Graph",
+        "scope": "User.Read"
+      },
+      {
+        "resource": "Microsoft Graph",
+        "scope": "User.ReadBasic.All"
+      },
+      {
+        "resource": "Microsoft Graph",
+        "scope": "People.Read"
+      },
+      {
+        "resource": "Microsoft Graph",
+        "scope": "Calendars.Read"
+      }
+    ],
     "developer": {
       "name": "",
       "websiteUrl": "",
@@ -30,7 +48,7 @@
         "title": "service-catalogue Feature",
         "description": "The feature that activates elements of the service-catalogue solution.",
         "id": "32ad960f-432f-4243-abd6-f02b2196d791",
-        "version": "1.0.0.5"
+        "version": "1.0.6.1"
       }
     ]
   },

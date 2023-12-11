@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState} from 'react';
+import {useState,useEffect} from 'react';
 import styles from '../SitsServiceCatalogue.module.scss';
 
 //3rd party Modules
@@ -7,12 +7,22 @@ import { Icon } from '@fluentui/react/lib/Icon';
 import Content from './Content'
 import ContentModal from './ContentModal'
 
+//API
+import { Web } from "@pnp/sp/webs"; 
+import "@pnp/sp/webs";
+import "@pnp/sp/lists";
+import "@pnp/sp/items";
+
+
 export default function Card (props:any) {
     const {
       service,
       colroles,
       catIcons,
-      contentType
+      contentType,
+      sp,
+      siteurl,
+      list
     } = props;
 
     //console.log(colroles)
@@ -23,9 +33,9 @@ export default function Card (props:any) {
     const status = colroles?.filter(col => col.role === "status")[0]?.column
     const content = colroles?.filter(col => col.role === "content")[0]?.column
     const label1 = colroles?.filter(col => col.role === "label1")[0]?.column
-    const label2 = colroles?.filter(col => col.role === "label2")[0]?.column
+    //const label2 = colroles?.filter(col => col.role === "label2")[0]?.column
 
-    //console.log(service[subcategory])
+    const ownerField = colroles?.filter(col => col.role === "owner")[0]?.column
 
     const [contentHidden, setContentHidden] = useState(true)
     const contentHiddenHandler = () => {
@@ -34,6 +44,17 @@ export default function Card (props:any) {
 
     const icon = service[status] === "Active" ? "CompletedSolid" : service[status]  === "Archive" ? "RepoSolid" : "SkypeCircleClock"
     
+    async function getOwner():Promise<any[]> {
+      const listSite = Web([sp.web, `${siteurl}`]) 
+      const owner =  await listSite.lists.getById(`${list}`).items.getById(service.ID).select(`${ownerField}/EMail`).expand(`${ownerField}`)()
+      return await owner.ServiceOwner.EMail
+    }
+
+    useEffect(()=>{
+      getOwner().then(res=>console.log(res))
+    },[])
+
+
     return (
         <div 
         className={contentHidden ? `${styles.content}` : `${styles.content} ${styles.content_opened}`}
@@ -46,7 +67,6 @@ export default function Card (props:any) {
                 <span>{service[subcategory]}</span>
                 <h4>{service[title]}</h4>
               </div>
-
               <div className={styles.service_cat_horizontal}>
                 <Icon 
                 iconName={

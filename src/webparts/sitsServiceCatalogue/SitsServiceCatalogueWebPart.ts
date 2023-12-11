@@ -6,23 +6,18 @@ import { Version } from '@microsoft/sp-core-library';
 import {
   type IPropertyPaneConfiguration,
   PropertyPaneTextField,
-  PropertyPaneLabel,
   PropertyPaneSlider,
-  PropertyPaneToggle,
   PropertyPaneChoiceGroup
 } from '@microsoft/sp-property-pane';
 import { PropertyFieldListPicker, PropertyFieldListPickerOrderBy } from '@pnp/spfx-property-controls/lib/PropertyFieldListPicker';
 import { PropertyFieldCollectionData, CustomCollectionFieldType } from '@pnp/spfx-property-controls/lib/PropertyFieldCollectionData';
 import { CalloutTriggers } from '@pnp/spfx-property-controls/lib/Callout';
-import { PropertyFieldLabelWithCallout } from '@pnp/spfx-property-controls/lib/PropertyFieldLabelWithCallout';
 import { PropertyFieldMonacoEditor } from '@pnp/spfx-property-controls/lib/PropertyFieldMonacoEditor';
-
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
 import { IColumnReturnProperty, PropertyFieldColumnPicker, PropertyFieldColumnPickerOrderBy } from '@pnp/spfx-property-controls/lib/PropertyFieldColumnPicker';
-import Catalogue from './components/Catalogue';
 import { PropertyPaneWebPartInformation } from '@pnp/spfx-property-controls/lib/PropertyPaneWebPartInformation';
-
 import { PropertyFieldToggleWithCallout } from '@pnp/spfx-property-controls/lib/PropertyFieldToggleWithCallout';
+
 
 //API
 import { spfi, SPFx as SPFxsp} from "@pnp/sp";
@@ -32,6 +27,8 @@ import "@pnp/sp/lists";
 import "@pnp/sp/items";
 import "@pnp/sp/fields";
 
+//Components
+import Catalogue from './components/Catalogue';
 
 export interface ICatalogueWebPartProps {
     toggleInfoHeaderValue: boolean;
@@ -53,6 +50,7 @@ export interface ICatalogueWebPartProps {
     subcatIcons: any [];
     subcatCSS: string;
 }
+
 
 export default class SitsServiceCatalogueWebPart extends BaseClientSideWebPart<ICatalogueWebPartProps> {
 

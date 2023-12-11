@@ -25,9 +25,7 @@ export default function SortByBox (props:any) {
     }
 
     useEffect(()=>{
-      console.log("triggered")
       props.onSort([sortedby,sortedbyAsc])
-
     },[sortedbyAsc, sortedby])
 
     const sortingOptions = [
@@ -46,7 +44,8 @@ export default function SortByBox (props:any) {
         <div 
         className={styles.sc__sort_buttons}
         style={{
-          left: `${sortedbyHidden ?  "-100%" : "0%"}`
+          left: `${sortedbyHidden ?  "-100%" : "0%"}`,
+          opacity: `${sortedbyHidden ?  "0" : "1"}`
         }}
         >
                 {sortingOptions.map((option,idx) => 

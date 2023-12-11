@@ -1,5 +1,12 @@
 @import '~@fluentui/react/dist/sass/References.scss';
 
+.person1 {  
+  --person-avatar-size: 56px;
+  --person-line1-font-size: 14px;
+  --person-line2-font-size: 13px;
+  --person-line3-font-size: 13px;
+}
+
 .PANEL_TEST { 
   background-color: red;
 }

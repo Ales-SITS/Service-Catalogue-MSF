@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import styles from './SitsServiceCatalogue.module.scss';
 
 //API
@@ -9,6 +9,7 @@ import "@pnp/sp/webs";
 import "@pnp/sp/lists";
 import "@pnp/sp/items";
 import "@pnp/sp/fields";
+import "@pnp/sp/items/get-all";
 
 import { SPFx as SPFxGraph, graphfi } from "@pnp/graph";
 import "@pnp/graph/users";
@@ -16,22 +17,22 @@ import "@pnp/graph/groups";
 import "@pnp/graph/members";
 
 //3rd party Modules
-import { Icon } from '@fluentui/react/lib/Icon';
+//import { Icon } from '@fluentui/react/lib/Icon';
 import MiniSearch from 'minisearch'
+import "@pnp/graph/users";
 
 //Components
 import Card from './Card/Card'
 import Categories from './Categories'
 import SortByBox from './SortByBox'
 import GroupByBox from './GroupByBox'
-
+import Grouped from './Grouped'
 
 export default function Catalogue (props:any) {
     const {
       header,
       siteurl,
       list,
-      columns,
       colroles,
       defaultgroupby,
 
@@ -46,6 +47,7 @@ export default function Catalogue (props:any) {
     //API init variables
     const sp = spfi().using(SPFxsp(context))
     const graph = graphfi().using(SPFxGraph(context))
+    const webpartID = context.instanceId.replaceAll("-","")
 
     //ROLES handlers
     const title = colroles?.filter(col => col.role === "title")[0]?.column
@@ -70,7 +72,7 @@ export default function Catalogue (props:any) {
 
     async function getServices():Promise<any[]> {
       const listSite = Web([sp.web, `${siteurl}`])  
-      const services: any[] = await listSite.lists.getById(`${list}`).items();
+      const services: any[] = await listSite.lists.getById(`${list}`).items.getAll();
       
       return await services
     }
@@ -176,7 +178,6 @@ export default function Catalogue (props:any) {
 
 //FILTERS
     const [categoriesFilter,setCategoriesFilter] = useState(categoriesList)
-
     function categoriesHandler(arr){
       const filtered = categoriesList.filter((_, i) => arr[i]);
       setCategoriesFilter(filtered)
@@ -203,7 +204,6 @@ export default function Catalogue (props:any) {
       return false
     })
 
-
 // SORTING functions
     const [sorting, setSorting] = useState("Title")
     const [sortingAsc, setSortingAsc] = useState(1)
@@ -228,11 +228,9 @@ export default function Catalogue (props:any) {
 
     useEffect(()=>{
       defaultgroupby === "Category" ? setGroupingArr(categoriesFilter) : setGroupingArr(subcategoriesList)
-
     },[categoriesFilter.length, subcategoriesList.length])
 
     const column = "1fr "
-
 
       return (
       <section className={styles.service_catalogue}>
@@ -260,44 +258,29 @@ export default function Catalogue (props:any) {
         {     
         grouping !== "None" ?
         groupingArr.map((grp,idx)=>
-        <>
-          <h2>{grp}</h2>
-          <div 
-            className={styles.service_catalogue_results}
-            style={{
-              gridTemplateColumns: `${column.repeat(cardsPerRow)}` 
-            }}
-          >
-            {   
-              inputValue !== "" ?
-              filteredResults
-              .sort((a,b)=> a[sorting] > b[sorting] ? sortingAsc*1 : -sortingAsc*1)
-              .filter(service => service[grouping === "Category" ? category : subcategory] === grp)
-              .map((service,idx)=>
-              <Card 
-                  key={`${idx}_${service.Title}`} 
-                  service={service} 
-                  colroles={colroles} 
-                  catIcons = {catIcons}
-                  contentType = {contentType}
-              />
-              ) :
-              filteredServicesList
-              .sort((a,b)=> a[sorting] > b[sorting] ? sortingAsc*1 : -sortingAsc*1)
-              .filter(service => service[grouping === "Category" ? category : subcategory] === grp)
-              .map((service,idx)=>
-              <Card 
-                  key={`${idx}_${service.Title}`} 
-                  service={service} 
-                  colroles={colroles} 
-                  catIcons = {catIcons}
-                  contentType = {contentType}
-              />
-              )
-              
-            }
-          </div>
-        </>
+        <Grouped
+          key={idx}
+          level={grouping === "Category" ? 1 : 2}
+          grp={grp}
+          cardsPerRow={cardsPerRow}
+          sorting={sorting}
+          grouping={grouping}
+          category={category}
+          subcategory={subcategory}
+          subcategoriesList={subcategoriesList}
+          filteredResults={filteredResults}
+          filteredServicesList={filteredServicesList}
+          sortingAsc={sortingAsc}
+          inputValue={inputValue}
+          colroles={colroles}
+          catIcons={catIcons}
+          subcatIcons={subcatIcons}
+          contentType={contentType}
+          sp={sp}
+          siteurl={siteurl}
+          list={list}
+          webpartID={webpartID}
+          />
         ) :
         <div 
             className={styles.service_catalogue_results}
@@ -314,6 +297,10 @@ export default function Catalogue (props:any) {
               colroles={colroles} 
               catIcons = {catIcons} 
               contentType = {contentType}
+
+              sp = {sp}
+              siteurl={siteurl}
+              list={list}
           />
               ) : 
           filteredServicesList.sort((a,b)=> a[sorting] > b[sorting] ? sortingAsc*1 : -sortingAsc*1).map((service,idx) => 
@@ -323,6 +310,10 @@ export default function Catalogue (props:any) {
               colroles={colroles} 
               catIcons = {catIcons}
               contentType = {contentType}
+
+              sp = {sp}
+              siteurl={siteurl}
+              list={list}
           />
               )
           }

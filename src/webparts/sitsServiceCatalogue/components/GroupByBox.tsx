@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { useEffect, useState, useRef } from 'react';
+import { useState } from 'react';
 import styles from './SitsServiceCatalogue.module.scss';
 
 //3rd party Modules
-import { Icon } from '@fluentui/react/lib/Icon';
+//import { Icon } from '@fluentui/react/lib/Icon';
 
 export default function GroupByByBox (props:any) {
 
@@ -15,7 +15,7 @@ export default function GroupByByBox (props:any) {
     const [groupby,setGroupby] = useState(props.defaultgroupby)
 
     const groupByHandler = (option) => {
-      if (option == groupby) {
+      if (option === groupby) {
         setGroupby("None")
         props.onGroup("None")
       } else {
@@ -41,7 +41,8 @@ export default function GroupByByBox (props:any) {
         <div 
           className={styles.sc__sort_buttons}
           style={{
-            left: `${groupedbyHidden ?  "-100%" : "0%"}`
+            left: `${groupedbyHidden ?  "-100%" : "0%"}`,
+            opacity: `${groupedbyHidden ?  "0" : "1"}`
           }}
         >
                 {sortingOptions.map((option,idx) => 
