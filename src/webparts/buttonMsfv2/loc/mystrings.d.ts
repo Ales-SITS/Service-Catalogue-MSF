@@ -1,4 +1,4 @@
-declare interface ISitsServiceCatalogueWebPartStrings {
+declare interface IButtonMsfv2WebPartStrings {
   PropertyPaneDescription: string;
   BasicGroupName: string;
   DescriptionFieldLabel: string;
@@ -13,7 +13,7 @@ declare interface ISitsServiceCatalogueWebPartStrings {
   UnknownEnvironment: string;
 }
 
-declare module 'SitsServiceCatalogueWebPartStrings' {
-  const strings: ISitsServiceCatalogueWebPartStrings;
+declare module 'ButtonMsfv2WebPartStrings' {
+  const strings: IButtonMsfv2WebPartStrings;
   export = strings;
 }

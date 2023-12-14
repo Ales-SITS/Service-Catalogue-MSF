@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useEffect, useState, useRef } from 'react';
-import styles from './SitsServiceCatalogue.module.scss';
+import styles from './ListToApp.module.scss';
 
 //3rd party Modules
 import { Icon } from '@fluentui/react/lib/Icon';

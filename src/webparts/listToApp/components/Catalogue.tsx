@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import styles from './SitsServiceCatalogue.module.scss';
+import styles from './ListToApp.module.scss';
 
 //API
 import { spfi, SPFx as SPFxsp} from "@pnp/sp";
@@ -26,7 +26,8 @@ import Card from './Card/Card'
 import Categories from './Categories'
 import SortByBox from './SortByBox'
 import GroupByBox from './GroupByBox'
-import Grouped from './Grouped'
+import Grouped from './Grouped/Grouped'
+
 
 export default function Catalogue (props:any) {
     const {
@@ -43,6 +44,8 @@ export default function Catalogue (props:any) {
       
       context
     } = props;
+
+    
 
     //API init variables
     const sp = spfi().using(SPFxsp(context))
@@ -173,13 +176,13 @@ export default function Catalogue (props:any) {
       }, []);
 
       setResults(unique)
-
     };
 
 //FILTERS
     const [categoriesFilter,setCategoriesFilter] = useState(categoriesList)
     function categoriesHandler(arr){
       const filtered = categoriesList.filter((_, i) => arr[i]);
+
       setCategoriesFilter(filtered)
     }
 
@@ -256,7 +259,34 @@ export default function Catalogue (props:any) {
         <SortByBox onSort={sortHandler}/>
         <GroupByBox onGroup={groupHandler} defaultgroupby={defaultgroupby}/>
         {     
-        grouping !== "None" ?
+        grouping !== "None" && inputValue !== "" ?
+        groupingArr.map((grp,idx)=>
+        filteredResults.filter(service => service[category] === grp).length === 0 ? null : 
+          <Grouped
+            key={idx}
+            level={grouping === "Category" ? 1 : 2}
+            grp={grp}
+            cardsPerRow={cardsPerRow}
+            sorting={sorting}
+            grouping={grouping}
+            category={category}
+            subcategory={subcategory}
+            subcategoriesList={subcategoriesList}
+            filteredResults={filteredResults}
+            filteredServicesList={filteredServicesList}
+            sortingAsc={sortingAsc}
+            inputValue={inputValue}
+            colroles={colroles}
+            catIcons={catIcons}
+            subcatIcons={subcatIcons}
+            contentType={contentType}
+            sp={sp}
+            siteurl={siteurl}
+            list={list}
+            webpartID={webpartID}
+            />
+        ) :
+        grouping !== "None" && inputValue === "" ? 
         groupingArr.map((grp,idx)=>
         <Grouped
           key={idx}
@@ -296,6 +326,8 @@ export default function Catalogue (props:any) {
               service={service} 
               colroles={colroles} 
               catIcons = {catIcons} 
+              subcatIcons = {subcatIcons}
+              webpartID={webpartID}
               contentType = {contentType}
 
               sp = {sp}
@@ -309,6 +341,8 @@ export default function Catalogue (props:any) {
               service={service} 
               colroles={colroles} 
               catIcons = {catIcons}
+              subcatIcons = {subcatIcons}
+              webpartID={webpartID}
               contentType = {contentType}
 
               sp = {sp}

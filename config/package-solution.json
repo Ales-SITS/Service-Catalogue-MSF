@@ -1,9 +1,9 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
   "solution": {
-    "name": "service-catalogue-client-side-solution",
+    "name": "MSF webparts package 2",
     "id": "28456783-887f-4444-a785-65e07d1fa789",
-    "version": "1.0.6.1",
+    "version": "2.0.0.2",
     "includeClientSideAssets": true,
     "skipFeatureDeployment": true,
     "isDomainIsolated": false,
@@ -34,10 +34,10 @@
     },
     "metadata": {
       "shortDescription": {
-        "default": "service-catalogue description"
+        "default": "MSF webparts package 2"
       },
       "longDescription": {
-        "default": "service-catalogue description"
+        "default": "MSF webparts package 2"
       },
       "screenshotPaths": [],
       "videoUrl": "",
@@ -45,14 +45,14 @@
     },
     "features": [
       {
-        "title": "service-catalogue Feature",
+        "title": "MSF webparts package 2",
         "description": "The feature that activates elements of the service-catalogue solution.",
         "id": "32ad960f-432f-4243-abd6-f02b2196d791",
-        "version": "1.0.6.1"
+        "version": "2.0.0.2"
       }
     ]
   },
   "paths": {
-    "zippedPackage": "solution/service-catalogue.sppkg"
+    "zippedPackage": "solution/msf-webparts2.sppkg"
   }
 }

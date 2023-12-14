@@ -1,0 +1,41 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx/client-side-web-part-manifest.schema.json",
+  "id": "55d08f7d-0928-4d5a-8c40-9176c87f20cf",
+  "alias": "ButtonMsfv2WebPart",
+  "componentType": "WebPart",
+  "version": "*",
+  "manifestVersion": 2,
+  "requiresCustomScript": false,
+  "supportedHosts": ["SharePointWebPart", "TeamsPersonalApp", "TeamsTab", "SharePointFullPage"],
+  "supportsThemeVariants": true,
+  "preconfiguredEntries": [{
+    "groupId": "5c03119e-3074-46fd-976b-c60198311f70",
+    "group": { "default": "Advanced" },
+    "title": { "default": "ButtonMsfv2" },
+    "description": { "default": "ButtonMsfv2 description" },
+    "officeFabricIconFontName": "Page",
+    "properties": {
+      "buttons_header": "Button MSF version 2",
+      "search_collection": [
+        {
+          "search_toggle": true,
+          "search_placeholder": "Placeholder",
+          "search_suffix": "*",
+          "uniqueId": "c6f14117-ce95-4f6c-9058-09d02a0e06f7",
+          "sortIdx": 1
+        }
+      ],
+      "buttons_collection": [
+        {
+          "button_icon": "6PointStar",
+          "button_label": "Button label",
+          "button_target": true,
+          "button_icon_toggle": true,
+          "button_url": "https://msfintl.sharepoint.com/sites/SITSExternalPortal",
+          "uniqueId": "20dd0322-8ded-4f3e-8109-bd1f78d7819b",
+          "sortIdx": 1
+        }
+      ]
+    }
+  }]
+}

@@ -2,18 +2,27 @@
   "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/config.2.0.schema.json",
   "version": "2.0",
   "bundles": {
-    "sits-service-catalogue-web-part": {
+    "list-to-app-web-part": {
       "components": [
         {
-          "entrypoint": "./lib/webparts/sitsServiceCatalogue/SitsServiceCatalogueWebPart.js",
-          "manifest": "./src/webparts/sitsServiceCatalogue/SitsServiceCatalogueWebPart.manifest.json"
+          "entrypoint": "./lib/webparts/listToApp/listToAppWebPart.js",
+          "manifest": "./src/webparts/listToApp/listToAppWebPart.manifest.json"
+        }
+      ]
+    },
+    "button-msfv-2-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/buttonMsfv2/ButtonMsfv2WebPart.js",
+          "manifest": "./src/webparts/buttonMsfv2/ButtonMsfv2WebPart.manifest.json"
         }
       ]
     }
   },
   "externals": {},
   "localizedResources": {
-    "SitsServiceCatalogueWebPartStrings": "lib/webparts/sitsServiceCatalogue/loc/{locale}.js",
-    "PropertyControlStrings": "node_modules/@pnp/spfx-property-controls/lib/loc/{locale}.js"
+    "SitsServiceCatalogueWebPartStrings": "lib/webparts/listToApp/loc/{locale}.js",
+    "PropertyControlStrings": "node_modules/@pnp/spfx-property-controls/lib/loc/{locale}.js",
+    "ButtonMsfv2WebPartStrings": "lib/webparts/buttonMsfv2/loc/{locale}.js"
   }
 }

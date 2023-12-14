@@ -1,7 +1,7 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/spfx/client-side-web-part-manifest.schema.json",
   "id": "1fd7d340-899d-48bd-ba8a-0a3d6c0d445b",
-  "alias": "SitsServiceCatalogueWebPart",
+  "alias": "ListToAppWebPart",
   "componentType": "WebPart",
   "version": "*",
   "manifestVersion": 2,
@@ -11,15 +11,15 @@
   "preconfiguredEntries": [{
     "groupId": "5c03119e-3074-46fd-976b-c60198311f70",
     "group": { "default": "Advanced" },
-    "title": { "default": "SITS Service Catalogue" },
-    "description": { "default": "SITS Service Catalogue description" },
+    "title": { "default": "List to App (MSF)" },
+    "description": { "default": "Create powerfull apps based on SPO lists" },
     "officeFabricIconFontName": "Page",
     "properties": {
-      "header": "SITS Service Catalogue",
+      "header": "List to App ",
       "siteurl": "https://msfintl.sharepoint.com/sites/GRP-SITS-Crossroad",
       "list": "91133e8a-e37c-42cb-bf65-b4a0cc0da7e2",
-      "multiColumn": ["ServicesCategory", "Title", "ServiceDescription", "Status", "ServiceSubcategory", "ServiceOwner", "ServiceManager", "Servicetype", "Assetsincludedintheservicedelivery"]
-    
+      "multiColumn": ["ServicesCategory", "Title", "ServiceDescription", "Status", "ServiceSubcategory", "ServiceOwner", "ServiceManager", "Servicetype", "Assetsincludedintheservicedelivery"],
+      "catIcon": [{"cat_icon":"12PointStar","category":"default", "uniqueId":"355460b5-85dd-435c-9157-6623e3b789b9", "sordIdx":1}]  
     }
   }]
 }

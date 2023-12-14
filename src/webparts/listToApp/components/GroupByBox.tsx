@@ -27,9 +27,7 @@ export default function GroupByByBox (props:any) {
 
     const sortingOptions = [
       'Category',
-      'Subcategory',
-      'Status',
-      'Owner'
+      'Subcategory'
     ]
 
     return (

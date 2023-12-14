@@ -30,7 +30,7 @@ import "@pnp/sp/fields";
 //Components
 import Catalogue from './components/Catalogue';
 
-export interface ICatalogueWebPartProps {
+export interface IListToAppWebPartProps {
     toggleInfoHeaderValue: boolean;
 
     header: string;
@@ -52,7 +52,7 @@ export interface ICatalogueWebPartProps {
 }
 
 
-export default class SitsServiceCatalogueWebPart extends BaseClientSideWebPart<ICatalogueWebPartProps> {
+export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWebPartProps> {
 
   private categories: any[] = ["default"]
   private subcategories: any[] = ["default"]
@@ -61,7 +61,7 @@ export default class SitsServiceCatalogueWebPart extends BaseClientSideWebPart<I
     const existingStyleElement = document.head.querySelector('style[data-webpart-styles]');
     if (existingStyleElement) {
       existingStyleElement.remove();
-  }
+    }
     const webPartId = this.context.instanceId.replaceAll("-","")
     const dynamicStyles = document.createElement('style');
     const concatCSS = this.properties.catCSS?.concat(" ",this.properties.subcatCSS)
@@ -70,7 +70,7 @@ export default class SitsServiceCatalogueWebPart extends BaseClientSideWebPart<I
   
     dynamicStyles.textContent = dynamicStylesContent;
 
-    const element: React.ReactElement<ICatalogueWebPartProps> = React.createElement(
+    const element: React.ReactElement<IListToAppWebPartProps> = React.createElement(
       Catalogue,
       {
         header: this.properties.header,
@@ -285,8 +285,8 @@ export default class SitsServiceCatalogueWebPart extends BaseClientSideWebPart<I
                     {key: "None", text: "None", checked: true},
                     {key: "Category", text: "Category"},
                     {key: "Subcategory", text: "Subcategory"},
-                    {key: "Status", text: "Status"},
-                    {key: "Owner", text: "Owner"}
+                   /* {key: "Status", text: "Status"},
+                    {key: "Owner", text: "Owner"}*/
                   ]
                 })
               ]
@@ -315,7 +315,7 @@ export default class SitsServiceCatalogueWebPart extends BaseClientSideWebPart<I
                   calloutContent: React.createElement('p', {}, 'With this control you can set if the content displays within the card or as a model window on top of the app.'),
                   onText: 'Modal',
                   offText: 'In card',
-                  checked: this.properties.toggleInfoHeaderValue
+                  checked: this.properties.contentType
                 })
               ]
             },
