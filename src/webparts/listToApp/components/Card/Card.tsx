@@ -23,7 +23,7 @@ export default function Card (props:any) {
       colroles,
       catIcons,
       subcatIcons,
-      contentType,
+      cardType,
       sp,
       siteurl,
       list
@@ -52,8 +52,6 @@ export default function Card (props:any) {
       link: service[link]
     }
 
-    console.log(contentType)
-
     const [contentHidden, setContentHidden] = useState(true)
     const contentHiddenHandler = () => {
       setContentHidden(current => !current)
@@ -72,13 +70,13 @@ export default function Card (props:any) {
     },[])
 
     const catIconName =   catIcons.find(cat => cat.category === service[category]) ? 
-                          catIcons.find(cat => cat.category === service[category]).cat_icon :
-                          catIcons.find(cat => cat.category === "default").cat_icon
+                          catIcons.find(cat => cat.category === service[category]) :
+                          catIcons.find(cat => cat.category === "default")
 
       
     const subcatIconName =   subcatIcons.find(subcat => subcat.subcategory === service[subcategory]) ? 
-                             subcatIcons.find(subcat => subcat.subcategory === service[subcategory]).subcat_icon :
-                             subcatIcons.find(subcat => subcat.subcategory === "default").subcat_icon                    
+                             subcatIcons.find(subcat => subcat.subcategory === service[subcategory]) :
+                             subcatIcons.find(subcat => subcat.subcategory === "default")                    
 
     return (
         <div 
@@ -89,41 +87,63 @@ export default function Card (props:any) {
             onClick={contentHiddenHandler}>
             <div className={cardstyles.product_service_button_top}>
               <div className={styles.service_cat_vertical}>
-                <span>{service[subcategory]}</span>
                 <h4>{service[title]}</h4>
               </div>
               <div className={styles.service_cat_horizontal}>
                 <Icon 
-                  iconName={catIconName} 
-                  title={service[category]}
+                  iconName={subcatIconName.subcat_icon} 
+                  title={serviceObj.subcategory}
+                  className={cardstyles.lta_icon}
+                  style={{
+                    color: `${catIconName.cat_icon_color}`,
+                    backgroundColor: `${catIconName.cat_icon_bg}`,
+                  }}
+                />
+                <Icon 
+                  iconName={catIconName.cat_icon} 
+                  title={serviceObj.category}
+                  className={cardstyles.lta_icon}
+                  style={{
+                    color: `${catIconName.cat_icon_color}`,
+                    backgroundColor: `${catIconName.cat_icon_bg}`,
+                  }}
                 />
                 <Icon 
                       iconName={icon} 
-                      title={service[status]}
+                      title={serviceObj.status}
                       style={{
-                        color: `${service[status] === "Active" ? "#02eb0a" : service[status] === "Archive" ? "#8f8f8f" : "#af00d6"}`,
+                        color: `${serviceObj.status === "Active" ? "#02eb0a" : serviceObj.status === "Archive" ? "#8f8f8f" : "#af00d6"}`,
                         marginLeft: '10px'
-                      }}/>
+                  }}
+                />
+                {serviceObj.link === null ? null :
+                  <a href={serviceObj.link.Url}>
+                  <Icon 
+                        iconName="Link12"
+                        title={serviceObj.link?.Description}
+                        className={cardstyles.lta_icon}
+                        style={{
+                          color: `${serviceObj.status === "Active" ? "#02eb0a" : serviceObj.status === "Archive" ? "#8f8f8f" : "#af00d6"}`,
+                          marginLeft: '10px'
+                    }}
+                  />
+                  </a>
+                }
                 </div>
             </div>
 
             <div className={cardstyles.content_products}>
-                  {service[label1]?.map(product => <span className={cardstyles.service_product}>{product}</span>)}
+                  {serviceObj.label1?.map(product => <span className={cardstyles.service_product}>{product}</span>)}
             </div>
           </button>
           {contentHidden === true ? null : 
-           contentType ? 
-           <ContentModal 
+           <ContentModal
+            cardType = {cardType}
             catIconName={catIconName}
             subcatIconName={subcatIconName}
             serviceObj = {serviceObj}
             onCloseModal={contentHiddenHandler}
-           />:
-           <Content 
-            service = {service} 
-            content = {content} 
-            serviceObj = {serviceObj}
-           />    
+           />  
           }      
         </div>
     );

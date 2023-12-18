@@ -17,12 +17,21 @@
           "manifest": "./src/webparts/buttonMsfv2/ButtonMsfv2WebPart.manifest.json"
         }
       ]
+    },
+    "welcome-user-msfv-2-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/welcomeUserMsfv2/WelcomeUserMsfv2WebPart.js",
+          "manifest": "./src/webparts/welcomeUserMsfv2/WelcomeUserMsfv2WebPart.manifest.json"
+        }
+      ]
     }
   },
   "externals": {},
   "localizedResources": {
     "SitsServiceCatalogueWebPartStrings": "lib/webparts/listToApp/loc/{locale}.js",
     "PropertyControlStrings": "node_modules/@pnp/spfx-property-controls/lib/loc/{locale}.js",
-    "ButtonMsfv2WebPartStrings": "lib/webparts/buttonMsfv2/loc/{locale}.js"
+    "ButtonMsfv2WebPartStrings": "lib/webparts/buttonMsfv2/loc/{locale}.js",
+    "WelcomeUserMsfv2WebPartStrings": "lib/webparts/welcomeUserMsfv2/loc/{locale}.js"
   }
 }

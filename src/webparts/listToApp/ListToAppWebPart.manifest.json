@@ -6,6 +6,7 @@
   "version": "*",
   "manifestVersion": 2,
   "requiresCustomScript": false,
+  "supportsFullBleed": true,
   "supportedHosts": ["SharePointWebPart", "TeamsPersonalApp", "TeamsTab", "SharePointFullPage"],
   "supportsThemeVariants": true,
   "preconfiguredEntries": [{
@@ -19,7 +20,8 @@
       "siteurl": "https://msfintl.sharepoint.com/sites/GRP-SITS-Crossroad",
       "list": "91133e8a-e37c-42cb-bf65-b4a0cc0da7e2",
       "multiColumn": ["ServicesCategory", "Title", "ServiceDescription", "Status", "ServiceSubcategory", "ServiceOwner", "ServiceManager", "Servicetype", "Assetsincludedintheservicedelivery"],
-      "catIcon": [{"cat_icon":"12PointStar","category":"default", "uniqueId":"355460b5-85dd-435c-9157-6623e3b789b9", "sordIdx":1}]  
+      "catIcons": [{"cat_icon":"12PointStar","category":"default", "uniqueId":"355460b5-85dd-435c-9157-6623e3b789b9", "sordIdx":1}],
+      "subcatIcons": [{"subcat_icon":"12PointStar","subcategory":"default", "uniqueId":"355460b5-85dd-435c-9157-6623e3b789b9", "sordIdx":1}]   
     }
   }]
 }

@@ -4,10 +4,10 @@ import styles from './ListToApp.module.scss';
 
 //3rd party Modules
 import { Icon } from '@fluentui/react/lib/Icon';
+import IconStyled from '../helpers/IconStyled'
 
 export default function ServiceCategories (props:any) {
     const {
-      internal,
       categoriesList,
       catIcons,
       context
@@ -32,23 +32,35 @@ export default function ServiceCategories (props:any) {
 
 
     return (
-         <ul className={`sc_${webpartID}_category_block`}>
+         <ul className={`lta_${webpartID}_category_block`}>
             {categoriesList.map((category,idx) => 
               <li
-                className={checkedState[idx] ? `sc_${webpartID}_category_button sc_${webpartID}_category_button_selected` : `sc_${webpartID}_category_button`}
+                className={checkedState[idx] ? `lta_${webpartID}_category_button lta_${webpartID}_category_button_selected` : `lta_${webpartID}_category_button`}
                 key={`${category}_${idx}`} 
                 title={category}
                 onClick={() => handleOnChange(idx)}
               > 
-                <Icon 
+                {/*<Icon 
                 iconName={
                   catIcons.find(cat => cat.category === category) ? 
                   catIcons.find(cat => cat.category === category).cat_icon :
                   catIcons.find(cat => cat.category === "default").cat_icon
                   } 
-                  className={`sc_${webpartID}_category_icon`}
-                  style={{fontSize:"35px", marginBottom:"5px"}}/>
-                <span className={`sc_${webpartID}_category_label`}>{category}</span>
+                  className={`lta_${webpartID}_category_icon`}
+                  style={{
+                    fontSize:"35px",
+                    marginBottom:"5px",
+                    color: `${catIconName.cat_icon_color}`,
+                    backgroundColor: `${catIconName.cat_icon_bg}`,
+                    
+                    }}/>*/}
+
+                    <IconStyled
+                      category={category}
+                      catIcons={catIcons}
+                      webpartID={webpartID}
+                    />
+                <span className={`lta_${webpartID}_category_label`}>{category}</span>
                 <input
                     type="checkbox"
                     name={category}

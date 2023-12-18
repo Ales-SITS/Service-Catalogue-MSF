@@ -10,6 +10,7 @@
     overflow-x: hidden;
     overflow-y: auto;
     transition: 0.5s;
+    background-color: white;
   }
   
 .content_opened {
@@ -57,8 +58,8 @@
   
   .content_modal {
     margin-top: -148px;
-    width: 800px;
-    height: 80vh;
+    width: 850px;
+    height: 85vh;
     box-sizing: border-box;
     padding: 10px 20px;
     display: flex;
@@ -66,7 +67,7 @@
     border-radius: 15px;
     box-shadow: 0 0 20px rgba(0,0,0,0.4);
     background-color: white;
-    overflow-y: auto;
+    overflow: hidden;
 }
 
 .content_modal_close_wrapper {
@@ -87,32 +88,61 @@
     cursor: pointer;
 }
   
-.service_card_details {
+.lta_details {
     display: flex;
-    flex-direction: column;
     width: 100%;
     box-shadow: 0 0 5px rgba(0,0,0,0.2);
     border-radius: 10px;
     padding: 10px;
     box-sizing: border-box;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
 }
 
-.service_card_detail {
+.lta_detail {
     display: flex;
     flex-direction: column;
     margin-bottom: 5px;
     margin-right: 20px
 }
 
-.service_card_detail_label {
+.lta_details_info {
+    display: flex;
+    flex-direction: column;
+    width: 90%;
+}
+
+.lta_details_link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 10%;
+}
+
+.lta_detail_label {
     font-size: 14px;
     font-weight: 700;
     margin-bottom: 5px;
 }
 
-.service_card_detail_value {
+.lta_detail_value {
     font-size: 16px;
+}
+
+.lta_icon {
+  width: 25px;
+  height: 25px;
+  border-radius: 25px;
+  line-height: 25px;
+  text-align: center;
+  font-size: 20px;
+  margin: 0 5px
+}
+
+.lta_content_box {
+  width: 100%;
+  box-sizing: border-box;
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
 
     .service_product {
@@ -130,7 +160,6 @@
         width: 100%;
         background-color: white;
         border: none;
-        border-bottom: 1px solid grey;
         margin-top: 5px;
         cursor: pointer;
         display: flex;

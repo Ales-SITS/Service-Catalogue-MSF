@@ -29,7 +29,7 @@ import GroupByBox from './GroupByBox'
 import Grouped from './Grouped/Grouped'
 
 
-export default function Catalogue (props:any) {
+export default function ListtoApp (props:any) {
     const {
       header,
       siteurl,
@@ -37,7 +37,7 @@ export default function Catalogue (props:any) {
       colroles,
       defaultgroupby,
 
-      contentType,
+      cardType,
       cardsPerRow,
       catIcons,
       subcatIcons,
@@ -133,7 +133,6 @@ export default function Catalogue (props:any) {
       });
 
       index.addAll(services);
-      //console.log(MiniSearch.getDefault('tokenize'))
       setSearchIndexCategories(index);
     }
 
@@ -236,14 +235,12 @@ export default function Catalogue (props:any) {
     const column = "1fr "
 
       return (
-      <section className={styles.service_catalogue}>
-        <div className={styles.service_catalogue_top}>
+      <div className={`${styles.lta} lta_${webpartID}_wrapper`}>
+        <div className={`lta_${webpartID}_header`}>
           <h1>{header}</h1>
-          <div className={styles.service_catalogue_top_options}>
-          </div>
         </div>
         <input
-            className={styles.sc__input} 
+            className={`lta_${webpartID}_input`} 
             type="text"
             onChange={handleSearch}
             value={inputValue}
@@ -260,12 +257,15 @@ export default function Catalogue (props:any) {
         <GroupByBox onGroup={groupHandler} defaultgroupby={defaultgroupby}/>
         {     
         grouping !== "None" && inputValue !== "" ?
-        groupingArr.map((grp,idx)=>
+        groupingArr.sort((a,b)=> a[sorting] > b[sorting] ? sortingAsc*1 : -sortingAsc*1).map((grp,idx)=>
         filteredResults.filter(service => service[category] === grp).length === 0 ? null : 
           <Grouped
             key={idx}
             level={grouping === "Category" ? 1 : 2}
+
             grp={grp}
+            catgrp={grouping === "Category" ? null : grp}
+
             cardsPerRow={cardsPerRow}
             sorting={sorting}
             grouping={grouping}
@@ -277,9 +277,11 @@ export default function Catalogue (props:any) {
             sortingAsc={sortingAsc}
             inputValue={inputValue}
             colroles={colroles}
+
             catIcons={catIcons}
             subcatIcons={subcatIcons}
-            contentType={contentType}
+
+            cardType={cardType}
             sp={sp}
             siteurl={siteurl}
             list={list}
@@ -287,11 +289,14 @@ export default function Catalogue (props:any) {
             />
         ) :
         grouping !== "None" && inputValue === "" ? 
-        groupingArr.map((grp,idx)=>
+        groupingArr.sort((a,b)=> a[sorting] > b[sorting] ? sortingAsc*1 : -sortingAsc*1).map((grp,idx)=>
         <Grouped
           key={idx}
           level={grouping === "Category" ? 1 : 2}
+
           grp={grp}
+          catgrp={grouping === "Category" ? null : grp}
+
           cardsPerRow={cardsPerRow}
           sorting={sorting}
           grouping={grouping}
@@ -303,9 +308,11 @@ export default function Catalogue (props:any) {
           sortingAsc={sortingAsc}
           inputValue={inputValue}
           colroles={colroles}
+
           catIcons={catIcons}
           subcatIcons={subcatIcons}
-          contentType={contentType}
+
+          cardType={cardType}
           sp={sp}
           siteurl={siteurl}
           list={list}
@@ -328,14 +335,14 @@ export default function Catalogue (props:any) {
               catIcons = {catIcons} 
               subcatIcons = {subcatIcons}
               webpartID={webpartID}
-              contentType = {contentType}
+              cardType = {cardType}
 
               sp = {sp}
               siteurl={siteurl}
               list={list}
           />
               ) : 
-          filteredServicesList.sort((a,b)=> a[sorting] > b[sorting] ? sortingAsc*1 : -sortingAsc*1).map((service,idx) => 
+          filteredServicesList.sort((a,b)=> a > b ? sortingAsc*1 : -sortingAsc*1).map((service,idx) => 
           <Card 
               key={`${idx}_${service.Title}`} 
               service={service} 
@@ -343,7 +350,7 @@ export default function Catalogue (props:any) {
               catIcons = {catIcons}
               subcatIcons = {subcatIcons}
               webpartID={webpartID}
-              contentType = {contentType}
+              cardType = {cardType}
 
               sp = {sp}
               siteurl={siteurl}
@@ -353,6 +360,6 @@ export default function Catalogue (props:any) {
           }
         </div> 
           }   
-      </section>
+      </div>
     );
   }

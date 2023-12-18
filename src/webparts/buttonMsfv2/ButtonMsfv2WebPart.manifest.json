@@ -6,12 +6,13 @@
   "version": "*",
   "manifestVersion": 2,
   "requiresCustomScript": false,
+  "supportsFullBleed": true,
   "supportedHosts": ["SharePointWebPart", "TeamsPersonalApp", "TeamsTab", "SharePointFullPage"],
   "supportsThemeVariants": true,
   "preconfiguredEntries": [{
     "groupId": "5c03119e-3074-46fd-976b-c60198311f70",
     "group": { "default": "Advanced" },
-    "title": { "default": "ButtonMsfv2" },
+    "title": { "default": "Button (MSF) v.2" },
     "description": { "default": "ButtonMsfv2 description" },
     "officeFabricIconFontName": "Page",
     "properties": {

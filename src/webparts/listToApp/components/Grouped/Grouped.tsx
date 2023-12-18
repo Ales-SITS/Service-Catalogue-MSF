@@ -16,6 +16,8 @@ export default function Grouped (props:any) {
     const {
       level,
       grp,
+      catgrp,
+
       cardsPerRow,
       sorting,
       grouping,
@@ -27,9 +29,11 @@ export default function Grouped (props:any) {
       sortingAsc,
       inputValue,
       colroles,
+
       catIcons,
       subcatIcons,
-      contentType,
+
+      cardType,
       sp,
       siteurl,
       list,
@@ -47,14 +51,30 @@ export default function Grouped (props:any) {
 
     const uniqueSubcategories = Array.from(new Set(groupedServices.map(item => item[subcategory])))
 
-    useEffect(()=>{
+     useEffect(()=>{
       setGroupHidden(level === 1 ? false : true)
     },[grouping])
 
     const column = "1fr "
     
+    const catIconName = catIcons.find(cat => cat.category === grp) ? 
+                        catIcons.find(cat => cat.category === grp) :
+                        catIcons.find(cat => cat.category === "default")
+ 
+    const subcatIconName = subcatIcons.find(subcat => subcat.subcategory === grp) ? 
+                           subcatIcons.find(subcat => subcat.subcategory === grp) :
+                           subcatIcons.find(subcat => subcat.subcategory === "default")
+
+
+    const catGrpIconName = catgrp===null ? null : 
+                           catIcons.find(cat => cat.category === catgrp) ? 
+                           catIcons.find(cat => cat.category === catgrp) :
+                           catIcons.find(cat => cat.category === "default")
+
+   // console.log(catgrp)
+
     return (
-        <div className={level === 1 ? group_styles.group1_wrapper :  group_styles.group2_wrapper}>
+        <div className={`${level === 1 ? group_styles.group1_wrapper :  group_styles.group2_wrapper} ${groupHidden === true ? null : group_styles.group_opened}`}>
           <button 
             className={level === 1 ?  group_styles.group1_heading : group_styles.group2_heading} 
             onClick={groupHiddenHandler}>
@@ -69,15 +89,25 @@ export default function Grouped (props:any) {
                 })
               </span>
             </div>
-            <Icon 
-                iconName={
-                  catIcons.find(cat => cat.category === grp) ? 
-                  catIcons.find(cat => cat.category === grp).cat_icon :
-                  catIcons.find(cat => cat.category === "default").cat_icon
-                  } 
-
-                  className={level === 1 ?  group_styles.group1_icon : group_styles.group2_icon}
+            {
+              level === 1 ? 
+              <Icon 
+              iconName={catIconName.cat_icon} 
+              className={group_styles.lta_category_icon}
+              style={{
+                color: `${catIconName.cat_icon_color}`,
+                backgroundColor: `${catIconName.cat_icon_bg}`,
+              }}
+              /> :
+              <Icon 
+              iconName={subcatIconName.subcat_icon} 
+              className={group_styles.lta_subcategory_icon}
+              style={{
+                color: `${catGrpIconName.cat_icon_color}`,
+                backgroundColor: `${catGrpIconName.cat_icon_bg}`,
+              }}
               />
+            }
           </button>
           {groupHidden ? null :
            level === 1 && inputValue !== "" ? 
@@ -98,9 +128,12 @@ export default function Grouped (props:any) {
               sortingAsc={sortingAsc}
               inputValue={inputValue}
               colroles={colroles}
+
               catIcons={catIcons}
+              catIconsDetails={catIconName}
               subcatIcons={subcatIcons}
-              contentType={contentType}
+
+              cardType={cardType}
               sp={sp}
               siteurl={siteurl}
               list={list}
@@ -112,6 +145,7 @@ export default function Grouped (props:any) {
                key={idx}
                level={2}
                grp={subcat}
+               catgrp={grp}
                cardsPerRow={cardsPerRow}
                sorting={sorting}
                grouping={grouping}
@@ -123,9 +157,12 @@ export default function Grouped (props:any) {
                sortingAsc={sortingAsc}
                inputValue={inputValue}
                colroles={colroles}
+
                catIcons={catIcons}
+               catIconsDetails={catIconName}
                subcatIcons={subcatIcons}
-               contentType={contentType}
+
+               cardType={cardType}
                sp={sp}
                siteurl={siteurl}
                list={list}
@@ -149,7 +186,7 @@ export default function Grouped (props:any) {
                   colroles={colroles} 
                   catIcons = {catIcons}
                   subcatIcons = {subcatIcons}
-                  contentType = {contentType}
+                  cardType = {cardType}
 
                   sp = {sp}
                   siteurl={siteurl}
@@ -167,7 +204,7 @@ export default function Grouped (props:any) {
                   colroles={colroles} 
                   catIcons = {catIcons}
                   subcatIcons = {subcatIcons}
-                  contentType = {contentType}
+                  cardType = {cardType}
 
                   sp = {sp}
                   siteurl={siteurl}

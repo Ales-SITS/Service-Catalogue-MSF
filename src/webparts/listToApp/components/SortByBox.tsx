@@ -36,13 +36,13 @@ export default function SortByBox (props:any) {
     ]
 
     return (
-      <div className={styles.sc__sort_box}>
+      <div className={styles.lta__sort_box}>
       <button
         onClick={sortedbyHiddenHandler}
-        className={styles.sc__sort} 
+        className={styles.lta__sort} 
       > Sorted by {sortedby} {sortedbyAsc ? "↓" : "↑"}</button>
         <div 
-        className={styles.sc__sort_buttons}
+        className={styles.lta__sort_buttons}
         style={{
           left: `${sortedbyHidden ?  "-100%" : "0%"}`,
           opacity: `${sortedbyHidden ?  "0" : "1"}`
@@ -50,7 +50,7 @@ export default function SortByBox (props:any) {
         >
                 {sortingOptions.map((option,idx) => 
                   <button 
-                    className={styles.sc__sort_button} 
+                    className={styles.lta__sort_button} 
                     key={idx} 
                     onClick={()=>sortedByHandler(`${option}`)}
                     style={{

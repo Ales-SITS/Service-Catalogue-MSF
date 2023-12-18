@@ -17,7 +17,7 @@ import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
 import { IColumnReturnProperty, PropertyFieldColumnPicker, PropertyFieldColumnPickerOrderBy } from '@pnp/spfx-property-controls/lib/PropertyFieldColumnPicker';
 import { PropertyPaneWebPartInformation } from '@pnp/spfx-property-controls/lib/PropertyPaneWebPartInformation';
 import { PropertyFieldToggleWithCallout } from '@pnp/spfx-property-controls/lib/PropertyFieldToggleWithCallout';
-
+import { PropertyFieldLabelWithCallout } from '@pnp/spfx-property-controls/lib/PropertyFieldLabelWithCallout';
 
 //API
 import { spfi, SPFx as SPFxsp} from "@pnp/sp";
@@ -28,7 +28,7 @@ import "@pnp/sp/items";
 import "@pnp/sp/fields";
 
 //Components
-import Catalogue from './components/Catalogue';
+import ListToApp from './components/ListToApp';
 
 export interface IListToAppWebPartProps {
     toggleInfoHeaderValue: boolean;
@@ -42,7 +42,9 @@ export interface IListToAppWebPartProps {
     defaultgroupby: string;
 
     cardsPerRow: number;
-    contentType: boolean;
+    cardType: boolean;
+
+    generalCSS: string;
 
     catIcons: any [];
     catCSS: string;
@@ -64,14 +66,13 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
     }
     const webPartId = this.context.instanceId.replaceAll("-","")
     const dynamicStyles = document.createElement('style');
-    const concatCSS = this.properties.catCSS?.concat(" ",this.properties.subcatCSS)
-    const dynamicStylesContent = concatCSS?.replaceAll(".sc__",`.sc_${webPartId}_`);
-
-  
+    const concatCSS = this.properties.generalCSS + " " + this.properties.catCSS + " " + this.properties.subcatCSS
+    const dynamicStylesContent = concatCSS?.replaceAll(".lta__",`.lta_${webPartId}_`);
+        
     dynamicStyles.textContent = dynamicStylesContent;
 
     const element: React.ReactElement<IListToAppWebPartProps> = React.createElement(
-      Catalogue,
+      ListToApp,
       {
         header: this.properties.header,
         siteurl: this.properties.siteurl,
@@ -81,7 +82,7 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
         defaultgroupby: this.properties.defaultgroupby,
 
         cardsPerRow: this.properties.cardsPerRow,
-        contentType: this.properties.contentType,
+        cardType: this.properties.cardType,
         catIcons: this.properties.catIcons,
         subcatIcons: this.properties.subcatIcons,
         
@@ -160,7 +161,8 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
                                 Property pane pages:
                                 <ul>
                                   <li>Page 1 - <strong>General settings</strong></li>
-                                  <li>Page 2 - <strong>Visuals</strong></li>
+                                  <li>Page 2 - <strong>Roles settings</strong></li>
+                                  <li>Page 3 - <strong>Card settings</strong></li>
                                 </ul>`,
                   moreInfoLink: `https://msfintl.sharepoint.com/sites/SITSExternalPortal`,
                   videoProperties: {
@@ -297,25 +299,23 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
         {
           groups: [
             {
-              groupName: "General Visuals",
+              groupName: "General visuals",
               groupFields: [
-                PropertyPaneSlider('cardsPerRow',{  
-                  label:"1. Set number of cards per row",  
-                  min:1,  
-                  max:5,  
-                  value:1,  
-                  showValue:true,  
-                  step:1                
-                }),
-                PropertyFieldToggleWithCallout('contentType', {
+                PropertyFieldLabelWithCallout('generalCSSlabel', {
                   calloutTrigger: CalloutTriggers.Hover,
+                  key: 'LabelWithCalloutFieldId',
+                  calloutContent: React.createElement('p', {}, "This application has preset CSS classes which you can use to customize its visuals. You can set earch part or role in its dedicated CSS editor, but you can also paste your solution to this general CSS editor. Each webpart has unique ID, so CSS in this solution won affect other List To App webpart."),
                   calloutWidth: 200,
-                  key: 'toggleInfoHeaderFieldId',
-                  label: '2. Set content display type',
-                  calloutContent: React.createElement('p', {}, 'With this control you can set if the content displays within the card or as a model window on top of the app.'),
-                  onText: 'Modal',
-                  offText: 'In card',
-                  checked: this.properties.contentType
+                  text: '1. Set general visuals with CSS'
+                }),
+                PropertyFieldMonacoEditor('generalCSS', {
+                  key: 'generalCSS',
+                  value: this.properties.generalCSS,
+                  onChange: (code: string) => { this.properties.generalCSS = code; },
+                  showMiniMap: true,
+                  language:"css",
+                  showLineNumbers:true,
+                  theme: 'vs-dark'
                 })
               ]
             },
@@ -324,7 +324,7 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
               groupFields: [
                 PropertyFieldCollectionData("catIcons", {
                   key: "catIcons",
-                  label: "1. Set visuals for categories",
+                  label: "2. Set visuals for categories",
                   panelHeader: "Categories icons",
                   manageBtnLabel: "Categories icons",
                   value: this.properties.catIcons,
@@ -342,7 +342,17 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
                         title: "Select icon",
                         iconFieldRenderMode: "picker",
                         type: CustomCollectionFieldType.fabricIcon,
-                      }                
+                      },
+                      {
+                        id: "cat_icon_color",
+                        title: "Select icon color",
+                        type: CustomCollectionFieldType.color,
+                      },
+                      {
+                        id: "cat_icon_bg",
+                        title: "Select icon background",
+                        type: CustomCollectionFieldType.color,
+                      }                  
                   ],
                   disabled: this.properties.colroles?.filter(col => col.role === "category").length < 1 || this.categories.length === 0
                 }),
@@ -356,7 +366,7 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
                 }),
                 PropertyFieldCollectionData("subcatIcons", {
                   key: "subcatIcons",
-                  label: "2. Set visuals for subcategories",
+                  label: "3. Set visuals for subcategories",
                   panelHeader: "Subcategories icons",
                   manageBtnLabel: "Subcategories icons",
                   value: this.properties.subcatIcons,
@@ -374,7 +384,17 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
                         title: "Select icon",
                         iconFieldRenderMode: "picker",
                         type: CustomCollectionFieldType.fabricIcon,
-                      }                
+                      },
+                      {
+                        id: "subcat_icon_color",
+                        title: "Select icon color",
+                        type: CustomCollectionFieldType.color,
+                      },
+                      {
+                        id: "subcat_icon_bg",
+                        title: "Select icon background",
+                        type: CustomCollectionFieldType.color,
+                      }                     
                   ],
                   disabled: this.properties.colroles?.filter(col => col.role === "subcategory").length < 1 || this.categories.length === 0
                 }),
@@ -387,6 +407,35 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
                   showLineNumbers:true,
                   theme: 'vs-dark'
                 })
+              ]
+            }
+          ]
+        },
+        {
+          groups: [
+            {
+              groupName: "Card settings",
+              groupFields: [
+                PropertyFieldToggleWithCallout('cardType', {
+                  calloutTrigger: CalloutTriggers.Hover,
+                  calloutWidth: 200,
+                  key: 'toggleInfoHeaderFieldId',
+                  label: '1. Set the card type',
+                  calloutContent: React.createElement('p', {}, 'With this control you can set if the content displays as a modal window with the flow of the app (Main window).'),
+                  onText: 'Modal window',
+                  offText: 'Main window',
+                  checked: this.properties.cardType
+                }),
+                PropertyPaneSlider('cardsPerRow',{  
+                  label: '2. Set number of cards per row',  
+                  min:1,  
+                  max:5,  
+                  value:1,  
+                  showValue:true,  
+                  step:1                
+                }),
+                
+
               ]
             }
           ]

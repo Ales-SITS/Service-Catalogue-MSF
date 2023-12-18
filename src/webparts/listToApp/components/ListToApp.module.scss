@@ -16,52 +16,16 @@
   display: flex;
 }
 
-.service_catalogue {
+.lta {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100%;
-
 }
 
-.service_catalogue_top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-    .service_catalogue_top h1 {
-      font-size: 22px
-    }
-
-    .service_catalogue_top_options {
-      display: flex;
-    }
-
-        .service_catalogue_top_options button {
-          background-color: white;
-          border: none;
-          outline: none;
-          width: 40px;
-          height: 40px;
-          border-radius: 40px;
-          cursor: pointer;
-          color: white;
-          background-color: red;
-          margin-left: 10px;
-          font-size: 18px;
-          line-height: 40px;
-          transition: 0.3s;
-        }
-
-        .service_catalogue_top_options button:hover {
-          background-color: #555;
-        }
-
-
-
-.sc__input {
+/*
+.lta__input {
   width: 100%;
   border-radius: 30px;
   padding: 5px 10px;
@@ -72,13 +36,14 @@
   margin: 2px;
 }
 
-.sc__input:focus {
+.lta__input:focus {
   outline: none;
   border: none;
   border: 1px solid #3a3a3a;
 }
+*/
 
-.sc__sort_box {
+.lta__sort_box {
   width: 100%;
   margin: 2px 0;
   display: flex;
@@ -88,7 +53,7 @@
   overflow-y: hidden;
 }
 
-.sc__sort {
+.lta__sort {
   width: 170px;
   text-align: start;
   color: red;
@@ -101,7 +66,7 @@
   z-index: 2;
 }
 
-.sc__sort_buttons {
+.lta__sort_buttons {
   display: flex;
   justify-content: start;
   transition: 0.4s;
@@ -110,7 +75,7 @@
   z-index: 1;
 }
 
-.sc__sort_button {
+.lta__sort_button {
   width: 19%;
   border: 0;
   outline: 0;
