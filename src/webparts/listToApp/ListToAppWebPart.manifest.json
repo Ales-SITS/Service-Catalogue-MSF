@@ -14,14 +14,28 @@
     "group": { "default": "Advanced" },
     "title": { "default": "List to App (MSF)" },
     "description": { "default": "Create powerfull apps based on SPO lists" },
-    "officeFabricIconFontName": "Page",
+    "iconImageUrl": "data:image/png;base64,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",
     "properties": {
       "header": "List to App ",
       "siteurl": "https://msfintl.sharepoint.com/sites/GRP-SITS-Crossroad",
       "list": "91133e8a-e37c-42cb-bf65-b4a0cc0da7e2",
       "multiColumn": ["ServicesCategory", "Title", "ServiceDescription", "Status", "ServiceSubcategory", "ServiceOwner", "ServiceManager", "Servicetype", "Assetsincludedintheservicedelivery"],
+     
       "catIcons": [{"cat_icon":"12PointStar","category":"default", "uniqueId":"355460b5-85dd-435c-9157-6623e3b789b9", "sordIdx":1}],
-      "subcatIcons": [{"subcat_icon":"12PointStar","subcategory":"default", "uniqueId":"355460b5-85dd-435c-9157-6623e3b789b9", "sordIdx":1}]   
+      "subcatIcons": [{"subcat_icon":"12PointStar","subcategory":"default", "uniqueId":"355460b5-85dd-435c-9157-6623e3b789b9", "sordIdx":1}],      
+      "statusIcons": [{"status_icon":"12PointStar","status":"default", "uniqueId":"311460b5-85dd-435c-9157-6623e3b789b9", "sordIdx":1}],      
+      "cardsPerRow": 1,
+      "catFilterToggle": true,
+      "searchToggle": true,
+      "subcatFilterToggle": true,
+      "sortingToggle": true,
+      "groupingToggle": true,
+
+      "generalCSS": " ",
+      "catCSS": " ",
+      "subcatCSS": " ",
+      "statusCSS": " ",
+      "cardCSS": " "
     }
   }]
 }

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext} from 'react';
 import styles from './ListToApp.module.scss';
 
 //API
@@ -28,8 +28,14 @@ import SortByBox from './SortByBox'
 import GroupByBox from './GroupByBox'
 import Grouped from './Grouped/Grouped'
 
+import { AppContext } from "./ListToAppContext"
 
-export default function ListtoApp (props:any) {
+export default function ListtoApp () {
+
+    const {settings} = useContext(AppContext)
+    const {cr} = useContext(AppContext)
+    const {sp} = useContext(AppContext)
+
     const {
       header,
       siteurl,
@@ -37,41 +43,22 @@ export default function ListtoApp (props:any) {
       colroles,
       defaultgroupby,
 
-      cardType,
+      searchToggle,
+      catFilterToggle,
+      subcatFilterToggle,
+      sortingToggle,
+      groupingToggle,
+
       cardsPerRow,
-      catIcons,
-      subcatIcons,
-      
-      context
-    } = props;
+      webpartID,
+    } = settings
 
-    
 
-    //API init variables
-    const sp = spfi().using(SPFxsp(context))
-    const graph = graphfi().using(SPFxGraph(context))
-    const webpartID = context.instanceId.replaceAll("-","")
-
-    //ROLES handlers
-    const title = colroles?.filter(col => col.role === "title")[0]?.column
-    const category = colroles?.filter(col => col.role === "category")[0]?.column
-    const subcategory = colroles?.filter(col => col.role === "subcategory")[0]?.column
-    const status = colroles?.filter(col => col.role === "status")[0]?.column
-    const content = colroles?.filter(col => col.role === "content")[0]?.column
-    const label1 = colroles?.filter(col => col.role === "label1")[0]?.column
-    const label2 = colroles?.filter(col => col.role === "label2")[0]?.column
-
-    const [internal,setInternal] = useState(false)
     const [servicesList,setServicesList] = useState<any[]>([])
     const [categoriesList,setCategoriesList] = useState<string[]>([])
     const [subcategoriesList,setSubcategoriesList] = useState<string[]>([])
 
-    //READ CORE DATA
-    async function getSITSInternal () {
-      const currentUser = await graph.me()
-      const currentUserDomain = currentUser.mail.split("@")[1].toLowerCase()
-      currentUserDomain === "sits.msf.org" ? setInternal(true) : setInternal(false)     
-    }
+   //READ CORE DATA
 
     async function getServices():Promise<any[]> {
       const listSite = Web([sp.web, `${siteurl}`])  
@@ -82,19 +69,17 @@ export default function ListtoApp (props:any) {
 
     async function getCategories():Promise<any[]> {
       const listSite = Web([sp.web, `${siteurl}`])  
-      const categories = await listSite.lists.getById(`${list}`).fields.getByInternalNameOrTitle(`${category}`)();
+      const categories = await listSite.lists.getById(`${list}`).fields.getByInternalNameOrTitle(`${cr.category}`)();
          return await categories.Choices
     }
 
     async function getSubcategories():Promise<any[]> {
       const listSite = Web([sp.web, `${siteurl}`])  
-      const subcategories = await listSite.lists.getById(`${list}`).fields.getByInternalNameOrTitle(`${subcategory}`)();
+      const subcategories = await listSite.lists.getById(`${list}`).fields.getByInternalNameOrTitle(`${cr.subcategory}`)();
          return await subcategories.Choices
     }
 
     useEffect(() => {
-      getSITSInternal() 
-
       getServices().then(services => {
         setServicesList(services)
         setSearchCategories(services)
@@ -116,8 +101,8 @@ export default function ListtoApp (props:any) {
     //SEARCH
     function setSearchCategories (services) {
       const index = new MiniSearch({
-        fields: [`${title}`, `${category}`, `${subcategory}`, `${content}`, `${label1}`],
-        storeFields: [`${title}`, `${category}`, `${subcategory}`, `${content}`, `${label1}`, `${status}`],
+        fields: [`${cr.title}`, `${cr.category}`, `${cr.subcategory}`, `${cr.content}`, `${cr.label1}`],
+        storeFields: [`${cr.title}`, `${cr.category}`, `${cr.subcategory}`, `${cr.content}`, `${cr.label1}`, `${cr.status}`],
         extractField: (service, fieldName) => {
           if (Array.isArray(fieldName)) {
            return service[fieldName].join(' ')
@@ -138,8 +123,8 @@ export default function ListtoApp (props:any) {
 
     function setSearchDescription(services) {
       const index = new MiniSearch({
-        fields: [`${title}`, `${category}`, `${subcategory}`, `${content}`, `${label1}`],
-        storeFields: [`${title}`, `${category}`, `${subcategory}`, `${content}`, `${label1}`, `${status}`],
+        fields: [`${cr.title}`, `${cr.category}`, `${cr.subcategory}`, `${cr.content}`, `${cr.label1}`],
+        storeFields: [`${cr.title}`, `${cr.category}`, `${cr.subcategory}`, `${cr.content}`, `${cr.label1}`, `${cr.status}`],
         tokenize: (string, _fieldName) => string.split('>'),
         idField: 'ID',
         searchOptions: {
@@ -234,58 +219,44 @@ export default function ListtoApp (props:any) {
 
     const column = "1fr "
 
-      return (
+      return (     
       <div className={`${styles.lta} lta_${webpartID}_wrapper`}>
         <div className={`lta_${webpartID}_header`}>
           <h1>{header}</h1>
         </div>
+        {searchToggle ?
         <input
             className={`lta_${webpartID}_input`} 
             type="text"
             onChange={handleSearch}
             value={inputValue}
             placeholder="Search"
-          />
+          /> : null}
+        {catFilterToggle ? 
         <Categories 
-          internal={internal}
           categoriesList={categoriesList}
           onCheckChange = {categoriesHandler}
-          catIcons = {catIcons}
-          context={context}
-        />
-        <SortByBox onSort={sortHandler}/>
-        <GroupByBox onGroup={groupHandler} defaultgroupby={defaultgroupby}/>
+        /> : null}
+        {sortingToggle?
+        <SortByBox onSort={sortHandler}/> : null}
+        {groupingToggle?
+        <GroupByBox onGroup={groupHandler} defaultgroupby={defaultgroupby}/> : null}
         {     
         grouping !== "None" && inputValue !== "" ?
         groupingArr.sort((a,b)=> a[sorting] > b[sorting] ? sortingAsc*1 : -sortingAsc*1).map((grp,idx)=>
-        filteredResults.filter(service => service[category] === grp).length === 0 ? null : 
+        filteredResults.filter(service => service[cr.category] === grp).length === 0 ? null : 
           <Grouped
             key={idx}
             level={grouping === "Category" ? 1 : 2}
-
             grp={grp}
             catgrp={grouping === "Category" ? null : grp}
-
-            cardsPerRow={cardsPerRow}
             sorting={sorting}
             grouping={grouping}
-            category={category}
-            subcategory={subcategory}
             subcategoriesList={subcategoriesList}
             filteredResults={filteredResults}
             filteredServicesList={filteredServicesList}
             sortingAsc={sortingAsc}
             inputValue={inputValue}
-            colroles={colroles}
-
-            catIcons={catIcons}
-            subcatIcons={subcatIcons}
-
-            cardType={cardType}
-            sp={sp}
-            siteurl={siteurl}
-            list={list}
-            webpartID={webpartID}
             />
         ) :
         grouping !== "None" && inputValue === "" ? 
@@ -293,30 +264,15 @@ export default function ListtoApp (props:any) {
         <Grouped
           key={idx}
           level={grouping === "Category" ? 1 : 2}
-
           grp={grp}
           catgrp={grouping === "Category" ? null : grp}
-
-          cardsPerRow={cardsPerRow}
           sorting={sorting}
           grouping={grouping}
-          category={category}
-          subcategory={subcategory}
           subcategoriesList={subcategoriesList}
           filteredResults={filteredResults}
           filteredServicesList={filteredServicesList}
           sortingAsc={sortingAsc}
           inputValue={inputValue}
-          colroles={colroles}
-
-          catIcons={catIcons}
-          subcatIcons={subcatIcons}
-
-          cardType={cardType}
-          sp={sp}
-          siteurl={siteurl}
-          list={list}
-          webpartID={webpartID}
           />
         ) :
         <div 
@@ -331,30 +287,12 @@ export default function ListtoApp (props:any) {
           <Card 
               key={`${idx}_${service.Title}`} 
               service={service} 
-              colroles={colroles} 
-              catIcons = {catIcons} 
-              subcatIcons = {subcatIcons}
-              webpartID={webpartID}
-              cardType = {cardType}
-
-              sp = {sp}
-              siteurl={siteurl}
-              list={list}
           />
               ) : 
           filteredServicesList.sort((a,b)=> a > b ? sortingAsc*1 : -sortingAsc*1).map((service,idx) => 
           <Card 
               key={`${idx}_${service.Title}`} 
               service={service} 
-              colroles={colroles} 
-              catIcons = {catIcons}
-              subcatIcons = {subcatIcons}
-              webpartID={webpartID}
-              cardType = {cardType}
-
-              sp = {sp}
-              siteurl={siteurl}
-              list={list}
           />
               )
           }

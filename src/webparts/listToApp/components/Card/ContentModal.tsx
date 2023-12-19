@@ -1,7 +1,7 @@
 import * as React from 'react';
 import styles from '../ListToApp.module.scss';
 import cardstyles from './Card.module.scss';
-
+import { useContext} from 'react';
 
 //3rd party Modules
 import * as DOMPurify from 'dompurify';
@@ -10,34 +10,35 @@ import { findDOMNode } from 'react-dom';
 //Components
 import { Icon } from '@fluentui/react/lib/Icon';
 
+import { AppContext } from "../ListToAppContext"
 
 export default function Content (props:any) {
+
+    const {settings} = useContext(AppContext)
+
     const {
         serviceObj,
         catIconName,
         subcatIconName,
-        cardType,
-        webpartID
+        statIconName
     } = props;
 
-    const icon = serviceObj.status === "Active" ? "CompletedSolid" : serviceObj.status  === "Archive" ? "RepoSolid" : "SkypeCircleClock"
-
-    console.log(catIconName)
-    console.log(subcatIconName)
+    const {cardType, webpartID} = settings
 
     return (
         <div className={cardType ? cardstyles.content_modal_overlay : cardstyles.content} onClick={props.onCloseModal}>
             <div className={cardstyles.content_modal} onClick={e => e.stopPropagation()}>
                 <div className={cardstyles.content_modal_close_wrapper}>
                     <Icon 
-                      iconName={icon} 
+                      iconName={statIconName.status_icon} 
                       title={serviceObj.status}
                       style={{
-                        color: `${serviceObj.status === "Active" ? "#02eb0a" : serviceObj.status === "Archive" ? "#8f8f8f" : "#af00d6"}`,
+                        color: `${statIconName.status_icon_color}`,
+                        backgroundColor: `${statIconName.status_icon_bg}`,
                       }}/>
                     <button 
-                    className={cardstyles.content_modal_close}
-                    onClick={props.onCloseModal}
+                        className={cardstyles.content_modal_close}
+                        onClick={props.onCloseModal}
                     >
                     ✖
                     </button> 

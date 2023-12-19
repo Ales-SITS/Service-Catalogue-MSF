@@ -29,6 +29,7 @@ import "@pnp/sp/fields";
 
 //Components
 import ListToApp from './components/ListToApp';
+import ListToAppContext from './components/ListToAppContext';
 
 export interface IListToAppWebPartProps {
     toggleInfoHeaderValue: boolean;
@@ -44,13 +45,23 @@ export interface IListToAppWebPartProps {
     cardsPerRow: number;
     cardType: boolean;
 
+    searchToggle: boolean;
+    catFilterToggle: boolean;
+    subcatFilterToggle: boolean;
+    sortingToggle: boolean;
+    groupingToggle: boolean;
     generalCSS: string;
 
     catIcons: any [];
     catCSS: string;
-
     subcatIcons: any [];
     subcatCSS: string;
+    statusIcons: any [];
+    statusCSS: string;
+
+    cardCSS:string;
+
+
 }
 
 
@@ -58,7 +69,8 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
 
   private categories: any[] = ["default"]
   private subcategories: any[] = ["default"]
-  
+  private statuses: any[] = ["default"]
+
   public render(): void {
     const existingStyleElement = document.head.querySelector('style[data-webpart-styles]');
     if (existingStyleElement) {
@@ -66,13 +78,13 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
     }
     const webPartId = this.context.instanceId.replaceAll("-","")
     const dynamicStyles = document.createElement('style');
-    const concatCSS = this.properties.generalCSS + " " + this.properties.catCSS + " " + this.properties.subcatCSS
+    const concatCSS = this.properties.generalCSS + " " + this.properties.catCSS + " " + this.properties.subcatCSS + " " + this.properties.statusCSS + " " + this.properties.cardCSS
     const dynamicStylesContent = concatCSS?.replaceAll(".lta__",`.lta_${webPartId}_`);
         
     dynamicStyles.textContent = dynamicStylesContent;
 
     const element: React.ReactElement<IListToAppWebPartProps> = React.createElement(
-      ListToApp,
+      ListToAppContext,
       {
         header: this.properties.header,
         siteurl: this.properties.siteurl,
@@ -81,11 +93,20 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
         colroles: this.properties.colroles,
         defaultgroupby: this.properties.defaultgroupby,
 
+        searchToggle: this.properties.searchToggle,
+        catFilterToggle: this.properties.catFilterToggle,
+        subcatFilterToggle: this.properties.subcatFilterToggle,
+        sortingToggle: this.properties.sortingToggle,
+        groupingToggle: this.properties.groupingToggle,
+
         cardsPerRow: this.properties.cardsPerRow,
         cardType: this.properties.cardType,
         catIcons: this.properties.catIcons,
         subcatIcons: this.properties.subcatIcons,
-        
+        statusIcons: this.properties.statusIcons,
+
+        webpartID : this.context.instanceId.replaceAll("-",""),
+
         context: this.context
       }
     );
@@ -129,8 +150,21 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
     const sp = spfi().using(SPFxsp(this.context))
     const listSite = Web([sp.web, `${this.properties.siteurl}`]) 
     try {
-      const cat = await listSite.lists.getById(`${this.properties.list}`).fields.getByInternalNameOrTitle(`${subcategory}`)()
-      this.subcategories = ["default", ...cat.Choices]
+      const subcat = await listSite.lists.getById(`${this.properties.list}`).fields.getByInternalNameOrTitle(`${subcategory}`)()
+      this.subcategories = ["default", ...subcat.Choices]
+    } catch (error) {
+      
+    } 
+    
+  }
+
+  public async getStatuses():Promise<void> {
+    const status = this.properties.colroles?.filter(col => col.role === "status")[0]?.column
+    const sp = spfi().using(SPFxsp(this.context))
+    const listSite = Web([sp.web, `${this.properties.siteurl}`]) 
+    try {
+      const stat = await listSite.lists.getById(`${this.properties.list}`).fields.getByInternalNameOrTitle(`${status}`)()
+      this.statuses = ["default", ...stat.Choices]
     } catch (error) {
       
     } 
@@ -144,6 +178,10 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
       this.getSubcategories().catch(error => {
         console.error('Error fetching categories:', error);
       });
+      this.getStatuses().catch(error => {
+        console.error('Error fetching categories:', error);
+      });
+
   }
 
   // PROPERTY Pane
@@ -297,16 +335,70 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
           ]
         },
         {
+          displayGroupsAsAccordion:true,
           groups: [
             {
-              groupName: "General visuals",
+              groupName: "1. General visuals",
+              isCollapsed: false,
               groupFields: [
+                PropertyFieldToggleWithCallout('searchToggle', {
+                  calloutTrigger: CalloutTriggers.Hover,
+                  calloutWidth: 300,
+                  key: 'searchToggleFieldId',
+                  label: 'Display search field',
+                  calloutContent: React.createElement('p', {}, 'Search field automatically filteres results based on the information included in columns with Content, Category, Subcategory and Label1 role.'),
+                  onText: 'On',
+                  offText: 'Off',
+                  checked: this.properties.searchToggle
+                }),
+                PropertyFieldToggleWithCallout('catFilterToggle', {
+                  calloutTrigger: CalloutTriggers.Hover,
+                  calloutWidth: 300,
+                  key: 'catFilterToggleFieldId',
+                  label: 'Display categories filters',
+                  calloutContent: React.createElement('p', {}, 'Category filters automatically filteres results based on the information included in column assigned to Category role.'),
+                  onText: 'On',
+                  offText: 'Off',
+                  checked: this.properties.catFilterToggle
+                }),
+                PropertyFieldToggleWithCallout('subcatFilterToggle', {
+                  calloutTrigger: CalloutTriggers.Hover,
+                  calloutWidth: 300,
+                  key: 'subcatFilterToggleFieldId',
+                  label: 'Display subcategories filters',
+                  calloutContent: React.createElement('p', {}, 'Subcategory filters automatically filteres results based on the information included in column assigned to Category role.'),
+                  onText: 'On',
+                  offText: 'Off',
+                  checked: this.properties.subcatFilterToggle
+                }),
+                PropertyFieldToggleWithCallout('sortingToggle', {
+                  calloutTrigger: CalloutTriggers.Hover,
+                  calloutWidth: 300,
+                  key: 'sortingToggleId',
+                  label: 'Display sorting options',
+                  calloutContent: React.createElement('p', {}, 'Your users will be able to change sorting by Title, Category, Subcategory and Status roles. Ascending and descending options are included.'),
+                  onText: 'On',
+                  offText: 'Off',
+                  checked: this.properties.sortingToggle
+                }),
+                PropertyFieldToggleWithCallout('groupingToggle', {
+                  calloutTrigger: CalloutTriggers.Hover,
+                  calloutWidth: 300,
+                  key: 'groupingToggleId',
+                  label: 'Display sorting options',
+                  calloutContent: React.createElement('p', {}, 'Your users will be able to change grouping to group by Category, Subcategory roles or turn off.'),
+                  onText: 'On',
+                  offText: 'Off',
+                  checked: this.properties.groupingToggle
+                }),
+                //sortingToggle: boolean;
+                //groupingToggle: boolean;
                 PropertyFieldLabelWithCallout('generalCSSlabel', {
                   calloutTrigger: CalloutTriggers.Hover,
                   key: 'LabelWithCalloutFieldId',
-                  calloutContent: React.createElement('p', {}, "This application has preset CSS classes which you can use to customize its visuals. You can set earch part or role in its dedicated CSS editor, but you can also paste your solution to this general CSS editor. Each webpart has unique ID, so CSS in this solution won affect other List To App webpart."),
-                  calloutWidth: 200,
-                  text: '1. Set general visuals with CSS'
+                  calloutContent: React.createElement('p', {}, "This application has preset CSS classes which you can use to customize its visuals. You can set earch part or role in its dedicated CSS editor, but you can also paste your solution to this general CSS editor. Each webpart has unique ID, so CSS in this solution won't affect other List To App webpart."),
+                  calloutWidth: 300,
+                  text: 'Set general visuals with CSS'
                 }),
                 PropertyFieldMonacoEditor('generalCSS', {
                   key: 'generalCSS',
@@ -320,11 +412,11 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
               ]
             },
             {
-              groupName: "Roles Visuals",
+              groupName: "2. Roles Visuals",
               groupFields: [
                 PropertyFieldCollectionData("catIcons", {
                   key: "catIcons",
-                  label: "2. Set visuals for categories",
+                  label: "Set visuals for categories",
                   panelHeader: "Categories icons",
                   manageBtnLabel: "Categories icons",
                   value: this.properties.catIcons,
@@ -366,7 +458,7 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
                 }),
                 PropertyFieldCollectionData("subcatIcons", {
                   key: "subcatIcons",
-                  label: "3. Set visuals for subcategories",
+                  label: "Set visuals for subcategories",
                   panelHeader: "Subcategories icons",
                   manageBtnLabel: "Subcategories icons",
                   value: this.properties.subcatIcons,
@@ -396,7 +488,7 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
                         type: CustomCollectionFieldType.color,
                       }                     
                   ],
-                  disabled: this.properties.colroles?.filter(col => col.role === "subcategory").length < 1 || this.categories.length === 0
+                  disabled: this.properties.colroles?.filter(col => col.role === "subcategory").length < 1 || this.subcategories.length === 0
                 }),
                 PropertyFieldMonacoEditor('subcatCSS', {
                   key: 'subcatCSS',
@@ -406,7 +498,49 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
                   language:"css",
                   showLineNumbers:true,
                   theme: 'vs-dark'
-                })
+                }),
+                PropertyFieldCollectionData("statusIcons", {
+                  key: "statusIcons",
+                  label: "Set visuals for categories",
+                  panelHeader: "Status icons",
+                  manageBtnLabel: "Status icons",
+                  value: this.properties.statusIcons,
+                    fields: [
+                      {
+                        id: 'status',
+                        title: 'Select status',
+                        type: CustomCollectionFieldType.dropdown,
+                        options: this.statuses?.map(item => {
+                          return { key: item, text: item };
+                        }),
+                      },
+                      {
+                        id: "status_icon",
+                        title: "Select icon",
+                        iconFieldRenderMode: "picker",
+                        type: CustomCollectionFieldType.fabricIcon,
+                      },
+                      {
+                        id: "status_icon_color",
+                        title: "Select icon color",
+                        type: CustomCollectionFieldType.color,
+                      },
+                      {
+                        id: "status_icon_bg",
+                        title: "Select icon background",
+                        type: CustomCollectionFieldType.color,
+                      }                  
+                  ],
+                  disabled: this.properties.colroles?.filter(col => col.role === "status").length < 1 || this.statuses.length === 0
+                }),
+                PropertyFieldMonacoEditor('statusCSS', {
+                  key: 'statusCSS',
+                  value: this.properties.statusCSS,
+                  onChange: (code: string) => { this.properties.statusCSS = code; },
+                  language:"css",
+                  showLineNumbers:true,
+                  theme: 'vs-dark'
+                }),
               ]
             }
           ]
@@ -434,7 +568,15 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
                   showValue:true,  
                   step:1                
                 }),
-                
+                PropertyFieldMonacoEditor('cardCSS', {
+                  key: 'cardCSS',
+                  value: this.properties.cardCSS,
+                  onChange: (code: string) => { this.properties.cardCSS = code; },
+                  showMiniMap: true,
+                  language:"css",
+                  showLineNumbers:true,
+                  theme: 'vs-dark'
+                })
 
               ]
             }

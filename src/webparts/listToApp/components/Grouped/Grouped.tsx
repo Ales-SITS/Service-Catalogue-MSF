@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import styles from '../ListToApp.module.scss';
 
 import group_styles from './Grouped.module.scss';
@@ -10,35 +10,32 @@ import "@pnp/graph/users";
 
 //Components
 import Card from '../Card/Card'
+import { AppContext } from "../ListToAppContext"
 
+export default function Grouped (props) {
 
-export default function Grouped (props:any) {
+  const {settings} = useContext(AppContext)
+  const {cr} = useContext(AppContext)
+
     const {
       level,
       grp,
       catgrp,
-
-      cardsPerRow,
       sorting,
       grouping,
-      category,
-      subcategory,
       subcategoriesList,
       filteredResults,
       filteredServicesList,
       sortingAsc,
       inputValue,
-      colroles,
+    } = props;
 
+    const {
+      cardsPerRow,
       catIcons,
       subcatIcons,
+     } = settings;
 
-      cardType,
-      sp,
-      siteurl,
-      list,
-      webpartID
-    } = props;
 
     const [groupHidden, setGroupHidden] = useState(level === 1 ? false : true)
     const groupHiddenHandler = () => {
@@ -47,9 +44,9 @@ export default function Grouped (props:any) {
 
     const groupedServices = filteredServicesList
     .sort((a,b)=> a[sorting] > b[sorting] ? sortingAsc*1 : -sortingAsc*1)
-    .filter(service => service[category] === grp)
+    .filter(service => service[cr.category] === grp)
 
-    const uniqueSubcategories = Array.from(new Set(groupedServices.map(item => item[subcategory])))
+    const uniqueSubcategories = Array.from(new Set(groupedServices.map(item => item[cr.subcategory])))
 
      useEffect(()=>{
       setGroupHidden(level === 1 ? false : true)
@@ -57,19 +54,19 @@ export default function Grouped (props:any) {
 
     const column = "1fr "
     
-    const catIconName = catIcons.find(cat => cat.category === grp) ? 
-                        catIcons.find(cat => cat.category === grp) :
-                        catIcons.find(cat => cat.category === "default")
+    const catIconName = catIcons?.find(cat => cat.category === grp) ? 
+                        catIcons?.find(cat => cat.category === grp) :
+                        catIcons?.find(cat => cat.category === "default")
  
-    const subcatIconName = subcatIcons.find(subcat => subcat.subcategory === grp) ? 
-                           subcatIcons.find(subcat => subcat.subcategory === grp) :
-                           subcatIcons.find(subcat => subcat.subcategory === "default")
+    const subcatIconName = subcatIcons?.find(subcat => subcat.subcategory === grp) ? 
+                           subcatIcons?.find(subcat => subcat.subcategory === grp) :
+                           subcatIcons?.find(subcat => subcat.subcategory === "default")
 
 
     const catGrpIconName = catgrp===null ? null : 
-                           catIcons.find(cat => cat.category === catgrp) ? 
-                           catIcons.find(cat => cat.category === catgrp) :
-                           catIcons.find(cat => cat.category === "default")
+                           catIcons?.find(cat => cat.category === catgrp) ? 
+                           catIcons?.find(cat => cat.category === catgrp) :
+                           catIcons?.find(cat => cat.category === "default")
 
    // console.log(catgrp)
 
@@ -84,8 +81,8 @@ export default function Grouped (props:any) {
               <span>
                 ({level === 1 ? 
                 uniqueSubcategories.length : inputValue!==""? 
-                filteredResults.filter(service => service[subcategory] === grp).length :
-                filteredServicesList.filter(service => service[subcategory] === grp).length
+                filteredResults.filter(service => service[cr.subcategory] === grp).length :
+                filteredServicesList.filter(service => service[cr.subcategory] === grp).length
                 })
               </span>
             </div>
@@ -112,7 +109,7 @@ export default function Grouped (props:any) {
           {groupHidden ? null :
            level === 1 && inputValue !== "" ? 
            uniqueSubcategories.map((subcat,idx)=>
-            filteredResults.filter(service => service[subcategory] === subcat).length < 1 ? null : 
+            filteredResults.filter(service => service[cr.subcategory] === subcat).length < 1 ? null : 
             <Grouped
               key={idx}
               level={2}
@@ -120,24 +117,11 @@ export default function Grouped (props:any) {
               cardsPerRow={cardsPerRow}
               sorting={sorting}
               grouping={grouping}
-              category={category}
-              subcategory={subcategory}
               subcategoriesList={subcategoriesList}
               filteredResults={filteredResults}
               filteredServicesList={filteredServicesList}
               sortingAsc={sortingAsc}
               inputValue={inputValue}
-              colroles={colroles}
-
-              catIcons={catIcons}
-              catIconsDetails={catIconName}
-              subcatIcons={subcatIcons}
-
-              cardType={cardType}
-              sp={sp}
-              siteurl={siteurl}
-              list={list}
-              webpartID={webpartID}
             />) :
             level === 1 && inputValue === "" ? 
             uniqueSubcategories.map((subcat,idx)=>
@@ -146,27 +130,13 @@ export default function Grouped (props:any) {
                level={2}
                grp={subcat}
                catgrp={grp}
-               cardsPerRow={cardsPerRow}
                sorting={sorting}
                grouping={grouping}
-               category={category}
-               subcategory={subcategory}
                subcategoriesList={subcategoriesList}
                filteredResults={filteredResults}
                filteredServicesList={filteredServicesList}
                sortingAsc={sortingAsc}
                inputValue={inputValue}
-               colroles={colroles}
-
-               catIcons={catIcons}
-               catIconsDetails={catIconName}
-               subcatIcons={subcatIcons}
-
-               cardType={cardType}
-               sp={sp}
-               siteurl={siteurl}
-               list={list}
-               webpartID={webpartID}
              />) :
           <div 
             className={styles.service_catalogue_results}
@@ -178,38 +148,20 @@ export default function Grouped (props:any) {
               inputValue !== "" ?
               filteredResults
               .sort((a,b)=> a[sorting] > b[sorting] ? sortingAsc*1 : -sortingAsc*1)
-              .filter(service => service[subcategory] === grp)
+              .filter(service => service[cr.subcategory] === grp)
               .map((service,idx)=>
               <Card 
                   key={`${idx}_${service.Title}`} 
                   service={service} 
-                  colroles={colroles} 
-                  catIcons = {catIcons}
-                  subcatIcons = {subcatIcons}
-                  cardType = {cardType}
-
-                  sp = {sp}
-                  siteurl={siteurl}
-                  list={list}
-                  webpartID={webpartID}
               />
               ) :
               filteredServicesList
               .sort((a,b)=> a[sorting] > b[sorting] ? sortingAsc*1 : -sortingAsc*1)
-              .filter(service => service[subcategory] === grp)
+              .filter(service => service[cr.subcategory] === grp)
               .map((service,idx)=>
               <Card  
                   key={`${idx}_${service.Title}`} 
-                  service={service} 
-                  colroles={colroles} 
-                  catIcons = {catIcons}
-                  subcatIcons = {subcatIcons}
-                  cardType = {cardType}
-
-                  sp = {sp}
-                  siteurl={siteurl}
-                  list={list}   
-                  webpartID={webpartID}          
+                  service={service}            
               />
               )
               

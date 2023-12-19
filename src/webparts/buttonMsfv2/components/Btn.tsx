@@ -24,8 +24,6 @@ export default function Btn (props) {
     
     const url = searchTermOption.includes("amp;")? searchTermOption.replace("amp;","") : searchTermOption
 
-    console.log(btn)
-
     return (
         <a 
             className={`${styles.link_reset}`}

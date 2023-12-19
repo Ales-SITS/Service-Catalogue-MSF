@@ -26,7 +26,7 @@ export default function ButtonMsfv2 (props) {
                   type="text"
                   onChange={setSearchTermHandler}
                   value={searchTerm}
-                  placeholder={search_collection[0].placeholder}
+                  placeholder={search_collection[0].search_placeholder}
                 />
             </div> : null}
           <div className={`btnmsf_${webPartId}_buttons`}>

@@ -1,18 +1,20 @@
 import * as React from 'react';
+import {useContext} from 'react';
 
 //3rd party Modules
 import { Icon } from '@fluentui/react/lib/Icon';
 
-export default function IconStyled (props:any) {
-    const {
-        category,
-        catIcons,
-        webpartID
-    } = props;
+//Context
+import { AppContext } from "../ListToAppContext"
 
-    const catIconName =   catIcons.find(cat => cat.category === category) ? 
-                          catIcons.find(cat => cat.category === category) :
-                          catIcons.find(cat => cat.category === "default")
+export default function IconStyled (props:any) {
+    const {settings} = useContext(AppContext)
+    const {category} = props;
+    const {catIcons, webpartID} = settings
+
+    const catIconName =   catIcons?.find(cat => cat.category === category) ? 
+                          catIcons?.find(cat => cat.category === category) :
+                          catIcons?.find(cat => cat.category === "default")
 
     return (
                 <Icon 
