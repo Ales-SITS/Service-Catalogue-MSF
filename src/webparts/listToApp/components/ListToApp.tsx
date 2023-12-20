@@ -101,8 +101,8 @@ export default function ListtoApp () {
     //SEARCH
     function setSearchCategories (services) {
       const index = new MiniSearch({
-        fields: [`${cr.title}`, `${cr.category}`, `${cr.subcategory}`, `${cr.content}`, `${cr.label1}`],
-        storeFields: [`${cr.title}`, `${cr.category}`, `${cr.subcategory}`, `${cr.content}`, `${cr.label1}`, `${cr.status}`],
+        fields: [`${cr.title}`, `${cr.category}`, `${cr.subcategory}`, `${cr.content}`, `${cr.Group1}`],
+        storeFields: [`${cr.title}`, `${cr.category}`, `${cr.subcategory}`, `${cr.content}`, `${cr.Group1}`, `${cr.status}`],
         extractField: (service, fieldName) => {
           if (Array.isArray(fieldName)) {
            return service[fieldName].join(' ')
@@ -123,8 +123,8 @@ export default function ListtoApp () {
 
     function setSearchDescription(services) {
       const index = new MiniSearch({
-        fields: [`${cr.title}`, `${cr.category}`, `${cr.subcategory}`, `${cr.content}`, `${cr.label1}`],
-        storeFields: [`${cr.title}`, `${cr.category}`, `${cr.subcategory}`, `${cr.content}`, `${cr.label1}`, `${cr.status}`],
+        fields: [`${cr.title}`, `${cr.category}`, `${cr.subcategory}`, `${cr.content}`, `${cr.Group1}`],
+        storeFields: [`${cr.title}`, `${cr.category}`, `${cr.subcategory}`, `${cr.content}`, `${cr.Group1}`, `${cr.status}`],
         tokenize: (string, _fieldName) => string.split('>'),
         idField: 'ID',
         searchOptions: {
@@ -194,12 +194,12 @@ export default function ListtoApp () {
 // SORTING functions
     const [sorting, setSorting] = useState("Title")
     const [sortingAsc, setSortingAsc] = useState(1)
-    const sortHandler = (sort) => {
-      const sorted = colroles?.filter(col => col.role === sort[0].toLowerCase())[0]?.column
+    const sortHandler = (sortVal) => {
+      const sorted = colroles?.filter(col => col.role === sortVal[0])[0]?.column
       setSorting(sorted)
-      const sortedAsc = sort[1] === true ? 1 : -1
+      const sortedAsc = sortVal[1] === true ? 1 : -1
       setSortingAsc(sortedAsc)
- }
+    }
 
 // GROUPING functions
     const [grouping, setGrouping] = useState(defaultgroupby)
@@ -289,7 +289,7 @@ export default function ListtoApp () {
               service={service} 
           />
               ) : 
-          filteredServicesList.sort((a,b)=> a > b ? sortingAsc*1 : -sortingAsc*1).map((service,idx) => 
+          filteredServicesList.sort((a,b)=> a[sorting] > b[sorting] ? sortingAsc*1 : -sortingAsc*1).map((service,idx) => 
           <Card 
               key={`${idx}_${service.Title}`} 
               service={service} 

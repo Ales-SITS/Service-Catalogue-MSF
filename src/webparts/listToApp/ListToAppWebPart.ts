@@ -7,7 +7,8 @@ import {
   type IPropertyPaneConfiguration,
   PropertyPaneTextField,
   PropertyPaneSlider,
-  PropertyPaneChoiceGroup
+  PropertyPaneChoiceGroup,
+  PropertyPaneToggle
 } from '@microsoft/sp-property-pane';
 import { PropertyFieldListPicker, PropertyFieldListPickerOrderBy } from '@pnp/spfx-property-controls/lib/PropertyFieldListPicker';
 import { PropertyFieldCollectionData, CustomCollectionFieldType } from '@pnp/spfx-property-controls/lib/PropertyFieldCollectionData';
@@ -28,7 +29,6 @@ import "@pnp/sp/items";
 import "@pnp/sp/fields";
 
 //Components
-import ListToApp from './components/ListToApp';
 import ListToAppContext from './components/ListToAppContext';
 
 export interface IListToAppWebPartProps {
@@ -59,8 +59,12 @@ export interface IListToAppWebPartProps {
     statusIcons: any [];
     statusCSS: string;
 
+    cardCategoryToggle: boolean;
+    cardSubcategoryToggle: boolean;
+    cardGroup1Toggle: boolean;
+    cardGroup2Toggle: boolean;
+    cardLinkToggle: boolean;
     cardCSS:string;
-
 
 }
 
@@ -89,7 +93,7 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
         header: this.properties.header,
         siteurl: this.properties.siteurl,
         list: this.properties.list,
-        columns: this.properties.multiColumn,
+        //columns: this.properties.multiColumn,
         colroles: this.properties.colroles,
         defaultgroupby: this.properties.defaultgroupby,
 
@@ -99,14 +103,20 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
         sortingToggle: this.properties.sortingToggle,
         groupingToggle: this.properties.groupingToggle,
 
-        cardsPerRow: this.properties.cardsPerRow,
-        cardType: this.properties.cardType,
+
         catIcons: this.properties.catIcons,
         subcatIcons: this.properties.subcatIcons,
         statusIcons: this.properties.statusIcons,
 
-        webpartID : this.context.instanceId.replaceAll("-",""),
+        cardsPerRow: this.properties.cardsPerRow,
+        cardType: this.properties.cardType,
+        cardCategoryToggle: this.properties.cardCategoryToggle,
+        cardSubcategoryToggle: this.properties.cardSubcategoryToggle,
+        cardGroup1Toggle: this.properties.cardGroup1Toggle,
+        cardGroup2Toggle: this.properties.cardGroup2Toggle,
+        cardLinkToggle: this.properties.cardLinkToggle,
 
+        webpartID : this.context.instanceId.replaceAll("-",""),
         context: this.context
       }
     );
@@ -133,7 +143,7 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
   //CUSTOM functions
 
   public async getCategories():Promise<void> {
-    const category = this.properties.colroles?.filter(col => col.role === "category")[0]?.column
+    const category = this.properties.colroles?.filter(col => col.role === "Category")[0]?.column
     const sp = spfi().using(SPFxsp(this.context))
     const listSite = Web([sp.web, `${this.properties.siteurl}`]) 
     try {
@@ -146,7 +156,7 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
   }
 
   public async getSubcategories():Promise<void> {
-    const subcategory = this.properties.colroles?.filter(col => col.role === "subcategory")[0]?.column
+    const subcategory = this.properties.colroles?.filter(col => col.role === "Subcategory")[0]?.column
     const sp = spfi().using(SPFxsp(this.context))
     const listSite = Web([sp.web, `${this.properties.siteurl}`]) 
     try {
@@ -159,7 +169,7 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
   }
 
   public async getStatuses():Promise<void> {
-    const status = this.properties.colroles?.filter(col => col.role === "status")[0]?.column
+    const status = this.properties.colroles?.filter(col => col.role === "Status")[0]?.column
     const sp = spfi().using(SPFxsp(this.context))
     const listSite = Web([sp.web, `${this.properties.siteurl}`]) 
     try {
@@ -195,11 +205,11 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
               groupName: "",
               groupFields: [
                 PropertyPaneWebPartInformation({
-                  description: `This is webart helps you to create dynamic and modern layouts based on data stored in a SharePoint list. It is fully customizable by CSS</br></br>
+                  description: `This web part facilitates the creation of dynamic and modern layouts using data from a SharePoint list. It offers full customization through CSS.</br></br>
                                 Property pane pages:
                                 <ul>
                                   <li>Page 1 - <strong>General settings</strong></li>
-                                  <li>Page 2 - <strong>Roles settings</strong></li>
+                                  <li>Page 2 - <strong>Basic Visuals and Roles settings</strong></li>
                                   <li>Page 3 - <strong>Card settings</strong></li>
                                 </ul>`,
                   moreInfoLink: `https://msfintl.sharepoint.com/sites/SITSExternalPortal`,
@@ -256,6 +266,7 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
                   key: "colroles",
                   label: "5. Set columns roles",
                   panelHeader: "Columns roles",
+                  panelDescription: "This application provides a predefined list of roles that you can assign to the columns selected in the previous step. These roles define the functions of each column within the application. For sorting and grouping, utilize roles such as Category, Subcategory, or Status. Each role can be applied only once.",
                   manageBtnLabel: "Columns roles",
                   value: this.properties.colroles,
                   panelProps: {
@@ -278,44 +289,50 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
                       type: CustomCollectionFieldType.dropdown,
                       options: [
                         {
-                          key: "title",
-                          text: "Title"
+                          key: "Title",
+                          text: "Title (single line of text)"
                         },
                         {
-                          key: "category",
-                          text: "Category (choice column)"
+                          key: "Category",
+                          text: "Category (choice)"
                         },
                         {
-                          key: "subcategory",
-                          text: "Subcategory (choice column)"
+                          key: "Subcategory",
+                          text: "Subcategory (choice)"
                         },
                         {
-                          key: "content",
-                          text: "Content"
+                          key: "Content",
+                          text: "Content (multiple line of text)"
                         },
                         {
-                          key: "status",
-                          text: "Status (choice column)"
+                          key: "Status",
+                          text: "Status (choice)"
                         },
                         {
-                          key: "label1",
-                          text: "Label 1 (choice column)"
+                          key: "Group1",
+                          text: "Group 1 (multiple choice)"
                         },
                         {
-                          key: "label2",
-                          text: "Label 2 (choice column)"
+                          key: "Group2",
+                          text: "Group 2 (multiple choice)"
                         },
                         {
-                          key: "owner",
-                          text: "Owner (person column)"
+                          key: "Owner",
+                          text: "Owner (person)"
                         },
                         {
-                          key: "link",
-                          text: "link (url)"
+                          key: "Link",
+                          text: "Link (hyperlink)"
                         }
                       ],
                       required: true
-                    }
+                    },
+                    {
+                      id: "name",
+                      title: "Name",
+                      type: CustomCollectionFieldType.string,
+                      required: false
+                    },
                   ],
                   disabled: this.properties.multiColumn.length < 1
                 }),
@@ -335,6 +352,9 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
           ]
         },
         {
+          header: {
+            description: "Within this property pane page, you can do your first visual customization. Start with general display options, then proceed to customizing roles you have assigned to your columns."
+          },
           displayGroupsAsAccordion:true,
           groups: [
             {
@@ -346,7 +366,7 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
                   calloutWidth: 300,
                   key: 'searchToggleFieldId',
                   label: 'Display search field',
-                  calloutContent: React.createElement('p', {}, 'Search field automatically filteres results based on the information included in columns with Content, Category, Subcategory and Label1 role.'),
+                  calloutContent: React.createElement('p', {}, 'Search field automatically filteres results based on the information included in columns with Content, Category, Subcategory and Group1 role.'),
                   onText: 'On',
                   offText: 'Off',
                   checked: this.properties.searchToggle
@@ -396,7 +416,7 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
                 PropertyFieldLabelWithCallout('generalCSSlabel', {
                   calloutTrigger: CalloutTriggers.Hover,
                   key: 'LabelWithCalloutFieldId',
-                  calloutContent: React.createElement('p', {}, "This application has preset CSS classes which you can use to customize its visuals. You can set earch part or role in its dedicated CSS editor, but you can also paste your solution to this general CSS editor. Each webpart has unique ID, so CSS in this solution won't affect other List To App webpart."),
+                  calloutContent: React.createElement('p', {}, "This application offers preset CSS classes for customizing its visuals. You have the option to modify each part or role in its dedicated CSS editor. Alternatively, you can paste your solution into the general CSS editor. Each web part has a unique ID, ensuring that CSS modifications in this solution will only affect the specified List To App web part and not others."),
                   calloutWidth: 300,
                   text: 'Set general visuals with CSS'
                 }),
@@ -446,7 +466,7 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
                         type: CustomCollectionFieldType.color,
                       }                  
                   ],
-                  disabled: this.properties.colroles?.filter(col => col.role === "category").length < 1 || this.categories.length === 0
+                  disabled: this.properties.colroles?.filter(col => col.role === "Category").length < 1 || this.categories.length === 0
                 }),
                 PropertyFieldMonacoEditor('catCSS', {
                   key: 'catCSS',
@@ -488,7 +508,7 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
                         type: CustomCollectionFieldType.color,
                       }                     
                   ],
-                  disabled: this.properties.colroles?.filter(col => col.role === "subcategory").length < 1 || this.subcategories.length === 0
+                  disabled: this.properties.colroles?.filter(col => col.role === "Subcategory").length < 1 || this.subcategories.length === 0
                 }),
                 PropertyFieldMonacoEditor('subcatCSS', {
                   key: 'subcatCSS',
@@ -531,7 +551,7 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
                         type: CustomCollectionFieldType.color,
                       }                  
                   ],
-                  disabled: this.properties.colroles?.filter(col => col.role === "status").length < 1 || this.statuses.length === 0
+                  disabled: this.properties.colroles?.filter(col => col.role === "Status").length < 1 || this.statuses.length === 0
                 }),
                 PropertyFieldMonacoEditor('statusCSS', {
                   key: 'statusCSS',
@@ -546,28 +566,67 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
           ]
         },
         {
+          header: {
+            description: "Within this property pane page, you can customize the visuals of individual cards, which display specific details about each element."
+          },
           groups: [
             {
-              groupName: "Card settings",
+              groupName: "1. General settings",
               groupFields: [
                 PropertyFieldToggleWithCallout('cardType', {
                   calloutTrigger: CalloutTriggers.Hover,
                   calloutWidth: 200,
                   key: 'toggleInfoHeaderFieldId',
-                  label: '1. Set the card type',
-                  calloutContent: React.createElement('p', {}, 'With this control you can set if the content displays as a modal window with the flow of the app (Main window).'),
+                  label: 'Set the card type',
+                  calloutContent: React.createElement('p', {}, "This control allows you to choose between displaying the content as a modal window or integrating it within the app's flow (Main window)."),
                   onText: 'Modal window',
                   offText: 'Main window',
                   checked: this.properties.cardType
                 }),
                 PropertyPaneSlider('cardsPerRow',{  
-                  label: '2. Set number of cards per row',  
+                  label: 'Set number of cards per row',  
                   min:1,  
                   max:5,  
                   value:1,  
                   showValue:true,  
                   step:1                
+                })       
+              ]
+            },
+            {
+              groupName: "2. Card details",
+              groupFields: [
+                PropertyPaneToggle('cardCategoryToggle',{
+                  label: 'Display Category',
+                  onText: 'On',
+                  offText: 'Off',
                 }),
+                PropertyPaneToggle('cardSubcategoryToggle',{
+                  label: 'Display Subcategory',
+                  onText: 'On',
+                  offText: 'Off',
+                }),
+                PropertyPaneToggle('cardGroup1Toggle',{
+                  label: 'Display Group1',
+                  onText: 'On',
+                  offText: 'Off',
+                }),
+                PropertyPaneToggle('cardGroup2Toggle',{
+                  label: 'Display Group2',
+                  onText: 'On',
+                  offText: 'Off',
+                }),
+                PropertyPaneToggle('cardLinkToggle',{
+                  label: 'Display Link',
+                  onText: 'On',
+                  offText: 'Off',
+                })
+
+              ],
+             },
+            {
+              groupName: "3. Card visuals",
+              groupFields: [
                 PropertyFieldMonacoEditor('cardCSS', {
                   key: 'cardCSS',
                   value: this.properties.cardCSS,

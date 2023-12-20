@@ -12,9 +12,10 @@ import { Icon } from '@fluentui/react/lib/Icon';
 
 import { AppContext } from "../ListToAppContext"
 
-export default function Content (props:any) {
+export default function Content (props) {
 
     const {settings} = useContext(AppContext)
+    const {roles} = useContext(AppContext)
 
     const {
         serviceObj,
@@ -23,19 +24,27 @@ export default function Content (props:any) {
         statIconName
     } = props;
 
-    const {cardType, webpartID} = settings
+    const {
+        cardType,
+        webpartID,
+        cardCategoryToggle,
+        cardSubcategoryToggle,
+        cardGroup1Toggle,
+        cardGroup2Toggle,
+        cardLinkToggle
+        } = settings
+
+    const categoryName = roles.category.name ? roles.category.name : "Category"
+    const subcategoryName = roles.subcategory.name ? roles.subcategory.name : "Subcategory"
+    const Group1Name = roles.Group1.name ? roles.Group1.name : "Group 1"
+    const Group2Name = roles.Group2.name ? roles.Group2.name : "Group 2"
+
+    console.log(serviceObj)
 
     return (
         <div className={cardType ? cardstyles.content_modal_overlay : cardstyles.content} onClick={props.onCloseModal}>
-            <div className={cardstyles.content_modal} onClick={e => e.stopPropagation()}>
+            <div className={`lta_${webpartID}_card`} onClick={e => e.stopPropagation()}>
                 <div className={cardstyles.content_modal_close_wrapper}>
-                    <Icon 
-                      iconName={statIconName.status_icon} 
-                      title={serviceObj.status}
-                      style={{
-                        color: `${statIconName.status_icon_color}`,
-                        backgroundColor: `${statIconName.status_icon_bg}`,
-                      }}/>
                     <button 
                         className={cardstyles.content_modal_close}
                         onClick={props.onCloseModal}
@@ -43,12 +52,13 @@ export default function Content (props:any) {
                     ✖
                     </button> 
                 </div>
-                <h2>{serviceObj.title}</h2>
-                <div className={cardstyles.lta_details}>
+                <h2 className={`lta_${webpartID}_card_title`}>{serviceObj.title}</h2>
+                <div className={`lta_${webpartID}_card_details_box`}>
                     <div className={cardstyles.lta_details_info}>                   
                         <div className={styles.service_cat_horizontal}>
+                            {!cardCategoryToggle ? null :
                             <div className={cardstyles.lta_detail}>
-                                <span className={cardstyles.lta_detail_label}>Category</span>
+                                <span className={`lta_${webpartID}_card_detail_label`}>{categoryName}</span>
                                 <span className={cardstyles.lta_detail_value}>
                                     <Icon 
                                     iconName={catIconName.cat_icon} 
@@ -61,8 +71,10 @@ export default function Content (props:any) {
                                     {serviceObj.category}
                                 </span>
                             </div>
+                            }
+                            {!cardSubcategoryToggle ? null :
                             <div className={cardstyles.lta_detail}>
-                                <span className={cardstyles.lta_detail_label}>Subcategory</span>
+                                <span className={`lta_${webpartID}_card_detail_label`}>{subcategoryName}</span>
                                 <span className={cardstyles.lta_detail_value}>
                                     <Icon 
                                     iconName={subcatIconName.subcat_icon}
@@ -75,45 +87,58 @@ export default function Content (props:any) {
                                     {serviceObj.subcategory}
                                 </span>                           
                             </div>
+                            }           
                         </div>
-
+                        {!cardGroup1Toggle ? null : 
                         <div className={cardstyles.lta_detail}>
-                            <span className={cardstyles.lta_detail_label}>Assets</span>
+                            <span className={`lta_${webpartID}_card_detail_label`}>{Group1Name}</span>
                             <div className={cardstyles.content_products}>
-                                {serviceObj.label1?.map(product => 
-                                <span className={cardstyles.service_product}>{product}</span>
+                                {serviceObj.Group1?.map((item,idx) => 
+                                <span key={idx} className={`lta_${webpartID}_card_detail_group1_item`}>{item}</span>
                                 )}
                             </div>
                         </div>
+                        }
+                        {!cardGroup2Toggle ? null :
                         <div className={cardstyles.lta_detail}>
-                            <span className={cardstyles.lta_detail_label}>Types</span>
+                            <span className={`lta_${webpartID}_card_detail_label`}>{Group2Name}</span>
                             <div className={cardstyles.content_products}>
-                                {serviceObj.label2?.map(product => 
-                                <span className={cardstyles.service_product}>{product}</span>
+                                {serviceObj.Group2?.map((item,idx) => 
+                                <span key={idx} className={`lta_${webpartID}_card_detail_group2_item`}>{item}</span>
                                 )}
                             </div>
                         </div>
+                        }
                     </div>
+                   
                     <div className={cardstyles.lta_details_link}>
-                        {serviceObj.link === null ? null :
-                            <a href={serviceObj.link.Url}>
+                        <Icon 
+                            iconName={statIconName.status_icon} 
+                            title={serviceObj.status}
+                            className={cardstyles.lta_icon}
+                            style={{
+                                color: `${statIconName.status_icon_color}`,
+                                backgroundColor: `${statIconName.status_icon_bg}`,
+                                fontSize: '20px'
+                        }}/>
+                        {!cardLinkToggle ? null : 
+                        serviceObj.link === null ? null :
+                            <a 
+                                href={serviceObj.link.Url}
+
+                            >
                                 <Icon 
                                     iconName="Link12"
                                     title={serviceObj.link?.Description}
-                                    className={cardstyles.lta_icon}
-                                    style={{
-                                        color: `${serviceObj.status === "Active" ? "#02eb0a" : serviceObj.status === "Archive" ? "#8f8f8f" : "#af00d6"}`,
-                                        marginLeft: '10px'
-                                }}
+                                    className={`lta_${webpartID}_link`}
                                 />
                             </a>
-                       }
+                        }
                     </div>
                 </div>
                 <div className={cardstyles.lta_content_box}>
                     <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(serviceObj.content)}}/>
                 </div>
-
             </div>
         </div>
     );

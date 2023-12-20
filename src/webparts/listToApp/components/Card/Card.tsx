@@ -23,13 +23,13 @@ export default function Card (props:any) {
 
     const {service} = props;
 
-
     const {
       catIcons,
       subcatIcons,
       statusIcons,
       siteurl,
-      list
+      list,
+      webpartID
     } = settings
    
     const serviceObj = {
@@ -38,8 +38,8 @@ export default function Card (props:any) {
       subcategory: service[cr.subcategory] ? service[cr.subcategory]  : null,
       status: service[cr.status]           ? service[cr.status]       : null,
       content: service[cr.content]         ? service[cr.content]      : null,
-      label1: service[cr.label1]           ? service[cr.label1]       : null,
-      label2: service[cr.label2]           ? service[cr.label2]       : null,
+      Group1: service[cr.Group1]           ? service[cr.Group1]       : null,
+      Group2: service[cr.Group2]           ? service[cr.Group2]       : null,
       ownerField: service[cr.ownerField]   ? service[cr.ownerField]   : null,
       link: service[cr.link]               ? service[cr.link]         : null
     }
@@ -48,7 +48,8 @@ export default function Card (props:any) {
     const contentHiddenHandler = () => {
       setContentHidden(current => !current)
     }
-    
+   
+    /*
     async function getOwner():Promise<any[]> {
       const listSite = Web([sp.web, `${siteurl}`]) 
       const owner =  await listSite.lists.getById(`${list}`).items.getById(service.ID).select(`${cr.ownerField}/EMail`).expand(`${cr.ownerField}`)()
@@ -58,11 +59,10 @@ export default function Card (props:any) {
     useEffect(()=>{
       getOwner().then(res=>console.log(res))
     },[])
-
+*/
     const catIconName =   catIcons?.find(cat => cat.category === service[cr.category]) ? 
                           catIcons?.find(cat => cat.category === service[cr.category]) :
                           catIcons?.find(cat => cat.category === "default")
-
       
     const subcatIconName = subcatIcons?.find(subcat => subcat.subcategory === service[cr.subcategory]) ? 
                            subcatIcons?.find(subcat => subcat.subcategory === service[cr.subcategory]) :
@@ -116,11 +116,7 @@ export default function Card (props:any) {
                   <Icon 
                         iconName="Link12"
                         title={serviceObj.link?.Description}
-                        className={cardstyles.lta_icon}
-                        style={{
-                          color: `${serviceObj.status === "Active" ? "#02eb0a" : serviceObj.status === "Archive" ? "#8f8f8f" : "#af00d6"}`,
-                          marginLeft: '10px'
-                    }}
+                        className={`lta_${webpartID}_link`}
                   />
                   </a>
                 }
@@ -128,7 +124,7 @@ export default function Card (props:any) {
             </div>
 
             <div className={cardstyles.content_products}>
-                  {serviceObj.label1?.map(product => <span className={cardstyles.service_product}>{product}</span>)}
+                  {serviceObj.Group1?.map(product => <span className={`lta_${webpartID}_card_detail_group1_item`}>{product}</span>)}
             </div>
           </button>
           {contentHidden === true ? null : 

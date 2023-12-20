@@ -1,6 +1,6 @@
 @import '~@fluentui/react/dist/sass/References.scss';
 
-.group1_wrapper {
+.Group1_wrapper {
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -10,7 +10,7 @@
   box-shadow: 0 0 5px rgba(0,0,0,0.2);
 }
 
-.group1_heading {
+.Group1_heading {
   font-size: 22px;
   border: 0;
   width: 100%;
@@ -26,7 +26,7 @@
   transition: 0.2s;
 }
 
-.group1_heading:hover {
+.Group1_heading:hover {
   transform: scale(1.01)
 }
 
@@ -48,7 +48,7 @@
   font-size: 20px;
 }
 
-.group2_wrapper {
+.Group2_wrapper {
   width: 95%;
   display: flex;
   flex-direction: column;
@@ -56,7 +56,7 @@
   margin: 5px;
 }
 
-.group2_heading {
+.Group2_heading {
   font-size: 18px;
   border: 0;
   width: 100%;
@@ -71,7 +71,7 @@
   transition: 0.2s;
 }
 
-.group2_heading:hover {
+.Group2_heading:hover {
   transform: scale(1.01)
 }
 

@@ -16,18 +16,31 @@ export default function ListToAppContext (props) {
     const sp = spfi().using(SPFxsp(context))
     const graph = graphfi().using(SPFxGraph(context))
 
+    const roles = {
+        title : colroles?.filter(col => col.role === "Title")[0],
+        category : colroles?.filter(col => col.role === "Category")[0],
+        subcategory : colroles?.filter(col => col.role === "Subcategory")[0],
+        status : colroles?.filter(col => col.role === "Status")[0],
+        content : colroles?.filter(col => col.role === "Content")[0],
+        Group1 : colroles?.filter(col => col.role === "Group1")[0],
+        Group2 : colroles?.filter(col => col.role === "Group2")[0],
+        link: colroles?.filter(col => col.role === "Link")[0],
+        none : {uniqueId: '0', column: '', role: 'none', name: "None", sortIdx: 1}
+    }
+
     const columns_roles = {
-        title : colroles?.filter(col => col.role === "title")[0]?.column,
-        category : colroles?.filter(col => col.role === "category")[0]?.column,
-        subcategory : colroles?.filter(col => col.role === "subcategory")[0]?.column,
-        status : colroles?.filter(col => col.role === "status")[0]?.column,
-        content : colroles?.filter(col => col.role === "content")[0]?.column,
-        label1 : colroles?.filter(col => col.role === "label1")[0]?.column,
-        label2 : colroles?.filter(col => col.role === "label2")[0]?.column,
+        title : roles.title?.column.replaceAll(" ",""),
+        category : roles.category?.column.replaceAll(" ",""),
+        subcategory : roles.subcategory?.column.replaceAll(" ",""),
+        status : roles.status?.column.replaceAll(" ",""),
+        content : roles.content?.column.replaceAll(" ",""),
+        Group1 : roles.Group1?.column.replaceAll(" ",""),
+        Group2 : roles.Group2?.column.replaceAll(" ",""),
+        link: roles.link?.column.replaceAll(" ","")
     }
 
     return (
-        <AppContext.Provider value={{settings: props, cr: columns_roles, sp: sp, graph: graph}}>
+        <AppContext.Provider value={{settings: props, cr: columns_roles, roles: roles, sp: sp, graph: graph}}>
            <ListToApp/>
         </AppContext.Provider> 
     )

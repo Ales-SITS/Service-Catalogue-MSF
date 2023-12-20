@@ -19,7 +19,7 @@
       "header": "List to App ",
       "siteurl": "https://msfintl.sharepoint.com/sites/GRP-SITS-Crossroad",
       "list": "91133e8a-e37c-42cb-bf65-b4a0cc0da7e2",
-      "multiColumn": ["ServicesCategory", "Title", "ServiceDescription", "Status", "ServiceSubcategory", "ServiceOwner", "ServiceManager", "Servicetype", "Assetsincludedintheservicedelivery"],
+      "multiColumn": ["Services Category", "Title", "Service Description", "Status", "Service Subcategory", "Service Owner", "Service Manager", "Service type", "Assets included in the service delivery"],
      
       "catIcons": [{"cat_icon":"12PointStar","category":"default", "uniqueId":"355460b5-85dd-435c-9157-6623e3b789b9", "sordIdx":1}],
       "subcatIcons": [{"subcat_icon":"12PointStar","subcategory":"default", "uniqueId":"355460b5-85dd-435c-9157-6623e3b789b9", "sordIdx":1}],      
@@ -30,6 +30,11 @@
       "subcatFilterToggle": true,
       "sortingToggle": true,
       "groupingToggle": true,
+      "cardCategoryToggle": true,
+      "cardSubcategoryToggle": true,
+      "cardGroup1Toggle": true,
+      "cardGroup2Toggle": true,
+      "cardLinkToggle": true,
 
       "generalCSS": " ",
       "catCSS": " ",

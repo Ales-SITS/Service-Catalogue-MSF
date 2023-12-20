@@ -1,38 +1,39 @@
 import * as React from 'react';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useContext} from 'react';
 import styles from './ListToApp.module.scss';
 
-//3rd party Modules
-import { Icon } from '@fluentui/react/lib/Icon';
+import { AppContext } from "./ListToAppContext"
 
-export default function SortByBox (props:any) {
+export default function SortByBox (props) {
+
+    const {roles} = useContext(AppContext);
 
     const [sortedbyHidden, setSortedbyHidden] = useState(true)
     const sortedbyHiddenHandler = () => {
       setSortedbyHidden(current => !current)
     }
 
-    const [sortedby,setSortedby] = useState('Title')
+    const [sortedby,setSortedby] = useState(['Title','Title'])
     const [sortedbyAsc,setSortedbyAsc] = useState(true)
 
     const sortedByHandler = (option) => {
-      if (option === sortedby) {
+      if (option[0] === sortedby[0]) {
         setSortedbyAsc(current => !current)
       } else {
-        setSortedby(option)
+        setSortedby([option[0],option[1]])
         setSortedbyAsc(true)
       }
     }
 
     useEffect(()=>{
-      props.onSort([sortedby,sortedbyAsc])
+      props.onSort([sortedby[0],sortedbyAsc])
     },[sortedbyAsc, sortedby])
 
     const sortingOptions = [
-      'Title',
-      'Category',
-      'Subcategory',
-      'Status'
+      [roles.title.role,roles.title.name ? roles.title.name : "Title"],
+      [roles.category.role,roles.category.name ? roles.category.name : "Category"],
+      [roles.subcategory.role,roles.subcategory.name ? roles.subcategory.name : "Subcategory"],
+      [roles.status.role,roles.status.name ? roles.status.name : "Status"]
     ]
 
     return (
@@ -40,7 +41,7 @@ export default function SortByBox (props:any) {
       <button
         onClick={sortedbyHiddenHandler}
         className={styles.lta__sort} 
-      > Sorted by {sortedby} {sortedbyAsc ? "↓" : "↑"}</button>
+      > Sorted by {sortedby[1]} {sortedbyAsc ? "↓" : "↑"}</button>
         <div 
         className={styles.lta__sort_buttons}
         style={{
@@ -52,12 +53,12 @@ export default function SortByBox (props:any) {
                   <button 
                     className={styles.lta__sort_button} 
                     key={idx} 
-                    onClick={()=>sortedByHandler(`${option}`)}
+                    onClick={()=>sortedByHandler(option)}
                     style={{
-                      borderBottom:`${option !== sortedby ? "0px solid white" : "1px solid red"}` 
+                      borderBottom:`${option[0] !== sortedby[0] ? "0px solid white" : "1px solid red"}` 
                     }}
                     >
-                      {option} {option !== sortedby ? "↓" : sortedbyAsc ? "↓" : "↑"}
+                      {option[1]} {option[0] !== sortedby[0] ? "↓" : sortedbyAsc ? "↓" : "↑"}
                   </button>
                 )}
                 

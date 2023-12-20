@@ -68,12 +68,11 @@ export default function Grouped (props) {
                            catIcons?.find(cat => cat.category === catgrp) :
                            catIcons?.find(cat => cat.category === "default")
 
-   // console.log(catgrp)
 
     return (
-        <div className={`${level === 1 ? group_styles.group1_wrapper :  group_styles.group2_wrapper} ${groupHidden === true ? null : group_styles.group_opened}`}>
+        <div className={`${level === 1 ? group_styles.Group1_wrapper :  group_styles.Group2_wrapper} ${groupHidden === true ? null : group_styles.group_opened}`}>
           <button 
-            className={level === 1 ?  group_styles.group1_heading : group_styles.group2_heading} 
+            className={level === 1 ?  group_styles.Group1_heading : group_styles.Group2_heading} 
             onClick={groupHiddenHandler}>
             <div>
               <span>{groupHidden ? "▸ " : "▿ "} </span>
