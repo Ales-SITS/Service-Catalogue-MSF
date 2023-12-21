@@ -24,65 +24,6 @@
   width: 100%;
 }
 
-/*
-.lta__input {
-  width: 100%;
-  border-radius: 30px;
-  padding: 5px 10px;
-  border: none;
-  outline: none;
-  transition: 0.2s;
-  border: 1px solid #555;
-  margin: 2px;
-}
-
-.lta__input:focus {
-  outline: none;
-  border: none;
-  border: 1px solid #3a3a3a;
-}
-*/
-
-.lta__sort_box {
-  width: 100%;
-  margin: 2px 0;
-  display: flex;
-  justify-content: start;
-  position: relative;
-  overflow-x: hidden;
-  overflow-y: hidden;
-}
-
-.lta__sort {
-  width: 170px;
-  text-align: start;
-  color: red;
-  background-color: white;
-  height: 30px;
-  border-radius: 30px;
-  border: none;
-  cursor: pointer;
-  position: relative;
-  z-index: 2;
-}
-
-.lta__sort_buttons {
-  display: flex;
-  justify-content: start;
-  transition: 0.4s;
-  width: 80%;
-  position: relative;
-  z-index: 1;
-}
-
-.lta__sort_button {
-  width: 19%;
-  border: 0;
-  outline: 0;
-  background-color:rgba(0,0,0,0);
-  cursor: pointer
-}
-
 .service_catalogue_results {
   width: 100%;
   display: grid;

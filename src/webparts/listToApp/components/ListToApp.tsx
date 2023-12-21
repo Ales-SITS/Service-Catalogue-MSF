@@ -23,10 +23,10 @@ import "@pnp/graph/users";
 
 //Components
 import Card from './Card/Card'
-import Categories from './Categories'
-import SortByBox from './SortByBox'
-import GroupByBox from './GroupByBox'
-import Grouped from './Grouped/Grouped'
+import Categories from './Controls/Categories'
+import SortByBox from './Controls/SortByBox'
+import GroupByBox from './Controls/GroupByBox'
+import Grouped from './Grouped'
 
 import { AppContext } from "./ListToAppContext"
 
@@ -41,7 +41,7 @@ export default function ListtoApp () {
       siteurl,
       list,
       colroles,
-      defaultgroupby,
+      defaultGroupby,
 
       searchToggle,
       catFilterToggle,
@@ -94,7 +94,7 @@ export default function ListtoApp () {
         setSubcategoriesList(subcategories)
       })
 
-      groupHandler(defaultgroupby)
+      groupHandler(defaultGroupby)
 
     }, []);
 
@@ -202,7 +202,7 @@ export default function ListtoApp () {
     }
 
 // GROUPING functions
-    const [grouping, setGrouping] = useState(defaultgroupby)
+    const [grouping, setGrouping] = useState(defaultGroupby)
     const [groupingArr,setGroupingArr] = useState([])
     const groupHandler = (group) => {
       if (group === "Category") {
@@ -214,7 +214,7 @@ export default function ListtoApp () {
     }
 
     useEffect(()=>{
-      defaultgroupby === "Category" ? setGroupingArr(categoriesFilter) : setGroupingArr(subcategoriesList)
+      defaultGroupby === "Category" ? setGroupingArr(categoriesFilter) : setGroupingArr(subcategoriesList)
     },[categoriesFilter.length, subcategoriesList.length])
 
     const column = "1fr "
@@ -237,12 +237,14 @@ export default function ListtoApp () {
           categoriesList={categoriesList}
           onCheckChange = {categoriesHandler}
         /> : null}
-        {sortingToggle?
+        {
+        sortingToggle?
         <SortByBox onSort={sortHandler}/> : null}
-        {groupingToggle?
-        <GroupByBox onGroup={groupHandler} defaultgroupby={defaultgroupby}/> : null}
-        {     
-        grouping !== "None" && inputValue !== "" ?
+        {
+        groupingToggle?
+        <GroupByBox onGroup={groupHandler} defaultGroupby={defaultGroupby}/>
+         : null}
+        {grouping !== "None" && inputValue !== "" ?
         groupingArr.sort((a,b)=> a[sorting] > b[sorting] ? sortingAsc*1 : -sortingAsc*1).map((grp,idx)=>
         filteredResults.filter(service => service[cr.category] === grp).length === 0 ? null : 
           <Grouped

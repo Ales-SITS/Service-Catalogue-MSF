@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useEffect, useState, useContext } from 'react';
-import styles from '../ListToApp.module.scss';
+import styles from './ListToApp.module.scss';
 
 import group_styles from './Grouped.module.scss';
 
@@ -9,8 +9,8 @@ import { Icon } from '@fluentui/react/lib/Icon';
 import "@pnp/graph/users";
 
 //Components
-import Card from '../Card/Card'
-import { AppContext } from "../ListToAppContext"
+import Card from './Card/Card'
+import { AppContext } from "./ListToAppContext"
 
 export default function Grouped (props) {
 

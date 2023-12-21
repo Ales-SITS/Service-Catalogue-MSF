@@ -29,12 +29,13 @@
     font-size: 20px;
 }
   
-.content_status_icon {
-    font-size: 28px;
-    color: green
-  }
   
-.content_products {
+.lta__card_iconbox {
+  display: flex;
+  align-items: center; 
+}
+
+.lta__card_group_items {
     width: 100%;
     display: flex;
     flex-wrap: wrap;
@@ -42,7 +43,7 @@
 }
 
 
-.content_modal_overlay {
+.lta__card_overlay {
     position: fixed;
     width: 100vw;
     height: 100vh;
@@ -56,7 +57,7 @@
     z-index: 100;
   }
   
-  .content_modal {
+  .lta__card_modal {
     margin-top: -148px;
     width: 850px;
     height: 85vh;
@@ -70,14 +71,14 @@
     overflow: hidden;
 }
 
-.content_modal_close_wrapper {
+.lta__card_modal_close_wrapper {
     width: 100%;
     display: flex;
     justify-content: end;
     align-items: center;
 }
 
-.content_modal_close {
+.lta__card_modal_close {
     width: 25px;
     height: 25px;
     font-size: 20px;
@@ -88,6 +89,12 @@
     cursor: pointer;
 }
   
+.lta_card_iconbox {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+}
+
 .lta_detail {
     display: flex;
     flex-direction: column;
@@ -110,10 +117,6 @@
     padding: 15px 0
 }
 
-.lta_detail_value {
-    font-size: 16px;
-}
-
 .lta_icon {
   width: 25px;
   height: 25px;
@@ -127,39 +130,22 @@
 .lta_content_box {
   width: 100%;
   box-sizing: border-box;
-  overflow-y: scroll;
+  overflow-y: auto;
   overflow-x: hidden;
 }
 
 
-    .product_service_button {
-        outline: none;
-        font-size: 18px;
-        width: 100%;
-        background-color: white;
-        border: none;
-        margin-top: 5px;
-        cursor: pointer;
-        display: flex;
-        flex-direction: column;
-        transition: 0.3s;
-      }
-  
-      .product_service_button_top {
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 5px;
-      }
-  
-  
-      .product_service_button_top div span {
-        font-size: 12px;
-        color: red
-      }
-  
-      .product_service_button_top div h4 {
-        margin: 5px 0
-      }
+.lta__card_button {
+    outline: none;
+    font-size: 18px;
+    width: 100%;
+    background-color: white;
+    border: none;
+    margin-top: 5px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: 0.3s;
+  }
   

@@ -34,19 +34,19 @@ export default function Content (props) {
         cardLinkToggle
         } = settings
 
-    const categoryName = roles.category.name ? roles.category.name : "Category"
-    const subcategoryName = roles.subcategory.name ? roles.subcategory.name : "Subcategory"
-    const Group1Name = roles.Group1.name ? roles.Group1.name : "Group 1"
-    const Group2Name = roles.Group2.name ? roles.Group2.name : "Group 2"
+    const categoryName = roles.category?.name ? roles.category.name : "Category"
+    const subcategoryName = roles.subcategory?.name ? roles.subcategory.name : "Subcategory"
+    const Group1Name = roles.Group1?.name ? roles.Group1.name : "Group 1"
+    const Group2Name = roles.Group2?.name ? roles.Group2.name : "Group 2"
 
     console.log(serviceObj)
 
     return (
-        <div className={cardType ? cardstyles.content_modal_overlay : cardstyles.content} onClick={props.onCloseModal}>
+        <div className={cardType ? cardstyles.lta__card_overlay : cardstyles.content} onClick={props.onCloseModal}>
             <div className={`lta_${webpartID}_card`} onClick={e => e.stopPropagation()}>
-                <div className={cardstyles.content_modal_close_wrapper}>
+                <div className={cardstyles.lta__card_modal_close_wrapper}>
                     <button 
-                        className={cardstyles.content_modal_close}
+                        className={cardstyles.lta__card_modal_close}
                         onClick={props.onCloseModal}
                     >
                     ✖
@@ -59,7 +59,7 @@ export default function Content (props) {
                             {!cardCategoryToggle ? null :
                             <div className={cardstyles.lta_detail}>
                                 <span className={`lta_${webpartID}_card_detail_label`}>{categoryName}</span>
-                                <span className={cardstyles.lta_detail_value}>
+                                <span className={`lta_${webpartID}_card_detail_value`}>
                                     <Icon 
                                     iconName={catIconName.cat_icon} 
                                     className={cardstyles.lta_icon}
@@ -75,7 +75,7 @@ export default function Content (props) {
                             {!cardSubcategoryToggle ? null :
                             <div className={cardstyles.lta_detail}>
                                 <span className={`lta_${webpartID}_card_detail_label`}>{subcategoryName}</span>
-                                <span className={cardstyles.lta_detail_value}>
+                                <span className={`lta_${webpartID}_card_detail_value`}>
                                     <Icon 
                                     iconName={subcatIconName.subcat_icon}
                                     className={cardstyles.lta_icon}
@@ -92,7 +92,7 @@ export default function Content (props) {
                         {!cardGroup1Toggle ? null : 
                         <div className={cardstyles.lta_detail}>
                             <span className={`lta_${webpartID}_card_detail_label`}>{Group1Name}</span>
-                            <div className={cardstyles.content_products}>
+                            <div className={cardstyles.lta__card_group_items}>
                                 {serviceObj.Group1?.map((item,idx) => 
                                 <span key={idx} className={`lta_${webpartID}_card_detail_group1_item`}>{item}</span>
                                 )}
@@ -102,7 +102,7 @@ export default function Content (props) {
                         {!cardGroup2Toggle ? null :
                         <div className={cardstyles.lta_detail}>
                             <span className={`lta_${webpartID}_card_detail_label`}>{Group2Name}</span>
-                            <div className={cardstyles.content_products}>
+                            <div className={cardstyles.lta__card_group_items}>
                                 {serviceObj.Group2?.map((item,idx) => 
                                 <span key={idx} className={`lta_${webpartID}_card_detail_group2_item`}>{item}</span>
                                 )}

@@ -6,7 +6,7 @@ import cardstyles from './Card.module.scss';
 
 //3rd party Modules
 import { Icon } from '@fluentui/react/lib/Icon';
-import ContentModal from './ContentModal'
+import CardModal from './CardContent'
 
 //API
 import { Web } from "@pnp/sp/webs"; 
@@ -29,7 +29,12 @@ export default function Card (props:any) {
       statusIcons,
       siteurl,
       list,
-      webpartID
+      webpartID,
+      cardCategoryToggle,
+      cardSubcategoryToggle,
+      cardGroup1Toggle,
+      cardGroup2Toggle,
+      cardLinkToggle
     } = settings
    
     const serviceObj = {
@@ -77,13 +82,11 @@ export default function Card (props:any) {
           className={contentHidden ? `${cardstyles.content}` : `${cardstyles.content} ${cardstyles.content_opened}`}
         >
           <button
-            className={cardstyles.product_service_button}
+            className={cardstyles.lta__card_button}
             onClick={contentHiddenHandler}>
-            <div className={cardstyles.product_service_button_top}>
-              <div className={styles.service_cat_vertical}>
-                <h4>{service[cr.title]}</h4>
-              </div>
-              <div className={styles.service_cat_horizontal}>
+              <h2 className={`lta_${webpartID}_card_title`}>{service[cr.title]}</h2>     
+              <div className={cardstyles.lta__card_iconbox}>
+                {!cardSubcategoryToggle ? null :
                 <Icon 
                   iconName={subcatIconName.subcat_icon} 
                   title={serviceObj.subcategory}
@@ -92,7 +95,8 @@ export default function Card (props:any) {
                     color: `${catIconName.cat_icon_color}`,
                     backgroundColor: `${catIconName.cat_icon_bg}`,
                   }}
-                />
+                />}
+                {!cardCategoryToggle ? null :
                 <Icon 
                   iconName={catIconName.cat_icon} 
                   title={serviceObj.category}
@@ -101,7 +105,8 @@ export default function Card (props:any) {
                     color: `${catIconName.cat_icon_color}`,
                     backgroundColor: `${catIconName.cat_icon_bg}`,
                   }}
-                />
+                />}
+                {
                 <Icon 
                       iconName={statIconName.status_icon} 
                       title={serviceObj.status}
@@ -110,7 +115,7 @@ export default function Card (props:any) {
                         color: `${statIconName.status_icon_color}`,
                         backgroundColor: `${statIconName.status_icon_bg}`,
                   }}
-                />
+                />}
                 {serviceObj.link === null ? null :
                   <a href={serviceObj.link.Url}>
                   <Icon 
@@ -121,14 +126,9 @@ export default function Card (props:any) {
                   </a>
                 }
                 </div>
-            </div>
-
-            <div className={cardstyles.content_products}>
-                  {serviceObj.Group1?.map(product => <span className={`lta_${webpartID}_card_detail_group1_item`}>{product}</span>)}
-            </div>
           </button>
           {contentHidden === true ? null : 
-           <ContentModal
+           <CardModal
             catIconName={catIconName}
             subcatIconName={subcatIconName}
             statIconName={statIconName}

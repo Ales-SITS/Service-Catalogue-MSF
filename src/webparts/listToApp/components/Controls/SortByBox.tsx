@@ -1,12 +1,13 @@
 import * as React from 'react';
 import { useEffect, useState, useContext} from 'react';
-import styles from './ListToApp.module.scss';
 
-import { AppContext } from "./ListToAppContext"
+import { AppContext } from "../ListToAppContext"
 
 export default function SortByBox (props) {
 
     const {roles} = useContext(AppContext);
+    const {settings} = useContext(AppContext)
+    const {webpartID} = settings
 
     const [sortedbyHidden, setSortedbyHidden] = useState(true)
     const sortedbyHiddenHandler = () => {
@@ -30,20 +31,20 @@ export default function SortByBox (props) {
     },[sortedbyAsc, sortedby])
 
     const sortingOptions = [
-      [roles.title.role,roles.title.name ? roles.title.name : "Title"],
-      [roles.category.role,roles.category.name ? roles.category.name : "Category"],
-      [roles.subcategory.role,roles.subcategory.name ? roles.subcategory.name : "Subcategory"],
-      [roles.status.role,roles.status.name ? roles.status.name : "Status"]
+      [roles.title?.role ? roles.title?.role : "Title", roles.title?.name ? roles.title.name : "Title"],
+      [roles.category?.role ? roles.category?.role : "Category", roles.category?.name ? roles.category.name : "Category"],
+      [roles.subcategory?.role ? roles.subcategory?.role : "SubCategory", roles.subcategory?.name ? roles.subcategory.name : "Subcategory"],
+      [roles.status?.role ? roles.status?.role : "Status", roles.status?.name ? roles.status.name : "Status"]
     ]
 
     return (
-      <div className={styles.lta__sort_box}>
+      <div className={`lta_${webpartID}_sortby_box`}>
       <button
         onClick={sortedbyHiddenHandler}
-        className={styles.lta__sort} 
-      > Sorted by {sortedby[1]} {sortedbyAsc ? "↓" : "↑"}</button>
+        className={`lta_${webpartID}_sortby_button`} 
+      > Sorted by<br/>{sortedby[1]} {sortedbyAsc ? "↓" : "↑"}</button>
         <div 
-        className={styles.lta__sort_buttons}
+        className={`lta_${webpartID}_sortby_choices`}
         style={{
           left: `${sortedbyHidden ?  "-100%" : "0%"}`,
           opacity: `${sortedbyHidden ?  "0" : "1"}`
@@ -51,13 +52,10 @@ export default function SortByBox (props) {
         >
                 {sortingOptions.map((option,idx) => 
                   <button 
-                    className={styles.lta__sort_button} 
+                    className={option[0] !== sortedby[0] ? `lta_${webpartID}_sortby_choice` : `lta_${webpartID}_sortby_choice lta_${webpartID}_sortby_choice_selected`} 
                     key={idx} 
                     onClick={()=>sortedByHandler(option)}
-                    style={{
-                      borderBottom:`${option[0] !== sortedby[0] ? "0px solid white" : "1px solid red"}` 
-                    }}
-                    >
+                      >
                       {option[1]} {option[0] !== sortedby[0] ? "↓" : sortedbyAsc ? "↓" : "↑"}
                   </button>
                 )}

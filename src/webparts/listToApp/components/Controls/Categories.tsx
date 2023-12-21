@@ -2,9 +2,9 @@ import * as React from 'react';
 import { useEffect, useState, useContext } from 'react';
 
 //3rd party Modules
-import IconStyled from './helpers/IconStyled'
+import IconStyled from '../helpers/IconStyled'
 
-import { AppContext } from "./ListToAppContext"
+import { AppContext } from "../ListToAppContext"
 
 export default function ServiceCategories (props) {
   const {settings} = useContext(AppContext);
