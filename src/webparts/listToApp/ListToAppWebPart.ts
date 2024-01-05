@@ -13,7 +13,6 @@ import {
 } from '@microsoft/sp-property-pane';
 import { PropertyFieldListPicker, PropertyFieldListPickerOrderBy } from '@pnp/spfx-property-controls/lib/PropertyFieldListPicker';
 import { PropertyFieldCollectionData, CustomCollectionFieldType } from '@pnp/spfx-property-controls/lib/PropertyFieldCollectionData';
-import { PropertyFieldMultiSelect } from '@pnp/spfx-property-controls/lib/PropertyFieldMultiSelect';
 import { CalloutTriggers } from '@pnp/spfx-property-controls/lib/Callout';
 import { PropertyFieldMonacoEditor } from '@pnp/spfx-property-controls/lib/PropertyFieldMonacoEditor';
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
@@ -42,10 +41,6 @@ export interface IListToAppWebPartProps {
     colroles: any[];
     multiColumn: string[];
     categories: any[];
-    defaultGroupby: string;
-
-    cardsPerRow: number;
-    cardType: boolean;
 
     searchToggle: boolean;
     catFilterToggle: boolean;
@@ -55,18 +50,27 @@ export interface IListToAppWebPartProps {
     generalCSS: string;
 
     catIcons: any [];
-    catCSS: string;
+    catfilterCSS: string;
     subcatIcons: any [];
-    subcatCSS: string;
+    subcatfilterCSS: string;
     statusIcons: any [];
     statusCSS: string;
-    groupbyCSS: string;    
-    sortbyCSS: string;
+    groupbyControlCSS: string;    
+    sortbyControlCSS: string;
 
+    defaultGroupby: string;
+    groupCategoryExpanded: boolean;
+    groupSubcategoryExpanded: boolean;
+    groupbyCSS: string;
+
+
+    cardType: boolean;
+    cardsPerRow: number;
     cardCategoryToggle: boolean;
     cardSubcategoryToggle: boolean;
     cardGroup1Toggle: boolean;
     cardGroup2Toggle: boolean;
+    cardGroup3Toggle: boolean;
     cardLinkToggle: boolean;
     cardCSS:string;
 
@@ -77,9 +81,9 @@ export interface IListToAppWebPartProps {
 
 export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWebPartProps> {
 
-  private categories: any[] = ["default"]
-  private subcategories: any[] = ["default"]
-  private statuses: any[] = ["default"]
+  private categories: string[] = ["default"]
+  private subcategories: string[] = ["default"]
+  private statuses: string[] = ["default"]
   private columns: any[] = []
   private filteredColumns: any[] = []
 
@@ -90,8 +94,9 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
     }
     const webPartId = this.context.instanceId.replaceAll("-","")
     const dynamicStyles = document.createElement('style');
-    const concatCSS = this.properties.generalCSS + " " + this.properties.catCSS + " " + this.properties.subcatCSS + " " + this.properties.statusCSS + " " + this.properties.groupbyCSS + " " + this.properties.sortbyCSS + " " + this.properties.cardCSS
-    const dynamicStylesContent = concatCSS?.replaceAll(".lta__",`.lta_${webPartId}_`);
+   
+    const concatfilterCSS = this.properties.generalCSS + " " + this.properties.catfilterCSS + " " + this.properties.subcatfilterCSS + " " + this.properties.statusCSS + " " + this.properties.groupbyControlCSS + " " + this.properties.sortbyControlCSS + " " + this.properties.groupbyCSS + " " + this.properties.cardCSS
+    const dynamicStylesContent = concatfilterCSS?.replaceAll(".lta__",`.lta_${webPartId}_`);
         
     dynamicStyles.textContent = dynamicStylesContent;
     
@@ -102,7 +107,6 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
         siteurl: this.properties.siteurl,
         list: this.properties.list,
         colroles: this.properties.colroles,
-        defaultGroupby: this.properties.defaultGroupby,
 
         searchToggle: this.properties.searchToggle,
         catFilterToggle: this.properties.catFilterToggle,
@@ -115,12 +119,17 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
         subcatIcons: this.properties.subcatIcons,
         statusIcons: this.properties.statusIcons,
 
+        defaultGroupby: this.properties.defaultGroupby,
+        groupCategoryExpanded: this.properties.groupCategoryExpanded,
+        groupSubcategoryExpanded: this.properties.groupSubcategoryExpanded,
+
         cardsPerRow: this.properties.cardsPerRow,
         cardType: this.properties.cardType,
         cardCategoryToggle: this.properties.cardCategoryToggle,
         cardSubcategoryToggle: this.properties.cardSubcategoryToggle,
         cardGroup1Toggle: this.properties.cardGroup1Toggle,
         cardGroup2Toggle: this.properties.cardGroup2Toggle,
+        cardGroup3Toggle: this.properties.cardGroup3Toggle,
         cardLinkToggle: this.properties.cardLinkToggle,
 
         webpartID : this.context.instanceId.replaceAll("-",""),
@@ -128,7 +137,6 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
       }
     );
 
-    console.log(dynamicStyles)
 
     document.head.appendChild(dynamicStyles);
 
@@ -146,10 +154,21 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
 
   public onInit(): Promise<void> {
     this.choicesHandler()
+
     return Promise.resolve()
   }
 
   //CUSTOM functions
+  public async getColumns():Promise<void> {
+    const sp = spfi().using(SPFxsp(this.context))
+    const listSite = Web([sp.web, `${this.properties.siteurl}`]) 
+    try {
+      const columns = await listSite.lists.getById(`${this.properties.list}`).fields()
+      this.columns = columns
+    } catch (error) {
+      console.log('Error fetching columns:', error)
+    } 
+  }
 
   public async getCategories():Promise<void> {
     const category = this.properties.colroles?.filter(col => col.role === "Category")[0]?.column
@@ -184,39 +203,34 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
     }   
   }
 
-  public async getColumns():Promise<void> {
-    const sp = spfi().using(SPFxsp(this.context))
-    const listSite = Web([sp.web, `${this.properties.siteurl}`]) 
-    try {
-      const columns = await listSite.lists.getById(`${this.properties.list}`).fields()
-      this.columns = columns
-    } catch (error) {
-      console.log('Error fetching columns:', error)
-    } 
-  }
-
+  /*
+  Picks selected columns from the full list based on column id.
+  For the next functions and usage, Internal name is needed, PropertyFieldColumnPicker ('multicolumn') can return either Name, id, or Internal name.
+  Logical is to use Internal name, but it is often different than the name and it makes the next step in PropertyFieldCollectionData confusing for users,
+  because they might see seemingly different choices than they have selected.
+  With this middle step, the application picks columns by ID which is the safest and the PropertyFieldCollectionData can then handle the full column object.
+  */
   public filterColumns(){
       const filtered = this.columns.filter(column => this.properties.multiColumn.includes(column.Id))
       this.filteredColumns = filtered
-      console.log(filtered)
   }
 
   public choicesHandler(): void {
+      this.getColumns().catch(error => {
+        console.error('Error fetching columns:', error);
+      })
       this.getCategories().catch(error => {
         console.error('Error fetching categories:', error);
       });
       this.getSubcategories().catch(error => {
-        console.error('Error fetching categories:', error);
+        console.error('Error fetching subcategories:', error);
       });
       this.getStatuses().catch(error => {
-        console.error('Error fetching categories:', error);
+        console.error('Error fetching statuses:', error);
       });
-
-
   }
 
   // PROPERTY Pane
-
   protected getPropertyPaneConfiguration(): IPropertyPaneConfiguration {
     return {
       pages: [
@@ -231,7 +245,8 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
                                 <ul>
                                   <li>Page 1 - <strong>General settings</strong></li>
                                   <li>Page 2 - <strong>Basic Visuals and Roles settings</strong></li>
-                                  <li>Page 3 - <strong>Card settings</strong></li>
+                                  <li>Page 3 - <strong>Grouping and sorting settings</strong></li>
+                                  <li>Page 4 - <strong>Card settings</strong></li>
                                 </ul>`,
                   moreInfoLink: `https://msfintl.sharepoint.com/sites/SITSExternalPortal`,
                   videoProperties: {
@@ -328,8 +343,12 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
                           text: "Subcategory (choice)"
                         },
                         {
-                          key: "Content",
-                          text: "Content (multiple line of text)"
+                          key: "ContentA",
+                          text: "Content A (multiple line of text)"
+                        },
+                        {
+                          key: "ContentB",
+                          text: "Content B (multiple line of text)"
                         },
                         {
                           key: "Status",
@@ -342,6 +361,10 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
                         {
                           key: "Group2",
                           text: "Group 2 (multiple choice)"
+                        },
+                        {
+                          key: "Group3",
+                          text: "Group 3 (multiple choice)"
                         },
                         {
                           key: "Owner",
@@ -366,7 +389,6 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
                 
               ]
             },
-
           ]
         },
         {
@@ -414,7 +436,7 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
                   calloutWidth: 300,
                   key: 'sortingToggleId',
                   label: 'Display sorting options',
-                  calloutContent: React.createElement('p', {}, 'Your users will be able to change sorting by Title, Category, Subcategory and Status roles. Ascending and descending options are included.'),
+                  calloutContent: React.createElement('p', {}, 'Your users will be able to sort by Title, Category, Subcategory or Status roles. Ascending and descending options are included.'),
                   onText: 'On',
                   offText: 'Off',
                   checked: this.properties.sortingToggle
@@ -423,8 +445,8 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
                   calloutTrigger: CalloutTriggers.Hover,
                   calloutWidth: 300,
                   key: 'groupingToggleId',
-                  label: 'Display sorting options',
-                  calloutContent: React.createElement('p', {}, 'Your users will be able to change grouping to group by Category, Subcategory roles or turn off.'),
+                  label: 'Display grouping options',
+                  calloutContent: React.createElement('p', {}, 'Your users will be able to group the content by Category or Subcategory roles or turn it off.'),
                   onText: 'On',
                   offText: 'Off',
                   checked: this.properties.groupingToggle
@@ -452,7 +474,7 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
               groupFields: [
                 PropertyFieldCollectionData("catIcons", {
                   key: "catIcons",
-                  label: "Set Categories visuals",
+                  label: "Set Categories filteres visuals",
                   panelHeader: "Categories icons",
                   manageBtnLabel: "Categories icons",
                   value: this.properties.catIcons,
@@ -484,17 +506,17 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
                   ],
                   disabled: this.properties.colroles?.filter(col => col.role === "Category").length < 1 || this.categories.length === 0
                 }),
-                PropertyFieldMonacoEditor('catCSS', {
-                  key: 'catCSS',
-                  value: this.properties.catCSS,
-                  onChange: (code: string) => { this.properties.catCSS = code; },
+                PropertyFieldMonacoEditor('catfilterCSS', {
+                  key: 'catfilterCSS',
+                  value: this.properties.catfilterCSS,
+                  onChange: (code: string) => { this.properties.catfilterCSS = code; },
                   language:"css",
                   showLineNumbers:true,
                   theme: 'vs-dark'
                 }),
                 PropertyFieldCollectionData("subcatIcons", {
                   key: "subcatIcons",
-                  label: "Set Subcategories visuals",
+                  label: "Set Subcategories filteres visuals",
                   panelHeader: "Subcategories icons",
                   manageBtnLabel: "Subcategories icons",
                   value: this.properties.subcatIcons,
@@ -526,10 +548,10 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
                   ],
                   disabled: this.properties.colroles?.filter(col => col.role === "Subcategory").length < 1 || this.subcategories.length === 0
                 }),
-                PropertyFieldMonacoEditor('subcatCSS', {
-                  key: 'subcatCSS',
-                  value: this.properties.subcatCSS,
-                  onChange: (code: string) => { this.properties.subcatCSS = code; },
+                PropertyFieldMonacoEditor('subcatfilterCSS', {
+                  key: 'subcatfilterCSS',
+                  value: this.properties.subcatfilterCSS,
+                  onChange: (code: string) => { this.properties.subcatfilterCSS = code; },
                   showMiniMap: true,
                   language:"css",
                   showLineNumbers:true,
@@ -537,7 +559,7 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
                 }),
                 PropertyFieldCollectionData("statusIcons", {
                   key: "statusIcons",
-                  label: "Set Status visuals",
+                  label: "Set Status filteres visuals",
                   panelHeader: "Status icons",
                   manageBtnLabel: "Status icons",
                   value: this.properties.statusIcons,
@@ -577,35 +599,35 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
                   showLineNumbers:true,
                   theme: 'vs-dark'
                 }),
-                PropertyPaneLabel('groupbyCSSlabel', {
-                  text: "Set visuals for Group by control"
-                }),
-                PropertyFieldMonacoEditor('groupbyCSS', {
-                  key: 'groupbyCSS',
-                  value: this.properties.groupbyCSS,
-                  onChange: (code: string) => { this.properties.groupbyCSS = code; },
-                  language:"css",
-                  showLineNumbers:true,
-                  theme: 'vs-dark'
-                }),
-                PropertyPaneLabel('sortbyCSSlabel', {
+                PropertyPaneLabel('sortbyControlCSSlabel', {
                   text: "Set visuals for Sort by control"
                 }),
-                PropertyFieldMonacoEditor('sortbyCSS', {
-                  key: 'sortbyCSS',
-                  value: this.properties.sortbyCSS,
-                  onChange: (code: string) => { this.properties.sortbyCSS = code; },
+                PropertyFieldMonacoEditor('sortbyControlCSS', {
+                  key: 'sortbyControlCSS',
+                  value: this.properties.sortbyControlCSS,
+                  onChange: (code: string) => { this.properties.sortbyControlCSS = code; },
                   language:"css",
                   showLineNumbers:true,
                   theme: 'vs-dark'
                 }),
+                PropertyPaneLabel('groupbyControlCSSlabel', {
+                  text: "Set visuals for Group by control"
+                }),
+                PropertyFieldMonacoEditor('groupbyControlCSS', {
+                  key: 'groupbyControlCSS',
+                  value: this.properties.groupbyControlCSS,
+                  onChange: (code: string) => { this.properties.groupbyControlCSS = code; },
+                  language:"css",
+                  showLineNumbers:true,
+                  theme: 'vs-dark'
+                })               
               ]
             }
           ]
         },
         {
           header: {
-            description: "Within this property pane page, you can customize the visuals of individual cards, which display specific details about each element."
+            description: "Within this property pane page, you can customize default grouping and sorting options."
           },
           groups: [
             {
@@ -624,7 +646,37 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
               ]
             },
             {
-              groupName: "2. Card settings",
+              groupName: "2. Grouping visuals", 
+              groupFields: [
+                PropertyPaneToggle('groupCategoryExpanded',{
+                  label: 'Default Category group display',
+                  onText: 'Expanded',
+                  offText: 'Collapsed',
+                }),
+                PropertyPaneToggle('groupSubcategoryExpanded',{
+                  label: 'Default Subcategory group display',
+                  onText: 'Expanded',
+                  offText: 'Collapsed',
+                }),
+                PropertyFieldMonacoEditor('groupby', {
+                  key: 'groupby',
+                  value: this.properties.groupbyCSS,
+                  onChange: (code: string) => { this.properties.groupbyCSS = code; },
+                  language:"css",
+                  showLineNumbers:true,
+                  theme: 'vs-dark'
+                }),
+              ]
+            },
+          ]
+        },
+        {
+          header: {
+            description: "Within this property pane page, you can customize the visuals of individual cards, which display specific details about each element."
+          },
+          groups: [
+            {
+              groupName: "1. Card settings",
               groupFields: [
                 PropertyFieldToggleWithCallout('cardType', {
                   calloutTrigger: CalloutTriggers.Hover,
@@ -669,6 +721,11 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
                   onText: 'On',
                   offText: 'Off',
                 }),
+                PropertyPaneToggle('cardGroup3Toggle',{
+                  label: 'Display Group3',
+                  onText: 'On',
+                  offText: 'Off',
+                }),
                 PropertyPaneToggle('cardLinkToggle',{
                   label: 'Display Link',
                   onText: 'On',
@@ -677,7 +734,7 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
               ],
              },
             {
-              groupName: "3. Card visuals",
+              groupName: "2. Card visuals",
               groupFields: [
                 PropertyFieldMonacoEditor('cardCSS', {
                   key: 'cardCSS',

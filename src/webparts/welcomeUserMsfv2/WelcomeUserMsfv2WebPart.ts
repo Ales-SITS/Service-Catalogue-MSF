@@ -7,13 +7,8 @@ import {
 } from '@microsoft/sp-property-pane';
 import { PropertyFieldCollectionData, CustomCollectionFieldType } from '@pnp/spfx-property-controls/lib/PropertyFieldCollectionData';
 import { PropertyFieldMonacoEditor } from '@pnp/spfx-property-controls/lib/PropertyFieldMonacoEditor';
-import { PropertyPaneWebPartInformation } from '@pnp/spfx-property-controls/lib/PropertyPaneWebPartInformation';
-
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
 
-
-
-import * as strings from 'WelcomeUserMsfv2WebPartStrings';
 import WelcomeUserMsfv2 from './components/WelcomeUserMsfv2';
 
 
@@ -54,8 +49,6 @@ export default class WelcomeUserMsfv2WebPart extends BaseClientSideWebPart<IWelc
       }
     );
 
-    console.log(dynamicStyles)
-
     document.head.appendChild(dynamicStyles);
 
     ReactDom.render(element, this.domElement);
@@ -80,7 +73,7 @@ export default class WelcomeUserMsfv2WebPart extends BaseClientSideWebPart<IWelc
       pages: [
         {
           header: {
-            description: strings.PropertyPaneDescription
+            description: "With this webpart you can greet your users with a style. You have almost unlimited visual customization options with the implemented CSS editor. Advanced solutions like gradients and animations are also possible! And as a bonus you can also include one or more buttons to navigate your users further!"
           },
           groups: [
             {

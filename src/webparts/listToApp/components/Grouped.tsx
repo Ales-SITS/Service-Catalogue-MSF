@@ -2,8 +2,6 @@ import * as React from 'react';
 import { useEffect, useState, useContext } from 'react';
 import styles from './ListToApp.module.scss';
 
-import group_styles from './Grouped.module.scss';
-
 //3rd party Modules
 import { Icon } from '@fluentui/react/lib/Icon';
 import "@pnp/graph/users";
@@ -27,21 +25,24 @@ export default function Grouped (props) {
       filteredResults,
       filteredServicesList,
       sortingAsc,
-      inputValue,
+      inputValue
     } = props;
 
     const {
+      webpartID,
       cardsPerRow,
       catIcons,
       subcatIcons,
-     } = settings;
+      groupCategoryExpanded,
+      groupSubcategoryExpanded
+    } = settings;
 
-
-    const [groupHidden, setGroupHidden] = useState(level === 1 ? false : true)
-    const groupHiddenHandler = () => {
-      setGroupHidden(current => !current)
+    const [groupExpanded, setGroupExpanded] = useState(level === 1 ? groupCategoryExpanded : groupSubcategoryExpanded)
+    const groupExpandedHandler = () => {
+      setGroupExpanded(current => !current)
     }
 
+  
     const groupedServices = filteredServicesList
     .sort((a,b)=> a[sorting] > b[sorting] ? sortingAsc*1 : -sortingAsc*1)
     .filter(service => service[cr.category] === grp)
@@ -49,7 +50,7 @@ export default function Grouped (props) {
     const uniqueSubcategories = Array.from(new Set(groupedServices.map(item => item[cr.subcategory])))
 
      useEffect(()=>{
-      setGroupHidden(level === 1 ? false : true)
+      setGroupExpanded(level === 1 ? groupCategoryExpanded : groupSubcategoryExpanded)
     },[grouping])
 
     const column = "1fr "
@@ -62,20 +63,36 @@ export default function Grouped (props) {
                            subcatIcons?.find(subcat => subcat.subcategory === grp) :
                            subcatIcons?.find(subcat => subcat.subcategory === "default")
 
-
-    const catGrpIconName = catgrp===null ? null : 
+    const catGrpIconName = catgrp === null ? null : 
                            catIcons?.find(cat => cat.category === catgrp) ? 
                            catIcons?.find(cat => cat.category === catgrp) :
                            catIcons?.find(cat => cat.category === "default")
 
+    const catIconInSubcat = catIcons?.find(cat => cat.category === filteredServicesList.filter(service => service[cr.subcategory] === grp)[0]?.[cr.category]) ? 
+                             catIcons?.find(cat => cat.category === filteredServicesList.filter(service => service[cr.subcategory] === grp)[0]?.[cr.category]) :
+                             catIcons?.find(cat => cat.category === "default")
+
 
     return (
-        <div className={`${level === 1 ? group_styles.Group1_wrapper :  group_styles.Group2_wrapper} ${groupHidden === true ? null : group_styles.group_opened}`}>
+        <div className={
+          level === 1 && groupExpanded === true ? 
+          `lta_${webpartID}_groupbyCategory_wrapper lta_${webpartID}_groupbyCategory_wrapper_expanded` : 
+          level === 1 && groupExpanded === false ?
+          `lta_${webpartID}_groupbyCategory_wrapper` : 
+          level === 2 && groupExpanded === true ? 
+          `lta_${webpartID}_groupbySubcategory_wrapper lta_${webpartID}_groupbySubcategory_wrapper_expanded` :
+          `lta_${webpartID}_groupbySubcategory_wrapper`
+          }>
           <button 
-            className={level === 1 ?  group_styles.Group1_heading : group_styles.Group2_heading} 
-            onClick={groupHiddenHandler}>
+            className={
+              level === 1 ? 
+              `lta_${webpartID}_groupbyCategory_heading` : 
+              `lta_${webpartID}_groupbySubcategory_heading`
+
+            } 
+            onClick={groupExpandedHandler}>
             <div>
-              <span>{groupHidden ? "▸ " : "▿ "} </span>
+              <span>{groupExpanded ? "▸ " : "▿ "} </span>
               <span>{grp} </span>
               <span>
                 ({level === 1 ? 
@@ -89,23 +106,33 @@ export default function Grouped (props) {
               level === 1 ? 
               <Icon 
               iconName={catIconName.cat_icon} 
-              className={group_styles.lta_category_icon}
+              className={`lta_${webpartID}_groupby_category_icon`}
               style={{
                 color: `${catIconName.cat_icon_color}`,
                 backgroundColor: `${catIconName.cat_icon_bg}`,
               }}
               /> :
-              <Icon 
-              iconName={subcatIconName.subcat_icon} 
-              className={group_styles.lta_subcategory_icon}
-              style={{
-                color: `${catGrpIconName.cat_icon_color}`,
-                backgroundColor: `${catGrpIconName.cat_icon_bg}`,
-              }}
-              />
+              <div>
+                <Icon 
+                  iconName={subcatIconName.subcat_icon} 
+                  className={`lta_${webpartID}_groupby_subcategory_icon`}
+                  style={{
+                    color: `${catGrpIconName.cat_icon_color}`,
+                    backgroundColor: `${catGrpIconName.cat_icon_bg}`,
+                  }}
+                />
+                <Icon 
+                  iconName={catIconInSubcat.cat_icon} 
+                  className={`lta_${webpartID}_groupby_subcategory_icon`}
+                  style={{
+                    color: `${catGrpIconName.cat_icon_color}`,
+                    backgroundColor: `${catGrpIconName.cat_icon_bg}`,
+                  }}
+                />
+              </div>
             }
           </button>
-          {groupHidden ? null :
+          {groupExpanded ? 
            level === 1 && inputValue !== "" ? 
            uniqueSubcategories.map((subcat,idx)=>
             filteredResults.filter(service => service[cr.subcategory] === subcat).length < 1 ? null : 
@@ -166,7 +193,7 @@ export default function Grouped (props) {
               
             }
           </div>
-          }
+          : null }
         </div>
     );
   }

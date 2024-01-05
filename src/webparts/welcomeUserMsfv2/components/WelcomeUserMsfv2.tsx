@@ -14,8 +14,6 @@ export default function WelcomeUserMsfv2 (props) {
       webPartId
     } = props
 
-    console.log(call_buttons)
-
     return (
       <div className={`wellmsf_${webPartId}_wrapper`}>
           <div className={`wellmsf_${webPartId}_content`}>

@@ -1,22 +1,3 @@
-.content {
-    width: 98%;
-    box-sizing: border-box;
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    border-radius: 15px;
-    margin: 5px 10px;
-    margin-bottom: 10px;
-    overflow-x: hidden;
-    overflow-y: auto;
-    transition: 0.5s;
-    background-color: white;
-  }
-  
-.content_opened {
-    box-shadow: 0 0 5px rgba(0,0,0,0.3);
-}
-  
 .content_header {
     display: flex;
     justify-content: space-between;
@@ -24,6 +5,7 @@
     margin-bottom: 10px;
 }
   
+
 .content_header h3 {
     margin: 0;
     font-size: 20px;
@@ -134,18 +116,4 @@
   overflow-x: hidden;
 }
 
-
-.lta__card_button {
-    outline: none;
-    font-size: 18px;
-    width: 100%;
-    background-color: white;
-    border: none;
-    margin-top: 5px;
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: 0.3s;
-  }
   

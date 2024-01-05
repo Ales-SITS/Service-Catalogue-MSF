@@ -16,7 +16,7 @@ export default function GroupByByBox (props) {
 
     const [groupby,setGroupby] = useState([
       roles[props.defaultGroupby.toLowerCase()]?.role ? roles[props.defaultGroupby.toLowerCase()].role : "None",
-      roles[props.defaultGroupby.toLowerCase()]?.name ? roles[props.defaultGroupby.toLowerCase()].name : "None"
+      roles[props.defaultGroupby.toLowerCase()]?.name ? roles[props.defaultGroupby.toLowerCase()].name : roles[props.defaultGroupby.toLowerCase()].role
     ])
 
     const groupByHandler = (option) => {

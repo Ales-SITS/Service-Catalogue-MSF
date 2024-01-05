@@ -12,7 +12,7 @@ import { Icon } from '@fluentui/react/lib/Icon';
 
 import { AppContext } from "../ListToAppContext"
 
-export default function Content (props) {
+export default function CardContent (props) {
 
     const {settings} = useContext(AppContext)
     const {roles} = useContext(AppContext)
@@ -31,6 +31,7 @@ export default function Content (props) {
         cardSubcategoryToggle,
         cardGroup1Toggle,
         cardGroup2Toggle,
+        cardGroup3Toggle,
         cardLinkToggle
         } = settings
 
@@ -38,11 +39,10 @@ export default function Content (props) {
     const subcategoryName = roles.subcategory?.name ? roles.subcategory.name : "Subcategory"
     const Group1Name = roles.Group1?.name ? roles.Group1.name : "Group 1"
     const Group2Name = roles.Group2?.name ? roles.Group2.name : "Group 2"
-
-    console.log(serviceObj)
+    const Group3Name = roles.Group3?.name ? roles.Group2.name : "Group 3"
 
     return (
-        <div className={cardType ? cardstyles.lta__card_overlay : cardstyles.content} onClick={props.onCloseModal}>
+        <div className={cardType ? cardstyles.lta__card_overlay : `lta_${webpartID}_card_wrapper`} onClick={props.onCloseModal}>
             <div className={`lta_${webpartID}_card`} onClick={e => e.stopPropagation()}>
                 <div className={cardstyles.lta__card_modal_close_wrapper}>
                     <button 
@@ -109,6 +109,16 @@ export default function Content (props) {
                             </div>
                         </div>
                         }
+                        {!cardGroup3Toggle ? null :
+                        <div className={cardstyles.lta_detail}>
+                            <span className={`lta_${webpartID}_card_detail_label`}>{Group3Name}</span>
+                            <div className={cardstyles.lta__card_group_items}>
+                                {serviceObj.Group2?.map((item,idx) => 
+                                <span key={idx} className={`lta_${webpartID}_card_detail_group3_item`}>{item}</span>
+                                )}
+                            </div>
+                        </div>
+                        }
                     </div>
                    
                     <div className={cardstyles.lta_details_link}>
@@ -119,7 +129,7 @@ export default function Content (props) {
                             style={{
                                 color: `${statIconName.status_icon_color}`,
                                 backgroundColor: `${statIconName.status_icon_bg}`,
-                                fontSize: '20px'
+                                fontSize: '18px'
                         }}/>
                         {!cardLinkToggle ? null : 
                         serviceObj.link === null ? null :
@@ -136,8 +146,13 @@ export default function Content (props) {
                         }
                     </div>
                 </div>
-                <div className={cardstyles.lta_content_box}>
-                    <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(serviceObj.content)}}/>
+                <div className={`lta_${webpartID}_card_content_box_wrapper`}>
+                    <div className={`lta_${webpartID}_card_contentA_box`}>
+                        <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(serviceObj.contentA)}}/>
+                    </div>
+                    <div className={`lta_${webpartID}_card_contentB_box`}>
+                        <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(serviceObj.contentB)}}/>
+                    </div>
                 </div>
             </div>
         </div>

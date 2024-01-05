@@ -6,7 +6,7 @@ import cardstyles from './Card.module.scss';
 
 //3rd party Modules
 import { Icon } from '@fluentui/react/lib/Icon';
-import CardModal from './CardContent'
+import CardContent from './CardContent'
 
 //API
 import { Web } from "@pnp/sp/webs"; 
@@ -32,9 +32,6 @@ export default function Card (props:any) {
       webpartID,
       cardCategoryToggle,
       cardSubcategoryToggle,
-      cardGroup1Toggle,
-      cardGroup2Toggle,
-      cardLinkToggle
     } = settings
    
     const serviceObj = {
@@ -42,9 +39,11 @@ export default function Card (props:any) {
       category: service[cr.category]       ? service[cr.category]     : null,
       subcategory: service[cr.subcategory] ? service[cr.subcategory]  : null,
       status: service[cr.status]           ? service[cr.status]       : null,
-      content: service[cr.content]         ? service[cr.content]      : null,
+      contentA: service[cr.contentA]       ? service[cr.contentA]     : null,
+      contentB: service[cr.contentB]       ? service[cr.contentB]     : null,
       Group1: service[cr.Group1]           ? service[cr.Group1]       : null,
       Group2: service[cr.Group2]           ? service[cr.Group2]       : null,
+      Group3: service[cr.Group3]           ? service[cr.Group3]       : null,
       ownerField: service[cr.ownerField]   ? service[cr.ownerField]   : null,
       link: service[cr.link]               ? service[cr.link]         : null
     }
@@ -53,8 +52,8 @@ export default function Card (props:any) {
     const contentHiddenHandler = () => {
       setContentHidden(current => !current)
     }
-   
-    /*
+
+     /*
     async function getOwner():Promise<any[]> {
       const listSite = Web([sp.web, `${siteurl}`]) 
       const owner =  await listSite.lists.getById(`${list}`).items.getById(service.ID).select(`${cr.ownerField}/EMail`).expand(`${cr.ownerField}`)()
@@ -77,12 +76,13 @@ export default function Card (props:any) {
                          statusIcons?.find(stat => stat.status === service[cr.status]) :
                          statusIcons?.find(stat => stat.status === "default")         
 
+
     return (
         <div 
-          className={contentHidden ? `${cardstyles.content}` : `${cardstyles.content} ${cardstyles.content_opened}`}
+          className={contentHidden ? `lta_${webpartID}_card_wrapper` : `lta_${webpartID}_card_wrapper lta_${webpartID}_card_wrapper_opened`}
         >
           <button
-            className={cardstyles.lta__card_button}
+            className={`lta_${webpartID}_card_heading`}
             onClick={contentHiddenHandler}>
               <h2 className={`lta_${webpartID}_card_title`}>{service[cr.title]}</h2>     
               <div className={cardstyles.lta__card_iconbox}>
@@ -128,7 +128,7 @@ export default function Card (props:any) {
                 </div>
           </button>
           {contentHidden === true ? null : 
-           <CardModal
+           <CardContent
             catIconName={catIconName}
             subcatIconName={subcatIconName}
             statIconName={statIconName}

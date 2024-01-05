@@ -9,7 +9,7 @@ import { AppContext } from "../ListToAppContext"
 export default function ServiceCategories (props) {
   const {settings} = useContext(AppContext);
   const {webpartID} = settings
-  const {categoriesList} = props;
+  const {subcategoriesList} = props;
 
   const [checkedState, setCheckedState] = useState([])
 
@@ -20,16 +20,19 @@ export default function ServiceCategories (props) {
         setCheckedState(updatedCheckedState);
         props.onCheckChange(updatedCheckedState)
   };
-    
+   
+  
   useEffect(()=>{
-      setCheckedState(new Array(categoriesList.length).fill(true))
-      props.onCheckChange(new Array(categoriesList.length).fill(true))
-  },[categoriesList])
+      setCheckedState(new Array(subcategoriesList.length).fill(true))
+      //props.onCheckChange(new Array(subcategoriesList.length).fill(true)) causes loop
+  },[subcategoriesList])
+  
 
+  console.log(subcategoriesList)
 
   return (
          <ul className={`lta_${webpartID}_category_block`}>
-            {categoriesList.map((category,idx) => 
+            {subcategoriesList.map((category,idx) => 
               <li
                 className={checkedState[idx] ? `lta_${webpartID}_category_button lta_${webpartID}_category_button_selected` : `lta_${webpartID}_category_button`}
                 key={`${category}_${idx}`} 

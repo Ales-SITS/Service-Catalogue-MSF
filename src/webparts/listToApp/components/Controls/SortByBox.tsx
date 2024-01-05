@@ -42,7 +42,7 @@ export default function SortByBox (props) {
       <button
         onClick={sortedbyHiddenHandler}
         className={`lta_${webpartID}_sortby_button`} 
-      > Sorted by<br/>{sortedby[1]} {sortedbyAsc ? "↓" : "↑"}</button>
+      > Sorted by {sortedby[1]} {sortedbyAsc ? "↓" : "↑"}</button>
         <div 
         className={`lta_${webpartID}_sortby_choices`}
         style={{

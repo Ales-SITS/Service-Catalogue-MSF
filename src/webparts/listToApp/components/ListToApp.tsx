@@ -24,6 +24,7 @@ import "@pnp/graph/users";
 //Components
 import Card from './Card/Card'
 import Categories from './Controls/Categories'
+import Subcategories from './Controls/Subcategories'
 import SortByBox from './Controls/SortByBox'
 import GroupByBox from './Controls/GroupByBox'
 import Grouped from './Grouped'
@@ -35,6 +36,7 @@ export default function ListtoApp () {
     const {settings} = useContext(AppContext)
     const {cr} = useContext(AppContext)
     const {sp} = useContext(AppContext)
+    const {roles} = useContext(AppContext)
 
     const {
       header,
@@ -59,7 +61,6 @@ export default function ListtoApp () {
     const [subcategoriesList,setSubcategoriesList] = useState<string[]>([])
 
    //READ CORE DATA
-
     async function getServices():Promise<any[]> {
       const listSite = Web([sp.web, `${siteurl}`])  
       const services: any[] = await listSite.lists.getById(`${list}`).items.getAll();
@@ -68,15 +69,15 @@ export default function ListtoApp () {
     }
 
     async function getCategories():Promise<any[]> {
-      const listSite = Web([sp.web, `${siteurl}`])  
+      const listSite = Web([sp.web, `${siteurl}`])
       const categories = await listSite.lists.getById(`${list}`).fields.getByInternalNameOrTitle(`${cr.category}`)();
-         return await categories.Choices
+      return await categories.Choices
     }
 
     async function getSubcategories():Promise<any[]> {
       const listSite = Web([sp.web, `${siteurl}`])  
       const subcategories = await listSite.lists.getById(`${list}`).fields.getByInternalNameOrTitle(`${cr.subcategory}`)();
-         return await subcategories.Choices
+      return await subcategories.Choices
     }
 
     useEffect(() => {
@@ -219,7 +220,25 @@ export default function ListtoApp () {
 
     const column = "1fr "
 
-      return (     
+    //Sorting for grouped option, changes only if Category or Subcategory is selected.
+    const sortedGroupingArrCategories = roles.category?.column === sorting ? groupingArr.sort((a,b)=> a > b ? sortingAsc*1 : -sortingAsc*1) : groupingArr
+    const sortedGroupingArrSubcategories = roles.subcategory?.column === sorting ? groupingArr.sort((a,b)=> a > b ? sortingAsc*1 : -sortingAsc*1) : groupingArr
+    const sortedGroupingArr = grouping === "Category" ? sortedGroupingArrCategories : sortedGroupingArrSubcategories
+
+    //FILTERES SUBCATEGORY
+    const filteredSubcategoriesList = subcategoriesList.filter(subcategory =>
+      filteredServicesList.some(service => service[cr.subcategory] === subcategory))
+
+    console.log(filteredSubcategoriesList)
+
+    const [subcategoriesFilter,setSubcategoriesFilter] = useState(filteredSubcategoriesList)
+    function subcategoriesHandler(arr){
+      const filtered = filteredSubcategoriesList.filter((_, i) => arr[i]);
+
+      setCategoriesFilter(filtered)
+    }
+
+     return (     
       <div className={`${styles.lta} lta_${webpartID}_wrapper`}>
         <div className={`lta_${webpartID}_header`}>
           <h1>{header}</h1>
@@ -237,6 +256,11 @@ export default function ListtoApp () {
           categoriesList={categoriesList}
           onCheckChange = {categoriesHandler}
         /> : null}
+        {subcatFilterToggle ? 
+        <Subcategories 
+          subcategoriesList={filteredSubcategoriesList}
+          onCheckChange = {subcategoriesHandler}
+        /> : null}
         {
         sortingToggle?
         <SortByBox onSort={sortHandler}/> : null}
@@ -245,7 +269,7 @@ export default function ListtoApp () {
         <GroupByBox onGroup={groupHandler} defaultGroupby={defaultGroupby}/>
          : null}
         {grouping !== "None" && inputValue !== "" ?
-        groupingArr.sort((a,b)=> a[sorting] > b[sorting] ? sortingAsc*1 : -sortingAsc*1).map((grp,idx)=>
+        sortedGroupingArr.map((grp,idx)=>
         filteredResults.filter(service => service[cr.category] === grp).length === 0 ? null : 
           <Grouped
             key={idx}
@@ -258,11 +282,11 @@ export default function ListtoApp () {
             filteredResults={filteredResults}
             filteredServicesList={filteredServicesList}
             sortingAsc={sortingAsc}
-            inputValue={inputValue}
+            inputValue={inputValue} 
             />
         ) :
         grouping !== "None" && inputValue === "" ? 
-        groupingArr.sort((a,b)=> a[sorting] > b[sorting] ? sortingAsc*1 : -sortingAsc*1).map((grp,idx)=>
+        sortedGroupingArr.map((grp,idx)=>
         <Grouped
           key={idx}
           level={grouping === "Category" ? 1 : 2}
