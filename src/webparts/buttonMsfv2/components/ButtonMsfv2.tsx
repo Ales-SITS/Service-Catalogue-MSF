@@ -21,7 +21,7 @@ export default function ButtonMsfv2 (props) {
       <div className={`btnmsf_${webPartId}_block`}>
           <div className={`btnmsf_${webPartId}_header`}>{buttons_header}</div>
           {search_collection[0].search_toggle ? 
-            <div className={`btnmsf_${webPartId}_input_ wrapper`}>
+            <div className={`btnmsf_${webPartId}_input_wrapper`}>
               <input className={`btnmsf_${webPartId}_input`}
                   type="text"
                   onChange={setSearchTermHandler}

@@ -28,10 +28,10 @@
     "dompurify": "^3.0.6",
     "html-react-parser": "^5.0.6",
     "minisearch": "^6.3.0",
+    "react": "17.0.1",
     "react-dom": "17.0.1",
     "react-use-draggable-scroll": "^0.4.7",
-    "tslib": "2.3.1",
-    "react": "17.0.1"
+    "tslib": "2.3.1"
   },
   "devDependencies": {
     "@microsoft/eslint-config-spfx": "1.18.2",

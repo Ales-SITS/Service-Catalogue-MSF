@@ -3,7 +3,8 @@ import { useEffect, useState, useContext} from 'react';
 import styles from './ListToApp.module.scss';
 
 //API
-import { spfi, SPFx as SPFxsp} from "@pnp/sp";
+
+//import { spfi, SPFx as SPFxsp} from "@pnp/sp";
 import { Web } from "@pnp/sp/webs"; 
 import "@pnp/sp/webs";
 import "@pnp/sp/lists";
@@ -11,10 +12,11 @@ import "@pnp/sp/items";
 import "@pnp/sp/fields";
 import "@pnp/sp/items/get-all";
 
-import { SPFx as SPFxGraph, graphfi } from "@pnp/graph";
+/*import { SPFx as SPFxGraph, graphfi } from "@pnp/graph";
 import "@pnp/graph/users";
 import "@pnp/graph/groups";
 import "@pnp/graph/members";
+*/
 
 //3rd party Modules
 //import { Icon } from '@fluentui/react/lib/Icon';
@@ -99,11 +101,12 @@ export default function ListtoApp () {
 
     }, []);
 
+
     //SEARCH
     function setSearchCategories (services) {
       const index = new MiniSearch({
-        fields: [`${cr.title}`, `${cr.category}`, `${cr.subcategory}`, `${cr.content}`, `${cr.Group1}`],
-        storeFields: [`${cr.title}`, `${cr.category}`, `${cr.subcategory}`, `${cr.content}`, `${cr.Group1}`, `${cr.status}`],
+        fields: [`${cr.title}`, `${cr.category}`, `${cr.subcategory}`, `${cr.contentA}`, `${cr.Group1}`],
+        storeFields: [`${cr.title}`, `${cr.category}`, `${cr.subcategory}`, `${cr.contentA}`, `${cr.Group1}`, `${cr.status}`],
         extractField: (service, fieldName) => {
           if (Array.isArray(fieldName)) {
            return service[fieldName].join(' ')
@@ -124,8 +127,8 @@ export default function ListtoApp () {
 
     function setSearchDescription(services) {
       const index = new MiniSearch({
-        fields: [`${cr.title}`, `${cr.category}`, `${cr.subcategory}`, `${cr.content}`, `${cr.Group1}`],
-        storeFields: [`${cr.title}`, `${cr.category}`, `${cr.subcategory}`, `${cr.content}`, `${cr.Group1}`, `${cr.status}`],
+        fields: [`${cr.title}`, `${cr.category}`, `${cr.subcategory}`, `${cr.contentA}`, `${cr.contentB}`, `${cr.Group1}`, `${cr.Group2}`],
+        storeFields: [`${cr.title}`, `${cr.category}`, `${cr.subcategory}`, `${cr.contentA}`, `${cr.contentB}`, `${cr.Group1}`, `${cr.Group2}`, `${cr.status}`],
         tokenize: (string, _fieldName) => string.split('>'),
         idField: 'ID',
         searchOptions: {
@@ -163,7 +166,7 @@ export default function ListtoApp () {
       setResults(unique)
     };
 
-//FILTERS
+//FILTERS step A (Category)
     const [categoriesFilter,setCategoriesFilter] = useState(categoriesList)
     function categoriesHandler(arr){
       const filtered = categoriesList.filter((_, i) => arr[i]);
@@ -173,9 +176,9 @@ export default function ListtoApp () {
 
 
 //List of services filtered by search and by selected categories
-    let filteredResults = results.filter(obj => {
+   const filteredResults_A = results.filter(obj => {
       for(let cat of categoriesFilter) {
-        if (obj.ServicesCategory.includes(cat)) {
+        if (obj[roles.category.column].includes(cat)) {
           return true
         }
       }
@@ -183,14 +186,15 @@ export default function ListtoApp () {
     })
 
 //List of services filtered by selected categories
-    let filteredServicesList = servicesList.filter(obj => {
+    const filteredServicesList_A = servicesList.filter(obj => {
       for(let cat of categoriesFilter) {
-        if (obj.ServicesCategory.includes(cat)) {
+        if (obj[roles.category.column].includes(cat)) {
           return true
         }
       }
       return false
     })
+
 
 // SORTING functions
     const [sorting, setSorting] = useState("Title")
@@ -225,18 +229,34 @@ export default function ListtoApp () {
     const sortedGroupingArrSubcategories = roles.subcategory?.column === sorting ? groupingArr.sort((a,b)=> a > b ? sortingAsc*1 : -sortingAsc*1) : groupingArr
     const sortedGroupingArr = grouping === "Category" ? sortedGroupingArrCategories : sortedGroupingArrSubcategories
 
-    //FILTERES SUBCATEGORY
+    //FILTERES Step B (SUBCATEGORY)
     const filteredSubcategoriesList = subcategoriesList.filter(subcategory =>
-      filteredServicesList.some(service => service[cr.subcategory] === subcategory))
-
-    console.log(filteredSubcategoriesList)
+      filteredServicesList_A.some(service => service[cr.subcategory] === subcategory))
 
     const [subcategoriesFilter,setSubcategoriesFilter] = useState(filteredSubcategoriesList)
     function subcategoriesHandler(arr){
       const filtered = filteredSubcategoriesList.filter((_, i) => arr[i]);
-
-      setCategoriesFilter(filtered)
+      setSubcategoriesFilter(filtered)
     }
+
+
+    const filteredServicesList = subcategoriesFilter.length < 1 ?  filteredServicesList_A : filteredServicesList_A.filter(obj => {
+      for(let subcat of subcategoriesFilter) {
+        if (obj[roles.subcategory.column].includes(subcat)) {
+          return true
+        }
+      }
+      return false
+    })
+
+    const filteredResults = subcategoriesFilter.length < 1 ?  filteredResults_A : filteredResults_A.filter(obj => {
+      for(let subcat of subcategoriesFilter) {
+        if (obj[roles.subcategory.column].includes(subcat)) {
+          return true
+        }
+      }
+      return false
+    })
 
      return (     
       <div className={`${styles.lta} lta_${webpartID}_wrapper`}>

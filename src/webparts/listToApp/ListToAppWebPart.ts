@@ -29,7 +29,13 @@ import "@pnp/sp/lists";
 import "@pnp/sp/items";
 import "@pnp/sp/fields";
 
+//TOOLKIT
+import { Providers, SharePointProvider } from '@microsoft/mgt-spfx';
+import { customElementHelper } from '@microsoft/mgt-element/dist/es6/components/customElementHelper';
+import { lazyLoadComponent } from '@microsoft/mgt-spfx-utils';
+
 //Components
+
 import ListToAppContext from './components/ListToAppContext';
 
 export interface IListToAppWebPartProps {
@@ -72,14 +78,30 @@ export interface IListToAppWebPartProps {
     cardGroup2Toggle: boolean;
     cardGroup3Toggle: boolean;
     cardLinkToggle: boolean;
+    cardOwnerToggle: boolean;
+    cardOwnerPresenceToggle: boolean;
+
     cardCSS:string;
 
     multiSelect:string[]
-
 }
 
+//const ListToAppContext = React.lazy(() => import('./components/ListToAppContext'))
+
+//customElementHelper.withDisambiguation('ListToApp');
 
 export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWebPartProps> {
+
+  protected async onInit():Promise<void> {
+    if (!Providers.globalProvider) {
+      Providers.globalProvider = new SharePointProvider(this.context);
+    }
+    
+    this.choicesHandler()
+
+    return super.onInit()
+  }
+
 
   private categories: string[] = ["default"]
   private subcategories: string[] = ["default"]
@@ -102,6 +124,8 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
     
     const element: React.ReactElement<IListToAppWebPartProps> = React.createElement(
       ListToAppContext,
+   /* const element = lazyLoadComponent(
+        ListToAppContext,*/
       {
         header: this.properties.header,
         siteurl: this.properties.siteurl,
@@ -131,7 +155,9 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
         cardGroup2Toggle: this.properties.cardGroup2Toggle,
         cardGroup3Toggle: this.properties.cardGroup3Toggle,
         cardLinkToggle: this.properties.cardLinkToggle,
-
+        cardOwnerToggle: this.properties.cardOwnerToggle,
+        cardOwnerPresenceToggle:this.properties.cardOwnerPresenceToggle,
+        
         webpartID : this.context.instanceId.replaceAll("-",""),
         context: this.context
       }
@@ -151,12 +177,6 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
     return Version.parse('1.0');
   }
 
-
-  public onInit(): Promise<void> {
-    this.choicesHandler()
-
-    return Promise.resolve()
-  }
 
   //CUSTOM functions
   public async getColumns():Promise<void> {
@@ -730,11 +750,26 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
                   label: 'Display Link',
                   onText: 'On',
                   offText: 'Off',
+                }),
+                PropertyPaneToggle('cardOwnerToggle',{
+                  label: 'Display Owner',
+                  onText: 'On',
+                  offText: 'Off',
                 })
               ],
              },
+             {
+              groupName: "2. Owner field details",
+              groupFields: [
+                PropertyPaneToggle('cardOwnerPresenceToggle',{
+                  label: 'Show presence',
+                  onText: 'On',
+                  offText: 'Off',
+                })
+              ]
+            },
             {
-              groupName: "2. Card visuals",
+              groupName: "3. Card visuals",
               groupFields: [
                 PropertyFieldMonacoEditor('cardCSS', {
                   key: 'cardCSS',

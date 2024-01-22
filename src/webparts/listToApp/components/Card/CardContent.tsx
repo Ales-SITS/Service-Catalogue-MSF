@@ -5,7 +5,10 @@ import { useContext} from 'react';
 
 //3rd party Modules
 import * as DOMPurify from 'dompurify';
-import { findDOMNode } from 'react-dom';
+//import { findDOMNode } from 'react-dom';
+
+import { Person } from '@microsoft/mgt-react';
+import { ViewType } from '@microsoft/mgt-spfx';
 
 //Components
 import { Icon } from '@fluentui/react/lib/Icon';
@@ -21,7 +24,8 @@ export default function CardContent (props) {
         serviceObj,
         catIconName,
         subcatIconName,
-        statIconName
+        statIconName,
+        owner
     } = props;
 
     const {
@@ -32,14 +36,19 @@ export default function CardContent (props) {
         cardGroup1Toggle,
         cardGroup2Toggle,
         cardGroup3Toggle,
-        cardLinkToggle
+        cardLinkToggle,
+        cardOwnerToggle,
+        cardOwnerPresenceToggle
         } = settings
 
     const categoryName = roles.category?.name ? roles.category.name : "Category"
     const subcategoryName = roles.subcategory?.name ? roles.subcategory.name : "Subcategory"
-    const Group1Name = roles.Group1?.name ? roles.Group1.name : "Group 1"
-    const Group2Name = roles.Group2?.name ? roles.Group2.name : "Group 2"
-    const Group3Name = roles.Group3?.name ? roles.Group2.name : "Group 3"
+    const Group1Name = roles.group1?.name ? roles.group1.name : "Group 1"
+    const Group2Name = roles.group2?.name ? roles.group2.name : "Group 2"
+    const Group3Name = roles.group3?.name ? roles.group2.name : "Group 3"
+    const OwnerName = roles.owner?.name ? roles.owner.name : "Owner"
+
+    //console.log(Person)
 
     return (
         <div className={cardType ? cardstyles.lta__card_overlay : `lta_${webpartID}_card_wrapper`} onClick={props.onCloseModal}>
@@ -119,8 +128,18 @@ export default function CardContent (props) {
                             </div>
                         </div>
                         }
-                    </div>
-                   
+                        {!cardOwnerToggle ? null :
+                        <div className={cardstyles.lta_detail}>
+                            <span className={`lta_${webpartID}_card_detail_label`}>{OwnerName}</span>
+                            <Person 
+                                personQuery={`${owner}`} 
+                                view={ViewType.threelines} 
+                                showPresence={cardOwnerPresenceToggle} 
+                                personCardInteraction={1}
+                                avatarSize='large'
+                                ></Person>  
+                        </div> }
+                    </div>      
                     <div className={cardstyles.lta_details_link}>
                         <Icon 
                             iconName={statIconName.status_icon} 
@@ -135,7 +154,6 @@ export default function CardContent (props) {
                         serviceObj.link === null ? null :
                             <a 
                                 href={serviceObj.link.Url}
-
                             >
                                 <Icon 
                                     iconName="Link12"

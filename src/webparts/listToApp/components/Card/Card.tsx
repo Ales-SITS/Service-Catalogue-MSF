@@ -1,12 +1,13 @@
 import * as React from 'react';
 import {useState,useEffect, useContext} from 'react';
 
-import styles from '../ListToApp.module.scss';
 import cardstyles from './Card.module.scss';
 
 //3rd party Modules
 import { Icon } from '@fluentui/react/lib/Icon';
 import CardContent from './CardContent'
+import { Person } from '@microsoft/mgt-react/dist/es6/spfx';
+import { ViewType } from '@microsoft/mgt-spfx';
 
 //API
 import { Web } from "@pnp/sp/webs"; 
@@ -44,7 +45,7 @@ export default function Card (props:any) {
       Group1: service[cr.Group1]           ? service[cr.Group1]       : null,
       Group2: service[cr.Group2]           ? service[cr.Group2]       : null,
       Group3: service[cr.Group3]           ? service[cr.Group3]       : null,
-      ownerField: service[cr.ownerField]   ? service[cr.ownerField]   : null,
+      owner: service[cr.owner]             ? service[cr.owner]        : null,
       link: service[cr.link]               ? service[cr.link]         : null
     }
 
@@ -53,17 +54,19 @@ export default function Card (props:any) {
       setContentHidden(current => !current)
     }
 
-     /*
-    async function getOwner():Promise<any[]> {
+    const [owner,setOwner] = useState("")
+     
+    async function getOwner():Promise<void> {
       const listSite = Web([sp.web, `${siteurl}`]) 
-      const owner =  await listSite.lists.getById(`${list}`).items.getById(service.ID).select(`${cr.ownerField}/EMail`).expand(`${cr.ownerField}`)()
-      return await owner.ServiceOwner.EMail
+      const owner =  await listSite.lists.getById(`${list}`).items.getById(service.ID).select(`${cr.owner}/EMail`).expand(`${cr.owner}`)()
+      setOwner(owner.ServiceOwner.EMail)
+      return Promise.resolve()
     }
 
     useEffect(()=>{
-      getOwner().then(res=>console.log(res))
+      getOwner()
     },[])
-*/
+
     const catIconName =   catIcons?.find(cat => cat.category === service[cr.category]) ? 
                           catIcons?.find(cat => cat.category === service[cr.category]) :
                           catIcons?.find(cat => cat.category === "default")
@@ -76,7 +79,6 @@ export default function Card (props:any) {
                          statusIcons?.find(stat => stat.status === service[cr.status]) :
                          statusIcons?.find(stat => stat.status === "default")         
 
-
     return (
         <div 
           className={contentHidden ? `lta_${webpartID}_card_wrapper` : `lta_${webpartID}_card_wrapper lta_${webpartID}_card_wrapper_opened`}
@@ -84,7 +86,7 @@ export default function Card (props:any) {
           <button
             className={`lta_${webpartID}_card_heading`}
             onClick={contentHiddenHandler}>
-              <h2 className={`lta_${webpartID}_card_title`}>{service[cr.title]}</h2>     
+              <h2 className={`lta_${webpartID}_card_title`}>{service[cr.title]}</h2>   
               <div className={cardstyles.lta__card_iconbox}>
                 {!cardSubcategoryToggle ? null :
                 <Icon 
@@ -116,6 +118,7 @@ export default function Card (props:any) {
                         backgroundColor: `${statIconName.status_icon_bg}`,
                   }}
                 />}
+                <Person personQuery={`${owner}`} view={ViewType.image}></Person>  
                 {serviceObj.link === null ? null :
                   <a href={serviceObj.link.Url}>
                   <Icon 
@@ -133,6 +136,7 @@ export default function Card (props:any) {
             subcatIconName={subcatIconName}
             statIconName={statIconName}
             serviceObj = {serviceObj}
+            owner = {owner}
             onCloseModal={contentHiddenHandler}
            />  
           }      

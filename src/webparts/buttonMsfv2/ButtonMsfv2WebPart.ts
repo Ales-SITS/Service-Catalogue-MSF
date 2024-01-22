@@ -72,10 +72,13 @@ export default class ButtonMsfv2WebPart extends BaseClientSideWebPart<IButtonMsf
               groupFields: [
                 PropertyPaneWebPartInformation({
                   description: `Create modern and visually appealing buttons for your SharePoint solution. With CSS editor and present CSS classes.`,
-                  moreInfoLink: `https://msfintl.sharepoint.com/sites/SITSExternalPortal`,
                   videoProperties: {
-                    embedLink: `https://www.youtube.com/embed/d_9o3tQ90zo`,
-                    properties: { allowFullScreen: true}
+                    embedLink: `https://msfintl.sharepoint.com/_layouts/15/embed.aspx?UniqueId=c78a468b-656d-4a72-91cf-b6a8c9300154&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create`,
+                    properties: { 
+                      allowFullScreen: true,
+                      autoplay: false
+                    
+                    }
                   },
                   key: 'webPartInfoId'
                 })

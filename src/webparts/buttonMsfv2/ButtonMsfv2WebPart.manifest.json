@@ -28,15 +28,15 @@
       ],
       "buttons_collection": [
         {
-          "button_icon": "6PointStar",
-          "button_label": "Button label",
+          "button_icon": "SharepointAppIcon16",
+          "button_label": "Btn label",
           "button_target": true,
           "button_icon_toggle": true,
           "button_url": "https://msfintl.sharepoint.com/sites/SITSExternalPortal",
           "uniqueId": "20dd0322-8ded-4f3e-8109-bd1f78d7819b",
           "sortIdx": 1
         }
-      ]
-    }
+      ],
+      "buttons_css":"/*Buttons CSS*/\n\n /*Webpart wrapper*/\n .btnmsf__block {\n display: flex;\n flex-direction: column;\n padding: 10px;\n border-radius: 60px;\n }\n\n .btnmsf__header {\n width: 100%;\n text-align: center;\n font-size: 20px }\n\n /*Input field*/\n .btnmsf__input_wrapper {\n width: 100%;\n display:flex;\n justify-content: center;\n margin: 10px 0;\n }\n\n .btnmsf__input {\n width: 80%;\n padding: 5px;\n border-radius: 10px;\n }\n\n /*Buttons wrapper*/\n .btnmsf__buttons {\n width: 100%;\n display: flex;\n justify-content: center;\n flex-wrap: wrap;\n gap: 40px;\n }\n\n /*Individual Button*/\n .btnmsf__button {\n width: 105px;\n height: 105px;\n border-radius: 105px;\n display: flex;\n flex-direction: column;\n align-items: center;\n justify-content: center;\n cursor: pointer;\n transition: 0.2s;\n box-shadow: 0 0 5px rgba(0,0,0,0.5);\n background: rgb(145,0,255);\n background: linear-gradient(266deg, rgba(145,0,255,1) 0%, rgba(87,78,255,1) 100%);\n }\n\n .btnmsf__button:hover {\n transform: scale(1.1) }\n\n .btnmsf__button_icon {\n font-size: 30px;\n padding: 2px;\n color: rgb(245, 243, 243);\n }\n\n .btnmsf__button_icon_custom {\n width: 100px;\n height: 100px;\n }\n\n .btnmsf__button_text {\n font-size: 17px;\n color: white;\n font-weight: 600;\n text-align: center;\n }\n\n /*Responsive design*/\n @media screen and (max-width: 1024px) {\n .btnmsf__buttons {\n display: grid;\n grid-template-columns: 1fr 1fr 1fr;\n }\n\n .btnmsf__button {\n width: 90px;\n height: 90px;\n border-radius: 90px;\n }\n\n .btnmsf__button_icon {\n font-size: 26px }\n\n .btnmsf__button_text {\n font-size: 16px;\n }\n\n }\n\n"    }
   }]
 }

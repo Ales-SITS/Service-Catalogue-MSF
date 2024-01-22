@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useEffect, useState, useContext } from 'react';
 
 //3rd party Modules
-import IconStyled from '../helpers/IconStyled'
+import SubcatIconStyled from '../helpers/SubcatIconStyled'
 
 import { AppContext } from "../ListToAppContext"
 
@@ -11,8 +11,9 @@ export default function ServiceCategories (props) {
   const {webpartID} = settings
   const {subcategoriesList} = props;
 
-  const [checkedState, setCheckedState] = useState([])
+  const checkArray = new Array(subcategoriesList.length).fill(true)
 
+  const [checkedState, setCheckedState] = useState(checkArray)
   const handleOnChange = (position) => {
       const updatedCheckedState = checkedState.map((item, index) =>
           index === position ? !item : item
@@ -21,32 +22,30 @@ export default function ServiceCategories (props) {
         props.onCheckChange(updatedCheckedState)
   };
    
-  
   useEffect(()=>{
       setCheckedState(new Array(subcategoriesList.length).fill(true))
-      //props.onCheckChange(new Array(subcategoriesList.length).fill(true)) causes loop
-  },[subcategoriesList])
+      //props.onCheckChange(new Array(subcategoriesList.length).fill(true)) //causes loop
+  },[subcategoriesList.length])
   
 
-  console.log(subcategoriesList)
 
   return (
-         <ul className={`lta_${webpartID}_category_block`}>
-            {subcategoriesList.map((category,idx) => 
+         <ul className={`lta_${webpartID}_subcategory_block`}>
+            {subcategoriesList.map((subcategory,idx) => 
               <li
-                className={checkedState[idx] ? `lta_${webpartID}_category_button lta_${webpartID}_category_button_selected` : `lta_${webpartID}_category_button`}
-                key={`${category}_${idx}`} 
-                title={category}
+                className={checkedState[idx] ? `lta_${webpartID}_subcategory_button lta_${webpartID}_subcategory_button_selected` : `lta_${webpartID}_subcategory_button`}
+                key={`${subcategory}_${idx}`} 
+                title={subcategory}
                 onClick={() => handleOnChange(idx)}
               > 
-                   <IconStyled
-                      category={category}
+                   <SubcatIconStyled
+                      category={subcategory}
                     />
-                <span className={`lta_${webpartID}_category_label`}>{category}</span>
+                <span className={`lta_${webpartID}_subcategory_label`}>{subcategory}</span>
                 <input
                     type="checkbox"
-                    name={category}
-                    value={category}
+                    name={subcategory}
+                    value={subcategory}
                     checked={checkedState[idx]}
                     onChange={() => handleOnChange(idx)}
                   />
