@@ -26,8 +26,6 @@ export default function ServiceCategories (props) {
       setCheckedState(new Array(subcategoriesList.length).fill(true))
       //props.onCheckChange(new Array(subcategoriesList.length).fill(true)) //causes loop
   },[subcategoriesList.length])
-  
-  console.log(subcategoriesList)
 
   return (
          <ul className={`lta_${webpartID}_subcategory_block`}>

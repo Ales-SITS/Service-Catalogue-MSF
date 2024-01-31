@@ -39,6 +39,7 @@ export default function ListtoApp () {
     const {cr} = useContext(AppContext)
     const {sp} = useContext(AppContext)
     const {roles} = useContext(AppContext)
+    const {currentUserDomain} = useContext(AppContext)
 
     const {
       header,
@@ -47,12 +48,17 @@ export default function ListtoApp () {
       colroles,
       defaultGroupby,
 
+      internalDomain,
+      internalCategory,
+      internalCategoryMultiSelect,
+      internalStatus,
+      internalStatusMultiSelect,
+
       searchToggle,
       catFilterToggle,
       subcatFilterToggle,
       sortingToggle,
       groupingToggle,
-      nestedGrouping,
 
       cardsPerRow,
       webpartID,
@@ -75,7 +81,7 @@ export default function ListtoApp () {
     async function getCategories():Promise<any[]> {
       const listSite = Web([sp.web, `${siteurl}`])
       const categories = await listSite.lists.getById(`${list}`).fields.getByInternalNameOrTitle(`${cr.category}`)();
-      return await categories.Choices
+      return await categories.Choices.filter(cat => !internalCategoryMultiSelect?.includes(cat))
     }
 
     async function getSubcategories():Promise<any[]> {
@@ -107,8 +113,8 @@ export default function ListtoApp () {
     //SEARCH
     function setSearchCategories (services) {
       const index = new MiniSearch({
-        fields: [`${cr.title}`, `${cr.category}`, `${cr.subcategory}`, `${cr.contentA}`, `${cr.Group1}`],
-        storeFields: [`${cr.title}`, `${cr.category}`, `${cr.subcategory}`, `${cr.contentA}`, `${cr.Group1}`, `${cr.status}`],
+        fields: [`${cr.title}`, `${cr.category}`, `${cr.subcategory}`, `${cr.contentA}`, `${cr.GroupA}`],
+        storeFields: [`${cr.title}`, `${cr.category}`, `${cr.subcategory}`, `${cr.contentA}`, `${cr.GroupA}`, `${cr.status}`],
         extractField: (service, fieldName) => {
           if (Array.isArray(fieldName)) {
            return service[fieldName].join(' ')
@@ -129,8 +135,8 @@ export default function ListtoApp () {
 
     function setSearchDescription(services) {
       const index = new MiniSearch({
-        fields: [`${cr.title}`, `${cr.category}`, `${cr.subcategory}`, `${cr.contentA}`, `${cr.contentB}`, `${cr.Group1}`, `${cr.Group2}`],
-        storeFields: [`${cr.title}`, `${cr.category}`, `${cr.subcategory}`, `${cr.contentA}`, `${cr.contentB}`, `${cr.Group1}`, `${cr.Group2}`, `${cr.status}`],
+        fields: [`${cr.title}`, `${cr.category}`, `${cr.subcategory}`, `${cr.contentA}`, `${cr.contentB}`, `${cr.GroupA}`, `${cr.GroupB}`],
+        storeFields: [`${cr.title}`, `${cr.category}`, `${cr.subcategory}`, `${cr.contentA}`, `${cr.contentB}`, `${cr.GroupA}`, `${cr.GroupB}`, `${cr.status}`],
         tokenize: (string, _fieldName) => string.split('>'),
         idField: 'ID',
         searchOptions: {
@@ -176,6 +182,8 @@ export default function ListtoApp () {
       setCategoriesFilter(filtered)
     }
 
+const internal = internalDomain === "" || internalDomain === undefined ? true : currentUserDomain.endsWith(internalDomain.toLowerCase()) 
+
 
 //List of services filtered by search and by selected categories
    const filteredResults_A = results.filter(obj => {
@@ -187,6 +195,32 @@ export default function ListtoApp () {
       return false
     })
 
+//List of services results filtered internally 
+  const filteredResults_B = 
+      internalCategoryMultiSelect?.length < 1 || internalCategoryMultiSelect === undefined || internalCategory === false || internal === true ?
+      filteredResults_A : 
+      filteredResults_A.filter(obj => {
+      for(let cat of internalCategoryMultiSelect) {
+        if (obj[roles.category.column] === cat) {
+          return false
+        }
+      }
+      return true
+      })
+
+const filteredResults_C =
+    internalStatusMultiSelect?.length < 1 || internalStatusMultiSelect === undefined || internalStatus === false || internal === true ?
+      filteredResults_B : 
+      filteredResults_B.filter(obj => {
+      for(let stat of internalStatusMultiSelect) {
+        if (obj[roles.status.column] === stat) {
+          return false
+        }
+      }
+      return true
+      })
+
+
 //List of services filtered by selected categories
     const filteredServicesList_A = servicesList.filter(obj => {
       for(let cat of categoriesFilter) {
@@ -196,6 +230,32 @@ export default function ListtoApp () {
       }
       return false
     })
+
+//List of services filtered internally (Category)
+    const filteredServicesList_B = 
+      internalCategoryMultiSelect?.length < 1 || internalCategoryMultiSelect === undefined || internalCategory === false || internal === true ?
+      filteredServicesList_A : 
+      filteredServicesList_A.filter(obj => {
+      for(let cat of internalCategoryMultiSelect) {
+        if (obj[roles.category.column] === cat) {
+          return false
+        }
+      }
+      return true
+      })
+
+//List of services filtered internally (Status)
+  const filteredServicesList_C = 
+      internalStatusMultiSelect?.length < 1 || internalStatusMultiSelect === undefined || internalStatus === false || internal === true ?
+      filteredServicesList_B : 
+      filteredServicesList_B.filter(obj => {
+      for(let stat of internalStatusMultiSelect) {
+        if (obj[roles.status.column] === stat) {
+          return false
+        }
+      }
+      return true
+      })
 
 
 // SORTING functions
@@ -229,11 +289,13 @@ export default function ListtoApp () {
     //Sorting for grouped option, changes only if Category or Subcategory is selected.
     const sortedGroupingArrCategories = roles.category?.column === sorting ? groupingArr.sort((a,b)=> a > b ? sortingAsc*1 : -sortingAsc*1) : groupingArr
     const sortedGroupingArrSubcategories = roles.subcategory?.column === sorting ? groupingArr.sort((a,b)=> a > b ? sortingAsc*1 : -sortingAsc*1) : groupingArr
-    const sortedGroupingArr = grouping === "Category" ? sortedGroupingArrCategories : sortedGroupingArrSubcategories
+    const sortedGroupingArr = grouping === "Category" ? 
+          sortedGroupingArrCategories : 
+          sortedGroupingArrSubcategories
 
-    //FILTERES Step B (SUBCATEGORY)
+    //FILTERES Step 2 (SUBCATEGORY)
     const filteredSubcategoriesList = subcategoriesList.filter(subcategory =>
-      filteredServicesList_A.some(service => service[cr.subcategory] === subcategory))
+      filteredServicesList_C.some(service => service[cr.subcategory] === subcategory))
 
     const [subcategoriesFilter,setSubcategoriesFilter] = useState(filteredSubcategoriesList)
     function subcategoriesHandler(arr){
@@ -242,7 +304,7 @@ export default function ListtoApp () {
     }
 
 
-    const filteredServicesList = subcategoriesFilter.length < 1 ?  filteredServicesList_A : filteredServicesList_A.filter(obj => {
+    const filteredServicesList = subcategoriesFilter.length < 1 ?  filteredServicesList_C : filteredServicesList_C.filter(obj => {
       for(let subcat of subcategoriesFilter) {
         if (obj[roles.subcategory.column].includes(subcat)) {
           return true
@@ -251,7 +313,7 @@ export default function ListtoApp () {
       return false
     })
 
-    const filteredResults = subcategoriesFilter.length < 1 ?  filteredResults_A : filteredResults_A.filter(obj => {
+    const filteredResults = subcategoriesFilter.length < 1 ?  filteredResults_C : filteredResults_C.filter(obj => {
       for(let subcat of subcategoriesFilter) {
         if (obj[roles.subcategory.column].includes(subcat)) {
           return true
@@ -259,7 +321,6 @@ export default function ListtoApp () {
       }
       return false
     })
-
 
      return (     
       <div className={`${styles.lta} lta_${webpartID}_wrapper`}>
@@ -311,6 +372,7 @@ export default function ListtoApp () {
         ) :
         grouping !== "None" && inputValue === "" ? 
         sortedGroupingArr.map((grp,idx)=>
+        filteredServicesList.filter(service => service[cr.category] === grp || service[cr.subcategory] === grp).length === 0 ? null : 
         <Grouped
           key={idx}
           level={grouping === "Category" ? 1 : 2}

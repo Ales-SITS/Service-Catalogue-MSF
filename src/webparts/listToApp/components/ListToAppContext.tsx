@@ -11,23 +11,25 @@ export const AppContext = createContext<any>(null);
 
 export default function ListToAppContext (props) {
    
-    const {colroles, context } = props
-    const [internalDomain, setInternalDomain] = useState(false)
+    const {
+        colroles,
+        context,
+    } = props
+
+    const [currentUserDomain, setCurrentUserDomain] = useState("")
 
     const sp = spfi().using(SPFxsp(context))
     const graph = graphfi().using(SPFxGraph(context))
 
     useEffect(()=>{
-        console.log("triggered")
         getCurrentUser()
       },[])
     
       const getCurrentUser = async() => {
-        console.log("triggered 2")
         const current_user = await graph.me();
-        console.log(current_user.userPrincipalName.split("@")[1])
+        const domain = current_user.userPrincipalName.toLowerCase()
+        setCurrentUserDomain(domain)
       }
-
 
     const roles = {
         title : colroles?.filter(col => col.role === "Title")[0],
@@ -36,11 +38,11 @@ export default function ListToAppContext (props) {
         status : colroles?.filter(col => col.role === "Status")[0],
         contentA : colroles?.filter(col => col.role === "ContentA")[0],
         contentB : colroles?.filter(col => col.role === "ContentB")[0],
-        group1 : colroles?.filter(col => col.role === "Group1")[0],
-        group2 : colroles?.filter(col => col.role === "Group2")[0],
-        group3 : colroles?.filter(col => col.role === "Group3")[0],
+        GroupA : colroles?.filter(col => col.role === "GroupA")[0],
+        GroupB : colroles?.filter(col => col.role === "GroupB")[0],
+        GroupC : colroles?.filter(col => col.role === "GroupC")[0],
         link: colroles?.filter(col => col.role === "Link")[0],
-        owner: colroles?.filter(col => col.role === "Owner")[0],
+        PersonA: colroles?.filter(col => col.role === "PersonA")[0],
         none : {uniqueId: '0', column: '', role: 'None', name: "None", sortIdx: 1}
     }
 
@@ -51,15 +53,15 @@ export default function ListToAppContext (props) {
         status : roles.status?.column.replaceAll(" ",""),
         contentA : roles.contentA?.column.replaceAll(" ",""),
         contentB : roles.contentB?.column.replaceAll(" ",""),
-        Group1 : roles.group1?.column.replaceAll(" ",""),
-        Group2 : roles.group2?.column.replaceAll(" ",""),
-        Group3 : roles.group3?.column.replaceAll(" ",""),
+        GroupA : roles.GroupA?.column.replaceAll(" ",""),
+        GroupB : roles.GroupB?.column.replaceAll(" ",""),
+        GroupC : roles.GroupC?.column.replaceAll(" ",""),
         link: roles.link?.column.replaceAll(" ",""),
-        owner: roles.owner?.column.replaceAll(" ","")
+        PersonA: roles.PersonA?.column.replaceAll(" ","")
     }
 
     return (
-        <AppContext.Provider value={{settings: props, cr: columns_roles, roles: roles, sp: sp, graph: graph}}>
+        <AppContext.Provider value={{settings: props, cr: columns_roles, roles: roles, sp: sp, graph: graph, currentUserDomain}}>
            <ListToApp/>
         </AppContext.Provider> 
     )

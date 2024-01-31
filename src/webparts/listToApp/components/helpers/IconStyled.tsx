@@ -21,7 +21,7 @@ export default function IconStyled (props:any) {
       {catIconName.cat_icon_toggle === true ? 
                   <img 
                   src={catIconName.cat_icon_custom}
-                  className={`lta_${webpartID}_category_icon_custom`}
+                  className={`lta_${webpartID}_category_icon`}
                   />
                   :
                 <Icon 

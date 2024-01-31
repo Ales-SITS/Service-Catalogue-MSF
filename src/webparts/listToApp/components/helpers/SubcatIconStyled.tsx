@@ -22,7 +22,7 @@ export default function SubcatIconStyled (props:any) {
         {subcatIconName.subcat_icon_toggle === true ? 
         <img 
         src={subcatIconName.subcat_icon_custom}
-        className={`lta_${webpartID}_subcategory_icon_custom`}
+        className={`lta_${webpartID}_subcategory_icon`}
         />
         :
           <Icon 

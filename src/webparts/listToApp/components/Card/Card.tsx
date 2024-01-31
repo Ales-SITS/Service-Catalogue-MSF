@@ -43,10 +43,10 @@ export default function Card (props:any) {
       status: service[cr.status]           ? service[cr.status]       : null,
       contentA: service[cr.contentA]       ? service[cr.contentA]     : null,
       contentB: service[cr.contentB]       ? service[cr.contentB]     : null,
-      Group1: service[cr.Group1]           ? service[cr.Group1]       : null,
-      Group2: service[cr.Group2]           ? service[cr.Group2]       : null,
-      Group3: service[cr.Group3]           ? service[cr.Group3]       : null,
-      owner: service[cr.owner]             ? service[cr.owner]        : null,
+      GroupA: service[cr.GroupA]           ? service[cr.GroupA]       : null,
+      GroupB: service[cr.GroupB]           ? service[cr.GroupB]       : null,
+      GroupC: service[cr.GroupC]           ? service[cr.GroupC]       : null,
+      PersonA: service[cr.PersonA]         ? service[cr.PersonA]        : null,
       link: service[cr.link]               ? service[cr.link]         : null
     }
 
@@ -55,17 +55,17 @@ export default function Card (props:any) {
       setContentHidden(current => !current)
     }
 
-    const [owner,setOwner] = useState("")
+    const [PersonA,setPersonA] = useState("")
      
-    async function getOwner():Promise<void> {
+    async function getPersonA():Promise<void> {
       const listSite = Web([sp.web, `${siteurl}`]) 
-      const owner =  await listSite.lists.getById(`${list}`).items.getById(service.ID).select(`${cr.owner}/EMail`).expand(`${cr.owner}`)()
-      setOwner(owner.ServiceOwner.EMail)
+      const PersonA =  await listSite.lists.getById(`${list}`).items.getById(service.ID).select(`${cr.PersonA}/EMail`).expand(`${cr.PersonA}`)()
+      setPersonA(PersonA[`${cr.PersonA}`].EMail)
       return Promise.resolve()
     }
 
     useEffect(()=>{
-      getOwner()
+      getPersonA()
     },[])
 
     const catIconName =   catIcons?.find(cat => cat.category === service[cr.category]) ? 
@@ -139,7 +139,7 @@ export default function Card (props:any) {
                         backgroundColor: `${statIconName.status_icon_bg}`,
                   }}
                 />}
-                <Person personQuery={`${owner}`} view={ViewType.image}></Person>  
+                <Person personQuery={`${PersonA}`} view={ViewType.image}></Person>  
                 {serviceObj.link === null ? null :
                   <a href={serviceObj.link.Url}>
                   <Icon 
@@ -157,7 +157,7 @@ export default function Card (props:any) {
             subcatIconName={subcatIconName}
             statIconName={statIconName}
             serviceObj = {serviceObj}
-            owner = {owner}
+            PersonA = {PersonA}
             onCloseModal={contentHiddenHandler}
            />  
           }      

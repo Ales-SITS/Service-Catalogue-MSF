@@ -49,7 +49,7 @@ export interface IListToAppWebPartProps {
     internalview: any[];
     multiColumn: string[];
     categories: any[];
-    internaldomain:string;
+    internalDomain:string;
     internalCategory: boolean;
     internalStatus: boolean;
     internalCategoryMultiSelect: string[];
@@ -83,12 +83,12 @@ export interface IListToAppWebPartProps {
     cardCategoryToggle: boolean;
     cardSubcategoryToggle: boolean;
     cardStatusToggle: boolean;
-    cardGroup1Toggle: boolean;
-    cardGroup2Toggle: boolean;
-    cardGroup3Toggle: boolean;
+    cardGroupAToggle: boolean;
+    cardGroupBToggle: boolean;
+    cardGroupCToggle: boolean;
     cardLinkToggle: boolean;
-    cardOwnerToggle: boolean;
-    cardOwnerPresenceToggle: boolean;
+    cardPersonAToggle: boolean;
+    cardPersonAPresenceToggle: boolean;
 
     cardCSS:string;
 
@@ -141,6 +141,13 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
         list: this.properties.list,
         colroles: this.properties.colroles,
 
+        internalDomain: this.properties.internalDomain,
+        internalCategory:  this.properties.internalCategory,
+        internalStatus:  this.properties.internalStatus,
+        internalCategoryMultiSelect:  this.properties.internalCategoryMultiSelect,
+        internalStatusMultiSelect:  this.properties.internalStatusMultiSelect,
+
+
         searchToggle: this.properties.searchToggle,
         catFilterToggle: this.properties.catFilterToggle,
         subcatFilterToggle: this.properties.subcatFilterToggle,
@@ -162,12 +169,12 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
         cardCategoryToggle: this.properties.cardCategoryToggle,
         cardSubcategoryToggle: this.properties.cardSubcategoryToggle,
         cardStatusToggle: this.properties.cardStatusToggle, 
-        cardGroup1Toggle: this.properties.cardGroup1Toggle,
-        cardGroup2Toggle: this.properties.cardGroup2Toggle,
-        cardGroup3Toggle: this.properties.cardGroup3Toggle,
+        cardGroupAToggle: this.properties.cardGroupAToggle,
+        cardGroupBToggle: this.properties.cardGroupBToggle,
+        cardGroupCToggle: this.properties.cardGroupCToggle,
         cardLinkToggle: this.properties.cardLinkToggle,
-        cardOwnerToggle: this.properties.cardOwnerToggle,
-        cardOwnerPresenceToggle:this.properties.cardOwnerPresenceToggle,
+        cardPersonAToggle: this.properties.cardPersonAToggle,
+        cardPersonAPresenceToggle:this.properties.cardPersonAPresenceToggle,
         
         webpartID : this.context.instanceId.replaceAll("-",""),
         context: this.context
@@ -268,9 +275,11 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
     return {
       pages: [
         {
+          displayGroupsAsAccordion:true,
           groups: [
             {
-              groupName: "",
+              groupName: "About",
+              isCollapsed: false,
               groupFields: [
                 PropertyPaneWebPartInformation({
                   description: `This web part facilitates the creation of dynamic and modern layouts using data from a SharePoint list. It offers full customization through CSS.</br></br>
@@ -388,20 +397,20 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
                           text: "Status (choice)"
                         },
                         {
-                          key: "Group1",
-                          text: "Group 1 (multiple choice)"
+                          key: "GroupA",
+                          text: "Group A (multiple choice)"
                         },
                         {
-                          key: "Group2",
-                          text: "Group 2 (multiple choice)"
+                          key: "GroupB",
+                          text: "Group B (multiple choice)"
                         },
                         {
-                          key: "Group3",
-                          text: "Group 3 (multiple choice)"
+                          key: "GroupC",
+                          text: "Group C (multiple choice)"
                         },
                         {
-                          key: "Owner",
-                          text: "Owner (person)"
+                          key: "PersonA",
+                          text: "Person A (person)"
                         },
                         {
                           key: "Link",
@@ -423,9 +432,14 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
             },
             {
               groupName: "Internal view",
+              isCollapsed: true,
               groupFields: [
-                PropertyPaneTextField('internaldomain', {
-                  label: "Apply internal view to a domain (i.e. sits.msf.org)"
+                PropertyPaneWebPartInformation({
+                  description: `The internal view feature enables you to restrict the display of items to specified users (defined by email or email/part or email/domain e.g.bohumil.nakashi@sits.msf.org or admin@sits.msf.org or sits.msf.org). In the current version, you have the ability to limit the display of categories or statuses according to your preferences.`,
+                  key: 'internalViewInfoId'
+                }),
+                PropertyPaneTextField('internalDomain', {
+                  label: "Apply Internal view to domain"
                 }),
                 PropertyPaneToggle('internalCategory',{
                   label: 'Internal view applied on Category role',
@@ -472,7 +486,7 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
                   calloutWidth: 300,
                   key: 'searchToggleFieldId',
                   label: 'Display search field',
-                  calloutContent: React.createElement('p', {}, 'Search field automatically filteres results based on the information included in columns with Content, Category, Subcategory and Group1 role.'),
+                  calloutContent: React.createElement('p', {}, 'Search field automatically filteres results based on the information included in columns with Content, Category, Subcategory and GroupA role.'),
                   onText: 'On',
                   offText: 'Off',
                   checked: this.properties.searchToggle
@@ -732,9 +746,11 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
           header: {
             description: "Within this property pane page, you can customize default grouping and sorting options."
           },
+          displayGroupsAsAccordion:true,
           groups: [
             {
               groupName: "1. Grouping settings", 
+              isCollapsed: false,
               groupFields: [
                 PropertyPaneChoiceGroup("defaultGroupby", {
                   label: 'Set default grouping',
@@ -743,7 +759,7 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
                     {key: "Category", text: "Category"},
                     {key: "Subcategory", text: "Subcategory"},
                   /*{key: "Status", text: "Status"},
-                    {key: "Owner", text: "Owner"}*/
+                    {key: "PersonA", text: "PersonA"}*/
                   ]
                 }),
                 PropertyPaneToggle('nestedGrouping',{
@@ -755,6 +771,7 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
             },
             {
               groupName: "2. Grouping visuals", 
+              isCollapsed: false,
               groupFields: [
                 PropertyPaneToggle('groupCategoryExpanded',{
                   label: 'Default Category group display',
@@ -782,9 +799,11 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
           header: {
             description: "Within this property pane page, you can customize the visuals of individual cards, which display specific details about each element."
           },
+          displayGroupsAsAccordion:true,
           groups: [
             {
               groupName: "1. Card settings",
+              isCollapsed: false,
               groupFields: [
                 PropertyFieldToggleWithCallout('cardType', {
                   calloutTrigger: CalloutTriggers.Hover,
@@ -819,18 +838,18 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
                   onText: 'On',
                   offText: 'Off',
                 }),
-                PropertyPaneToggle('cardGroup1Toggle',{
-                  label: 'Display Group1',
+                PropertyPaneToggle('cardGroupAToggle',{
+                  label: 'Display GroupA',
                   onText: 'On',
                   offText: 'Off',
                 }),
-                PropertyPaneToggle('cardGroup2Toggle',{
-                  label: 'Display Group2',
+                PropertyPaneToggle('cardGroupBToggle',{
+                  label: 'Display GroupB',
                   onText: 'On',
                   offText: 'Off',
                 }),
-                PropertyPaneToggle('cardGroup3Toggle',{
-                  label: 'Display Group3',
+                PropertyPaneToggle('cardGroupCToggle',{
+                  label: 'Display GroupC',
                   onText: 'On',
                   offText: 'Off',
                 }),
@@ -839,17 +858,18 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
                   onText: 'On',
                   offText: 'Off',
                 }),
-                PropertyPaneToggle('cardOwnerToggle',{
-                  label: 'Display Owner',
+                PropertyPaneToggle('cardPersonAToggle',{
+                  label: 'Display Person A',
                   onText: 'On',
                   offText: 'Off',
                 })
               ],
              },
              {
-              groupName: "2. Owner field details",
+              groupName: "2. Person A field details",
+              isCollapsed: false,
               groupFields: [
-                PropertyPaneToggle('cardOwnerPresenceToggle',{
+                PropertyPaneToggle('cardPersonAPresenceToggle',{
                   label: 'Show presence',
                   onText: 'On',
                   offText: 'Off',
@@ -858,6 +878,7 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
             },
             {
               groupName: "3. Card visuals",
+              isCollapsed: false,
               groupFields: [
                 PropertyFieldMonacoEditor('cardCSS', {
                   key: 'cardCSS',

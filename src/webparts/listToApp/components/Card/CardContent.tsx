@@ -25,7 +25,7 @@ export default function CardContent (props) {
         catIconName,
         subcatIconName,
         statIconName,
-        owner,
+        PersonA,
     } = props;
 
     const {
@@ -34,20 +34,20 @@ export default function CardContent (props) {
         cardCategoryToggle,
         cardSubcategoryToggle,
         cardStatusToggle,
-        cardGroup1Toggle,
-        cardGroup2Toggle,
-        cardGroup3Toggle,
+        cardGroupAToggle,
+        cardGroupBToggle,
+        cardGroupCToggle,
         cardLinkToggle,
-        cardOwnerToggle,
-        cardOwnerPresenceToggle
+        cardPersonAToggle,
+        cardPersonAPresenceToggle
         } = settings
 
     const categoryName = roles.category?.name ? roles.category.name : "Category"
     const subcategoryName = roles.subcategory?.name ? roles.subcategory.name : "Subcategory"
-    const Group1Name = roles.group1?.name ? roles.group1.name : "Group 1"
-    const Group2Name = roles.group2?.name ? roles.group2.name : "Group 2"
-    const Group3Name = roles.group3?.name ? roles.group2.name : "Group 3"
-    const OwnerName = roles.owner?.name ? roles.owner.name : "Owner"
+    const GroupAName = roles.GroupA?.name ? roles.GroupA.name : "Group A"
+    const GroupBName = roles.GroupB?.name ? roles.GroupB.name : "Group B"
+    const GroupCName = roles.GroupC?.name ? roles.GroupB.name : "Group C"
+    const PersonAName = roles.PersonA?.name ? roles.PersonA.name : "Person A"
 
     //console.log(Person)
 
@@ -112,43 +112,43 @@ export default function CardContent (props) {
                             </div>
                             }           
                         </div>
-                        {!cardGroup1Toggle ? null : 
+                        {!cardGroupAToggle ? null : 
                         <div className={cardstyles.lta_detail}>
-                            <span className={`lta_${webpartID}_card_detail_label`}>{Group1Name}</span>
+                            <span className={`lta_${webpartID}_card_detail_label`}>{GroupAName}</span>
                             <div className={cardstyles.lta__card_group_items}>
-                                {serviceObj.Group1?.map((item,idx) => 
-                                <span key={idx} className={`lta_${webpartID}_card_detail_group1_item`}>{item}</span>
+                                {serviceObj.GroupA?.map((item,idx) => 
+                                <span key={idx} className={`lta_${webpartID}_card_detail_GroupA_item`}>{item}</span>
                                 )}
                             </div>
                         </div>
                         }
-                        {!cardGroup2Toggle ? null :
+                        {!cardGroupBToggle ? null :
                         <div className={cardstyles.lta_detail}>
-                            <span className={`lta_${webpartID}_card_detail_label`}>{Group2Name}</span>
+                            <span className={`lta_${webpartID}_card_detail_label`}>{GroupBName}</span>
                             <div className={cardstyles.lta__card_group_items}>
-                                {serviceObj.Group2?.map((item,idx) => 
-                                <span key={idx} className={`lta_${webpartID}_card_detail_group2_item`}>{item}</span>
+                                {serviceObj.GroupB?.map((item,idx) => 
+                                <span key={idx} className={`lta_${webpartID}_card_detail_GroupB_item`}>{item}</span>
                                 )}
                             </div>
                         </div>
                         }
-                        {!cardGroup3Toggle ? null :
+                        {!cardGroupCToggle ? null :
                         <div className={cardstyles.lta_detail}>
-                            <span className={`lta_${webpartID}_card_detail_label`}>{Group3Name}</span>
+                            <span className={`lta_${webpartID}_card_detail_label`}>{GroupCName}</span>
                             <div className={cardstyles.lta__card_group_items}>
-                                {serviceObj.Group2?.map((item,idx) => 
-                                <span key={idx} className={`lta_${webpartID}_card_detail_group3_item`}>{item}</span>
+                                {serviceObj.GroupB?.map((item,idx) => 
+                                <span key={idx} className={`lta_${webpartID}_card_detail_GroupC_item`}>{item}</span>
                                 )}
                             </div>
                         </div>
                         }
-                        {!cardOwnerToggle ? null :
+                        {!cardPersonAToggle ? null :
                         <div className={cardstyles.lta_detail}>
-                            <span className={`lta_${webpartID}_card_detail_label`}>{OwnerName}</span>
+                            <span className={`lta_${webpartID}_card_detail_label`}>{PersonAName}</span>
                             <Person 
-                                personQuery={`${owner}`} 
+                                personQuery={`${PersonA}`} 
                                 view={ViewType.threelines} 
-                                showPresence={cardOwnerPresenceToggle} 
+                                showPresence={cardPersonAPresenceToggle} 
                                 personCardInteraction={1}
                                 avatarSize='large'
                                 ></Person>  
