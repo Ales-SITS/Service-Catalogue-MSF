@@ -52,11 +52,13 @@ export default function ListtoApp () {
       subcatFilterToggle,
       sortingToggle,
       groupingToggle,
+      nestedGrouping,
 
       cardsPerRow,
       webpartID,
     } = settings
 
+    const subcategoryIncluded = colroles?.some(role => role.role === "Subcategory" )
 
     const [servicesList,setServicesList] = useState<any[]>([])
     const [categoriesList,setCategoriesList] = useState<string[]>([])
@@ -258,6 +260,7 @@ export default function ListtoApp () {
       return false
     })
 
+
      return (     
       <div className={`${styles.lta} lta_${webpartID}_wrapper`}>
         <div className={`lta_${webpartID}_header`}>
@@ -283,10 +286,10 @@ export default function ListtoApp () {
         /> : null}
         {
         sortingToggle?
-        <SortByBox onSort={sortHandler}/> : null}
+        <SortByBox onSort={sortHandler} subcategoryIncluded={subcategoryIncluded}/> : null}
         {
         groupingToggle?
-        <GroupByBox onGroup={groupHandler} defaultGroupby={defaultGroupby}/>
+        <GroupByBox onGroup={groupHandler} defaultGroupby={defaultGroupby} subcategoryIncluded={subcategoryIncluded}/>
          : null}
         {grouping !== "None" && inputValue !== "" ?
         sortedGroupingArr.map((grp,idx)=>
@@ -303,6 +306,7 @@ export default function ListtoApp () {
             filteredServicesList={filteredServicesList}
             sortingAsc={sortingAsc}
             inputValue={inputValue} 
+            subcategoryIncluded={subcategoryIncluded}
             />
         ) :
         grouping !== "None" && inputValue === "" ? 
@@ -319,6 +323,7 @@ export default function ListtoApp () {
           filteredServicesList={filteredServicesList}
           sortingAsc={sortingAsc}
           inputValue={inputValue}
+          subcategoryIncluded={subcategoryIncluded}
           />
         ) :
         <div 

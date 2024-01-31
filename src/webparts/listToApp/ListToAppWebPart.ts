@@ -20,6 +20,7 @@ import { IColumnReturnProperty, PropertyFieldColumnPicker, PropertyFieldColumnPi
 import { PropertyPaneWebPartInformation } from '@pnp/spfx-property-controls/lib/PropertyPaneWebPartInformation';
 import { PropertyFieldToggleWithCallout } from '@pnp/spfx-property-controls/lib/PropertyFieldToggleWithCallout';
 import { PropertyFieldLabelWithCallout } from '@pnp/spfx-property-controls/lib/PropertyFieldLabelWithCallout';
+import { PropertyFieldMultiSelect } from '@pnp/spfx-property-controls/lib/PropertyFieldMultiSelect';
 
 //API
 import { spfi, SPFx as SPFxsp} from "@pnp/sp";
@@ -45,8 +46,14 @@ export interface IListToAppWebPartProps {
     siteurl: string;
     list: string;
     colroles: any[];
+    internalview: any[];
     multiColumn: string[];
     categories: any[];
+    internaldomain:string;
+    internalCategory: boolean;
+    internalStatus: boolean;
+    internalCategoryMultiSelect: string[];
+    internalStatusMultiSelect: string[];
 
     searchToggle: boolean;
     catFilterToggle: boolean;
@@ -65,6 +72,7 @@ export interface IListToAppWebPartProps {
     sortbyControlCSS: string;
 
     defaultGroupby: string;
+    nestedGrouping: boolean;
     groupCategoryExpanded: boolean;
     groupSubcategoryExpanded: boolean;
     groupbyCSS: string;
@@ -74,6 +82,7 @@ export interface IListToAppWebPartProps {
     cardsPerRow: number;
     cardCategoryToggle: boolean;
     cardSubcategoryToggle: boolean;
+    cardStatusToggle: boolean;
     cardGroup1Toggle: boolean;
     cardGroup2Toggle: boolean;
     cardGroup3Toggle: boolean;
@@ -144,6 +153,7 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
         statusIcons: this.properties.statusIcons,
 
         defaultGroupby: this.properties.defaultGroupby,
+        nestedGrouping: this.properties.nestedGrouping,
         groupCategoryExpanded: this.properties.groupCategoryExpanded,
         groupSubcategoryExpanded: this.properties.groupSubcategoryExpanded,
 
@@ -151,6 +161,7 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
         cardType: this.properties.cardType,
         cardCategoryToggle: this.properties.cardCategoryToggle,
         cardSubcategoryToggle: this.properties.cardSubcategoryToggle,
+        cardStatusToggle: this.properties.cardStatusToggle, 
         cardGroup1Toggle: this.properties.cardGroup1Toggle,
         cardGroup2Toggle: this.properties.cardGroup2Toggle,
         cardGroup3Toggle: this.properties.cardGroup3Toggle,
@@ -185,6 +196,7 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
     try {
       const columns = await listSite.lists.getById(`${this.properties.list}`).fields()
       this.columns = columns
+      this.filterColumns()
     } catch (error) {
       console.log('Error fetching columns:', error)
     } 
@@ -230,6 +242,7 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
   because they might see seemingly different choices than they have selected.
   With this middle step, the application picks columns by ID which is the safest and the PropertyFieldCollectionData can then handle the full column object.
   */
+
   public filterColumns(){
       const filtered = this.columns.filter(column => this.properties.multiColumn.includes(column.Id))
       this.filteredColumns = filtered
@@ -281,13 +294,13 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
               groupName: "General settings",
               groupFields: [
                 PropertyPaneTextField('header', {
-                  label: "1. App header"
+                  label: "1. App name"
                 }),
                 PropertyPaneTextField('siteurl', {
                   label: "2. List site url"
                 }),
                 PropertyFieldListPicker('list', {
-                  label: '3. Select a list',
+                  label: '3. List selection',
                   selectedList: this.properties.list,
                   includeHidden: false,
                   orderBy: PropertyFieldListPickerOrderBy.Title,
@@ -305,7 +318,7 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
                   disabled: this.properties.siteurl !== "" ? false : true 
                 }),
                 PropertyFieldColumnPicker('multiColumn', {
-                  label: '4. Select columns',
+                  label: '4. Columns selection',
                   context: this.context,
                   selectedColumn: this.properties.multiColumn,
                   listId: this.properties.list,
@@ -326,10 +339,10 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
                 }),
                 PropertyFieldCollectionData("colroles", {
                   key: "colroles",
-                  label: "5. Set columns roles",
-                  panelHeader: "Columns roles",
+                  label: "5. Column roles settings",
+                  panelHeader: "Column roles",
                   panelDescription: "This application provides a predefined list of roles that you can assign to the columns selected in the previous step. These roles define the functions of each column within the application. For sorting and grouping, utilize roles such as Category, Subcategory, or Status. Each role can be applied only once.",
-                  manageBtnLabel: "Columns roles",
+                  manageBtnLabel: "Column roles",
                   value: this.properties.colroles,
                   panelProps: {
                     customWidth: "300px",
@@ -405,10 +418,43 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
                     },
                   ],
                   disabled: this.properties.multiColumn.length < 1
-                })
-                
+                })   
               ]
             },
+            {
+              groupName: "Internal view",
+              groupFields: [
+                PropertyPaneTextField('internaldomain', {
+                  label: "Apply internal view to a domain (i.e. sits.msf.org)"
+                }),
+                PropertyPaneToggle('internalCategory',{
+                  label: 'Internal view applied on Category role',
+                  onText: 'On',
+                  offText: 'Off',
+                }),
+                PropertyFieldMultiSelect('internalCategoryMultiSelect', {
+                  key: 'multiSelectCategory',
+                  label: "Select categories limited to the domain",
+                  options: this.categories?.map(item => {
+                      return { key: item, text: item };
+                    }),   
+                  selectedKeys: this.properties.internalCategoryMultiSelect
+                }),
+                PropertyPaneToggle('internalStatus',{
+                  label: 'Internal view applied on Status role',
+                  onText: 'On',
+                  offText: 'Off',
+                }),
+                PropertyFieldMultiSelect('internalStatusMultiSelect', {
+                  key: 'multiSelectStatus',
+                  label: "Select statuses limited to the domain",
+                  options: this.statuses?.map(item => {
+                    return { key: item, text: item };
+                  }),   
+                  selectedKeys: this.properties.internalStatusMultiSelect
+                }),
+              ]
+            }      
           ]
         },
         {
@@ -496,6 +542,7 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
                   key: "catIcons",
                   label: "Set Categories filteres visuals",
                   panelHeader: "Categories icons",
+                  panelDescription: "You can choose between fluent UI icons or custom icons via URL link. If you check 'Include custom icon', fluent UI icon won't be applied.",
                   manageBtnLabel: "Categories icons",
                   value: this.properties.catIcons,
                     fields: [
@@ -509,20 +556,32 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
                       },
                       {
                         id: "cat_icon",
-                        title: "Select icon",
+                        title: "Select fluent UI icon",
                         iconFieldRenderMode: "picker",
                         type: CustomCollectionFieldType.fabricIcon,
                       },
                       {
                         id: "cat_icon_color",
-                        title: "Select icon color",
+                        title: "Select fluent UI icon color",
                         type: CustomCollectionFieldType.color,
                       },
                       {
                         id: "cat_icon_bg",
-                        title: "Select icon background",
+                        title: "Select fluent UI icon background",
                         type: CustomCollectionFieldType.color,
-                      }                  
+                      },
+                      {
+                        id: "cat_icon_toggle",
+                        title: "Include custom icon?",
+                        type: CustomCollectionFieldType.boolean,
+                        defaultValue: false,
+                      },
+                      {
+                        id: "cat_icon_custom",
+                        title: "Custom Icon Url",
+                        iconFieldRenderMode: "picker",
+                        type: CustomCollectionFieldType.url,
+                      },                  
                   ],
                   disabled: this.properties.colroles?.filter(col => col.role === "Category").length < 1 || this.categories.length === 0
                 }),
@@ -564,7 +623,19 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
                         id: "subcat_icon_bg",
                         title: "Select icon background",
                         type: CustomCollectionFieldType.color,
-                      }                     
+                      },
+                      {
+                        id: "subcat_icon_toggle",
+                        title: "Include custom icon?",
+                        type: CustomCollectionFieldType.boolean,
+                        defaultValue: false,
+                      },
+                      {
+                        id: "subcat_icon_custom",
+                        title: "Custom Icon Url",
+                        iconFieldRenderMode: "picker",
+                        type: CustomCollectionFieldType.url,
+                      },                      
                   ],
                   disabled: this.properties.colroles?.filter(col => col.role === "Subcategory").length < 1 || this.subcategories.length === 0
                 }),
@@ -607,7 +678,19 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
                         id: "status_icon_bg",
                         title: "Select icon background",
                         type: CustomCollectionFieldType.color,
-                      }                  
+                      },
+                      {
+                        id: "status_icon_toggle",
+                        title: "Include custom icon?",
+                        type: CustomCollectionFieldType.boolean,
+                        defaultValue: false,
+                      },
+                      {
+                        id: "status_icon_custom",
+                        title: "Custom Icon Url",
+                        iconFieldRenderMode: "picker",
+                        type: CustomCollectionFieldType.url,
+                      }                 
                   ],
                   disabled: this.properties.colroles?.filter(col => col.role === "Status").length < 1 || this.statuses.length === 0
                 }),
@@ -662,7 +745,12 @@ export default class ListToAppWebPart extends BaseClientSideWebPart<IListToAppWe
                   /*{key: "Status", text: "Status"},
                     {key: "Owner", text: "Owner"}*/
                   ]
-                })
+                }),
+                PropertyPaneToggle('nestedGrouping',{
+                  label: 'Nested subcategories grouping (items grouped also by nested subcategories)',
+                  onText: 'On',
+                  offText: 'Off',
+                }),
               ]
             },
             {

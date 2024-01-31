@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { createContext} from "react";
+import { createContext, useEffect, useState} from "react";
 
 import ListToApp from "./ListToApp"
 import { spfi, SPFx as SPFxsp} from "@pnp/sp";
@@ -12,9 +12,22 @@ export const AppContext = createContext<any>(null);
 export default function ListToAppContext (props) {
    
     const {colroles, context } = props
+    const [internalDomain, setInternalDomain] = useState(false)
 
     const sp = spfi().using(SPFxsp(context))
     const graph = graphfi().using(SPFxGraph(context))
+
+    useEffect(()=>{
+        console.log("triggered")
+        getCurrentUser()
+      },[])
+    
+      const getCurrentUser = async() => {
+        console.log("triggered 2")
+        const current_user = await graph.me();
+        console.log(current_user.userPrincipalName.split("@")[1])
+      }
+
 
     const roles = {
         title : colroles?.filter(col => col.role === "Title")[0],

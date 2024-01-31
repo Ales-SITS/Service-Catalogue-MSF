@@ -9,6 +9,8 @@ export default function GroupByByBox (props) {
     const {settings} = useContext(AppContext)
     const {webpartID} = settings
 
+    const {subcategoryIncluded} = props
+
     const [groupedbyHidden, setGroupedbyHidden] = useState(true)
     const groupedbyHiddenHandler = () => {
       setGroupedbyHidden(current => !current)
@@ -31,7 +33,7 @@ export default function GroupByByBox (props) {
 
     const groupingOptions = [
       [roles.category?.role ? roles.category?.role : "Category" , roles.category?.name ? roles.category.name : "Category"],
-      [roles.subcategory?.role ? roles.subcategory?.role : "Subcategory", roles.subcategory?.name ? roles.subcategory.name : "Subcategory"]
+      [roles.subcategory?.role ? roles.subcategory?.role : "Subcategory", roles.subcategory?.name ? roles.subcategory.name : "Subcategory"] 
     ]
 
     return (
@@ -48,7 +50,9 @@ export default function GroupByByBox (props) {
             opacity: `${groupedbyHidden ?  "0" : "1"}`
           }}
         >
-                {groupingOptions.map((option,idx) => 
+
+          {subcategoryIncluded === true ? 
+                groupingOptions.map((option,idx) => 
                   <button 
                     className={option[0] !== groupby[0] ? `lta_${webpartID}_groupby_choice` : `lta_${webpartID}_groupby_choice lta_${webpartID}_groupby_choice_selected`} 
                     key={idx} 
@@ -56,8 +60,15 @@ export default function GroupByByBox (props) {
                     >
                       {option[1]}
                   </button>
-                )}
-                
+                )   : 
+                <button 
+                    className={groupingOptions[0][0] !== groupby[0] ? `lta_${webpartID}_groupby_choice` : `lta_${webpartID}_groupby_choice lta_${webpartID}_groupby_choice_selected`} 
+              
+                    onClick={()=>groupByHandler(groupingOptions[0])}
+                    >
+                      {groupingOptions[0][1]}
+                  </button>
+                }       
         </div>
    
     </div>

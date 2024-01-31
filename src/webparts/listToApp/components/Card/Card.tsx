@@ -33,6 +33,7 @@ export default function Card (props:any) {
       webpartID,
       cardCategoryToggle,
       cardSubcategoryToggle,
+      cardStatusToggle
     } = settings
    
     const serviceObj = {
@@ -79,6 +80,7 @@ export default function Card (props:any) {
                          statusIcons?.find(stat => stat.status === service[cr.status]) :
                          statusIcons?.find(stat => stat.status === "default")         
 
+
     return (
         <div 
           className={contentHidden ? `lta_${webpartID}_card_wrapper` : `lta_${webpartID}_card_wrapper lta_${webpartID}_card_wrapper_opened`}
@@ -88,7 +90,13 @@ export default function Card (props:any) {
             onClick={contentHiddenHandler}>
               <h2 className={`lta_${webpartID}_card_title`}>{service[cr.title]}</h2>   
               <div className={cardstyles.lta__card_iconbox}>
-                {!cardSubcategoryToggle ? null :
+                {
+                !cardSubcategoryToggle ? null :
+                subcatIconName.subcat_icon_toggle === true ? 
+                <img 
+                  className={cardstyles.lta_icon}
+                  src={subcatIconName.subcat_icon_custom}
+                /> :
                 <Icon 
                   iconName={subcatIconName.subcat_icon} 
                   title={serviceObj.subcategory}
@@ -97,8 +105,15 @@ export default function Card (props:any) {
                     color: `${catIconName.cat_icon_color}`,
                     backgroundColor: `${catIconName.cat_icon_bg}`,
                   }}
-                />}
+                /> 
+             
+                }
                 {!cardCategoryToggle ? null :
+                  catIconName.cat_icon_toggle === true ? 
+                <img 
+                  className={cardstyles.lta_icon}
+                  src={catIconName.cat_icon_custom}
+                /> :
                 <Icon 
                   iconName={catIconName.cat_icon} 
                   title={serviceObj.category}
@@ -109,6 +124,12 @@ export default function Card (props:any) {
                   }}
                 />}
                 {
+                !cardStatusToggle ? null :
+                 statIconName.status_icon_toggle === true ? 
+                   <img 
+                     className={cardstyles.lta_icon}
+                     src={statIconName.status_icon_custom}
+                   /> :
                 <Icon 
                       iconName={statIconName.status_icon} 
                       title={serviceObj.status}

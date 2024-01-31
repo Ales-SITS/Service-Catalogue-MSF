@@ -16,14 +16,23 @@ export default function SubcatIconStyled (props:any) {
                             subcatIcons?.find(subcat => subcat.subcategory === subcategory) :
                             subcatIcons?.find(subcat => subcat.subcategory === "default")
 
+                           
     return (
-                <Icon 
+        <>      
+        {subcatIconName.subcat_icon_toggle === true ? 
+        <img 
+        src={subcatIconName.subcat_icon_custom}
+        className={`lta_${webpartID}_subcategory_icon_custom`}
+        />
+        :
+          <Icon 
                 iconName={subcatIconName.subcat_icon} 
                   className={`lta_${webpartID}_subcategory_icon`}
                   style={{
                     color: `${subcatIconName.subcat_icon_color}`,
                     backgroundColor: `${subcatIconName.subcat_icon_bg}`,              
                     }}/>
-
+                  }
+       </>
     );
   }

@@ -27,7 +27,7 @@ export default function ServiceCategories (props) {
       //props.onCheckChange(new Array(subcategoriesList.length).fill(true)) //causes loop
   },[subcategoriesList.length])
   
-
+  console.log(subcategoriesList)
 
   return (
          <ul className={`lta_${webpartID}_subcategory_block`}>
@@ -39,7 +39,7 @@ export default function ServiceCategories (props) {
                 onClick={() => handleOnChange(idx)}
               > 
                    <SubcatIconStyled
-                      category={subcategory}
+                      subcategory={subcategory}
                     />
                 <span className={`lta_${webpartID}_subcategory_label`}>{subcategory}</span>
                 <input

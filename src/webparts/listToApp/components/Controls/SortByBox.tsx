@@ -9,6 +9,8 @@ export default function SortByBox (props) {
     const {settings} = useContext(AppContext)
     const {webpartID} = settings
 
+    const {subcategoryIncluded} = props
+
     const [sortedbyHidden, setSortedbyHidden] = useState(true)
     const sortedbyHiddenHandler = () => {
       setSortedbyHidden(current => !current)
@@ -37,6 +39,13 @@ export default function SortByBox (props) {
       [roles.status?.role ? roles.status?.role : "Status", roles.status?.name ? roles.status.name : "Status"]
     ]
 
+    const sortingOptionsB = [
+      [roles.title?.role ? roles.title?.role : "Title", roles.title?.name ? roles.title.name : "Title"],
+      [roles.category?.role ? roles.category?.role : "Category", roles.category?.name ? roles.category.name : "Category"],
+      [roles.status?.role ? roles.status?.role : "Status", roles.status?.name ? roles.status.name : "Status"]
+    ]
+
+
     return (
       <div className={`lta_${webpartID}_sortby_box`}>
       <button
@@ -50,7 +59,10 @@ export default function SortByBox (props) {
           opacity: `${sortedbyHidden ?  "0" : "1"}`
         }}
         >
-                {sortingOptions.map((option,idx) => 
+
+{subcategoryIncluded === true ? 
+
+              sortingOptions.map((option,idx) => 
                   <button 
                     className={option[0] !== sortedby[0] ? `lta_${webpartID}_sortby_choice` : `lta_${webpartID}_sortby_choice lta_${webpartID}_sortby_choice_selected`} 
                     key={idx} 
@@ -58,7 +70,18 @@ export default function SortByBox (props) {
                       >
                       {option[1]} {option[0] !== sortedby[0] ? "↓" : sortedbyAsc ? "↓" : "↑"}
                   </button>
-                )}
+                ) :
+                sortingOptionsB.map((option,idx) => 
+                <button 
+                  className={option[0] !== sortedby[0] ? `lta_${webpartID}_sortby_choice` : `lta_${webpartID}_sortby_choice lta_${webpartID}_sortby_choice_selected`} 
+                  key={idx} 
+                  onClick={()=>sortedByHandler(option)}
+                    >
+                    {option[1]} {option[0] !== sortedby[0] ? "↓" : sortedbyAsc ? "↓" : "↑"}
+                </button>
+              ) }
+
+
                 
         </div>
    

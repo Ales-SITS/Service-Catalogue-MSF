@@ -25,7 +25,7 @@ export default function CardContent (props) {
         catIconName,
         subcatIconName,
         statIconName,
-        owner
+        owner,
     } = props;
 
     const {
@@ -33,6 +33,7 @@ export default function CardContent (props) {
         webpartID,
         cardCategoryToggle,
         cardSubcategoryToggle,
+        cardStatusToggle,
         cardGroup1Toggle,
         cardGroup2Toggle,
         cardGroup3Toggle,
@@ -69,6 +70,12 @@ export default function CardContent (props) {
                             <div className={cardstyles.lta_detail}>
                                 <span className={`lta_${webpartID}_card_detail_label`}>{categoryName}</span>
                                 <span className={`lta_${webpartID}_card_detail_value`}>
+                                    {
+                                        catIconName.cat_icon_toggle === true ? 
+                                        <img 
+                                          className={cardstyles.lta_icon}
+                                          src={catIconName.cat_icon_custom}
+                                        /> :
                                     <Icon 
                                     iconName={catIconName.cat_icon} 
                                     className={cardstyles.lta_icon}
@@ -77,6 +84,7 @@ export default function CardContent (props) {
                                         backgroundColor: `${catIconName.cat_icon_bg}`,
                                       }}
                                     />
+                                    }
                                     {serviceObj.category}
                                 </span>
                             </div>
@@ -85,14 +93,20 @@ export default function CardContent (props) {
                             <div className={cardstyles.lta_detail}>
                                 <span className={`lta_${webpartID}_card_detail_label`}>{subcategoryName}</span>
                                 <span className={`lta_${webpartID}_card_detail_value`}>
-                                    <Icon 
-                                    iconName={subcatIconName.subcat_icon}
-                                    className={cardstyles.lta_icon}
-                                    style={{
-                                        color: `${catIconName.cat_icon_color}`,
-                                        backgroundColor: `${catIconName.cat_icon_bg}`,
-                                    }}
-                                    />
+                                    {
+                                    subcatIconName.subcat_icon_toggle === true ? 
+                                        <img 
+                                        className={cardstyles.lta_icon}
+                                        src={subcatIconName.subcat_icon_custom}
+                                        /> :
+                                        <Icon 
+                                        iconName={subcatIconName.subcat_icon}
+                                        className={cardstyles.lta_icon}
+                                        style={{
+                                            color: `${catIconName.cat_icon_color}`,
+                                            backgroundColor: `${catIconName.cat_icon_bg}`,
+                                        }}
+                                    />}
                                     {serviceObj.subcategory}
                                 </span>                           
                             </div>
@@ -141,15 +155,21 @@ export default function CardContent (props) {
                         </div> }
                     </div>      
                     <div className={cardstyles.lta_details_link}>
-                        <Icon 
-                            iconName={statIconName.status_icon} 
-                            title={serviceObj.status}
-                            className={cardstyles.lta_icon}
-                            style={{
-                                color: `${statIconName.status_icon_color}`,
-                                backgroundColor: `${statIconName.status_icon_bg}`,
-                                fontSize: '18px'
-                        }}/>
+                        {statIconName.status_icon_toggle === true ? 
+                            <img 
+                                className={cardstyles.lta_icon}
+                                src={statIconName.status_icon_custom}
+                            /> :
+                            <Icon 
+                                iconName={statIconName.status_icon} 
+                                title={serviceObj.status}
+                                className={cardstyles.lta_icon}
+                                style={{
+                                    color: `${statIconName.status_icon_color}`,
+                                    backgroundColor: `${statIconName.status_icon_bg}`,
+                                    fontSize: '18px'
+                            }}/>
+                        }
                         {!cardLinkToggle ? null : 
                         serviceObj.link === null ? null :
                             <a 

@@ -25,7 +25,8 @@ export default function Grouped (props) {
       filteredResults,
       filteredServicesList,
       sortingAsc,
-      inputValue
+      inputValue,
+      subcategoryIncluded
     } = props;
 
     const {
@@ -33,6 +34,7 @@ export default function Grouped (props) {
       cardsPerRow,
       catIcons,
       subcatIcons,
+      nestedGrouping,
       groupCategoryExpanded,
       groupSubcategoryExpanded
     } = settings;
@@ -41,7 +43,6 @@ export default function Grouped (props) {
     const groupExpandedHandler = () => {
       setGroupExpanded(current => !current)
     }
-
   
     const groupedServices = filteredServicesList
     .sort((a,b)=> a[sorting] > b[sorting] ? sortingAsc*1 : -sortingAsc*1)
@@ -88,22 +89,34 @@ export default function Grouped (props) {
               level === 1 ? 
               `lta_${webpartID}_groupbyCategory_heading` : 
               `lta_${webpartID}_groupbySubcategory_heading`
-
             } 
             onClick={groupExpandedHandler}>
             <div>
               <span>{groupExpanded ? "▸ " : "▿ "} </span>
               <span>{grp} </span>
               <span>
-                ({level === 1 ? 
-                uniqueSubcategories.length : inputValue!==""? 
-                filteredResults.filter(service => service[cr.subcategory] === grp).length :
-                filteredServicesList.filter(service => service[cr.subcategory] === grp).length
+                ({
+                level === 1 && subcategoryIncluded === true? 
+                uniqueSubcategories.length : 
+                level === 1 && subcategoryIncluded === false ?
+                  inputValue!=="" ? 
+                  filteredResults.filter(service => service[cr.category] === grp).length :
+                  filteredServicesList.filter(service => service[cr.category] === grp).length :
+                level !== 1 ? 
+                  inputValue!=="" ? 
+                  filteredResults.filter(service => service[cr.subcategory] === grp).length :
+                  filteredServicesList.filter(service => service[cr.subcategory] === grp).length :
+                  null
                 })
               </span>
             </div>
             {
               level === 1 ? 
+              catIconName.cat_icon_toggle === true ? 
+              <img 
+                  className={`lta_${webpartID}_groupby_category_icon`}
+                  src={catIconName.cat_icon_custom}
+                /> :
               <Icon 
               iconName={catIconName.cat_icon} 
               className={`lta_${webpartID}_groupby_category_icon`}
@@ -113,6 +126,12 @@ export default function Grouped (props) {
               }}
               /> :
               <div>
+                {
+                subcatIconName.subcat_icon_toggle === true ? 
+                <img 
+                  className={`lta_${webpartID}_groupby_subcategory_icon`}
+                  src={subcatIconName.subcat_icon_custom}
+                />:
                 <Icon 
                   iconName={subcatIconName.subcat_icon} 
                   className={`lta_${webpartID}_groupby_subcategory_icon`}
@@ -121,6 +140,13 @@ export default function Grouped (props) {
                     backgroundColor: `${catGrpIconName.cat_icon_bg}`,
                   }}
                 />
+                }
+                {
+                catIconName.cat_icon_toggle === true ? 
+                <img 
+                  className={`lta_${webpartID}_groupby_subcategory_icon`}
+                  src={catIconName.cat_icon_custom}
+                /> :
                 <Icon 
                   iconName={catIconInSubcat.cat_icon} 
                   className={`lta_${webpartID}_groupby_subcategory_icon`}
@@ -129,11 +155,12 @@ export default function Grouped (props) {
                     backgroundColor: `${catGrpIconName.cat_icon_bg}`,
                   }}
                 />
+                }
               </div>
             }
           </button>
           {groupExpanded ? 
-           level === 1 && inputValue !== "" ? 
+           level === 1 && subcategoryIncluded === true && nestedGrouping === true && inputValue !== "" ? 
            uniqueSubcategories.map((subcat,idx)=>
             filteredResults.filter(service => service[cr.subcategory] === subcat).length < 1 ? null : 
             <Grouped
@@ -148,9 +175,10 @@ export default function Grouped (props) {
               filteredServicesList={filteredServicesList}
               sortingAsc={sortingAsc}
               inputValue={inputValue}
+              subcategoryIncluded={subcategoryIncluded}
             />) :
-            level === 1 && inputValue === "" ? 
-            uniqueSubcategories.map((subcat,idx)=>
+           level === 1 && subcategoryIncluded === true && nestedGrouping === true && inputValue === "" ? 
+           uniqueSubcategories.map((subcat,idx)=>
              <Grouped
                key={idx}
                level={2}
@@ -163,7 +191,27 @@ export default function Grouped (props) {
                filteredServicesList={filteredServicesList}
                sortingAsc={sortingAsc}
                inputValue={inputValue}
-             />) :
+               subcategoryIncluded={subcategoryIncluded}
+            />) :
+           level === 1 && inputValue !== "" ?
+           filteredResults
+              .sort((a,b)=> a[sorting] > b[sorting] ? sortingAsc*1 : -sortingAsc*1)
+              .filter(service => service[cr.category] === grp)
+              .map((service,idx)=>
+              <Card 
+                  key={`${idx}_${service.Title}`} 
+                  service={service} 
+              /> ) :
+            level === 1 && inputValue === "" ?
+            filteredServicesList
+              .sort((a,b)=> a[sorting] > b[sorting] ? sortingAsc*1 : -sortingAsc*1)
+              .filter(service => service[cr.category] === grp)
+              .map((service,idx)=>
+              <Card 
+                  key={`${idx}_${service.Title}`} 
+                  service={service} 
+              /> ) :
+            
           <div 
             className={styles.service_catalogue_results}
             style={{
